@@ -174,6 +174,104 @@ export async function registerRoutes(
     }
   });
 
+  // Admin Auth API
+  app.post("/api/admin/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email e senha sao obrigatorios" });
+      }
+      
+      const user = await storage.validatePassword(email, password);
+      if (!user) {
+        return res.status(401).json({ error: "Email ou senha incorretos" });
+      }
+      
+      if (!user.isAdmin) {
+        return res.status(403).json({ error: "Acesso restrito a administradores" });
+      }
+      
+      const session = await storage.createAdminSession(user.id);
+      
+      res.cookie("admin_session", session.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      
+      res.json({ 
+        id: user.id, 
+        email: user.email, 
+        firstName: user.firstName, 
+        lastName: user.lastName,
+        isAdmin: user.isAdmin 
+      });
+    } catch (error) {
+      console.error("Error admin login:", error);
+      res.status(500).json({ error: "Falha ao fazer login" });
+    }
+  });
+
+  app.get("/api/admin/me", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        res.clearCookie("admin_session");
+        return res.status(401).json({ error: "Sessao invalida ou expirada" });
+      }
+      
+      res.json({ 
+        id: session.user.id, 
+        email: session.user.email, 
+        firstName: session.user.firstName, 
+        lastName: session.user.lastName,
+        isAdmin: session.user.isAdmin 
+      });
+    } catch (error) {
+      console.error("Error checking admin session:", error);
+      res.status(500).json({ error: "Falha ao verificar sessao" });
+    }
+  });
+
+  app.post("/api/admin/logout", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (sessionId) {
+        await storage.deleteAdminSession(sessionId);
+      }
+      res.clearCookie("admin_session");
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error admin logout:", error);
+      res.status(500).json({ error: "Falha ao fazer logout" });
+    }
+  });
+
+  app.post("/api/admin/seed", async (req: Request, res: Response) => {
+    try {
+      if (process.env.NODE_ENV === "production") {
+        return res.status(403).json({ error: "Nao disponivel em producao" });
+      }
+      
+      const admin = await storage.seedAdminUser();
+      res.json({ 
+        message: "Admin criado/encontrado", 
+        email: admin.email,
+        hint: "Senha padrao: admin123" 
+      });
+    } catch (error) {
+      console.error("Error seeding admin:", error);
+      res.status(500).json({ error: "Falha ao criar admin" });
+    }
+  });
+
   // Site Settings API
   app.get("/api/settings", async (req: Request, res: Response) => {
     try {

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Save, Plus, Trash2, Edit2, Image, Settings, Package, LayoutDashboard } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Edit2, Image, Settings, Package, LayoutDashboard, LogOut, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,6 +26,14 @@ interface Product {
   category?: string;
 }
 
+interface AdminUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isAdmin: boolean;
+}
+
 interface AdminPageProps {
   onBack: () => void;
 }
@@ -42,7 +50,110 @@ const defaultSettings = {
   footerText: "2024 NeonKeys. Todos os direitos reservados.",
 };
 
-export default function AdminPage({ onBack }: AdminPageProps) {
+function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) => void }) {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const loginMutation = useMutation({
+    mutationFn: () => api.adminLogin(email, password),
+    onSuccess: (data) => {
+      toast({ title: "Bem-vindo!", description: `Ola, ${data.firstName}!` });
+      onLoginSuccess(data);
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: "Erro", 
+        description: error.message || "Email ou senha incorretos",
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const seedMutation = useMutation({
+    mutationFn: () => api.seedAdmin(),
+    onSuccess: (data) => {
+      toast({ 
+        title: "Admin Criado", 
+        description: `Email: ${data.email} - Senha: admin123` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao criar admin", variant: "destructive" });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    loginMutation.mutate();
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <Lock className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle>Painel Administrativo</CardTitle>
+          <CardDescription>Entre com suas credenciais de administrador</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="admin-email">Email</Label>
+              <Input
+                id="admin-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@exemplo.com"
+                required
+                data-testid="input-admin-email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="admin-password">Senha</Label>
+              <Input
+                id="admin-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Sua senha"
+                required
+                data-testid="input-admin-password"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={loginMutation.isPending}
+              data-testid="button-admin-login"
+            >
+              {loginMutation.isPending ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
+          <div className="mt-4 pt-4 border-t border-border">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => seedMutation.mutate()}
+              disabled={seedMutation.isPending}
+              data-testid="button-seed-admin"
+            >
+              {seedMutation.isPending ? "Criando..." : "Criar Usuario Admin Padrao"}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Cria um admin com email: admin@neonkeys.com e senha: admin123
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogout: () => void; onBack: () => void }) {
   const { toast } = useToast();
   const [settings, setSettings] = useState(defaultSettings);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -77,6 +188,14 @@ export default function AdminPage({ onBack }: AdminPageProps) {
       }));
     }
   }, [savedSettings]);
+
+  const logoutMutation = useMutation({
+    mutationFn: () => api.adminLogout(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/me"] });
+      onLogout();
+    },
+  });
 
   const saveSettingsMutation = useMutation({
     mutationFn: (newSettings: Record<string, string>) => api.saveSettings(newSettings),
@@ -171,10 +290,24 @@ export default function AdminPage({ onBack }: AdminPageProps) {
               <h1 className="text-lg font-bold">Painel Administrativo</h1>
             </div>
           </div>
-          <Button onClick={handleSaveSettings} disabled={saveSettingsMutation.isPending} data-testid="button-save-settings">
-            <Save className="h-4 w-4 mr-2" />
-            {saveSettingsMutation.isPending ? "Salvando..." : "Salvar Tudo"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              {admin.firstName} {admin.lastName}
+            </span>
+            <Button onClick={handleSaveSettings} disabled={saveSettingsMutation.isPending} data-testid="button-save-settings">
+              <Save className="h-4 w-4 mr-2" />
+              {saveSettingsMutation.isPending ? "Salvando..." : "Salvar Tudo"}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => logoutMutation.mutate()}
+              disabled={logoutMutation.isPending}
+              data-testid="button-admin-logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -530,9 +663,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                     <Label>Nome</Label>
                                     <Input
                                       value={editingProduct.name}
-                                      onChange={(e) =>
-                                        setEditingProduct({ ...editingProduct, name: e.target.value })
-                                      }
+                                      onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                                       data-testid="input-edit-product-name"
                                     />
                                   </div>
@@ -540,9 +671,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                     <Label>URL da Imagem</Label>
                                     <Input
                                       value={editingProduct.imageUrl}
-                                      onChange={(e) =>
-                                        setEditingProduct({ ...editingProduct, imageUrl: e.target.value })
-                                      }
+                                      onChange={(e) => setEditingProduct({ ...editingProduct, imageUrl: e.target.value })}
                                       data-testid="input-edit-product-image"
                                     />
                                   </div>
@@ -551,11 +680,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                       <Label>Plataforma</Label>
                                       <Select
                                         value={editingProduct.platform}
-                                        onValueChange={(v) =>
-                                          setEditingProduct({ ...editingProduct, platform: v })
-                                        }
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, platform: v })}
                                       >
-                                        <SelectTrigger data-testid="select-edit-product-platform">
+                                        <SelectTrigger>
                                           <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -572,11 +699,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                       <Label>Regiao</Label>
                                       <Select
                                         value={editingProduct.region}
-                                        onValueChange={(v) =>
-                                          setEditingProduct({ ...editingProduct, region: v })
-                                        }
+                                        onValueChange={(v) => setEditingProduct({ ...editingProduct, region: v })}
                                       >
-                                        <SelectTrigger data-testid="select-edit-product-region">
+                                        <SelectTrigger>
                                           <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -593,9 +718,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                       <Label>Preco</Label>
                                       <Input
                                         value={editingProduct.price}
-                                        onChange={(e) =>
-                                          setEditingProduct({ ...editingProduct, price: e.target.value })
-                                        }
+                                        onChange={(e) => setEditingProduct({ ...editingProduct, price: e.target.value })}
                                         data-testid="input-edit-product-price"
                                       />
                                     </div>
@@ -603,9 +726,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                       <Label>Preco Original</Label>
                                       <Input
                                         value={editingProduct.originalPrice}
-                                        onChange={(e) =>
-                                          setEditingProduct({ ...editingProduct, originalPrice: e.target.value })
-                                        }
+                                        onChange={(e) => setEditingProduct({ ...editingProduct, originalPrice: e.target.value })}
                                         data-testid="input-edit-product-original-price"
                                       />
                                     </div>
@@ -614,23 +735,35 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                                       <Input
                                         type="number"
                                         value={editingProduct.discount}
-                                        onChange={(e) =>
-                                          setEditingProduct({
-                                            ...editingProduct,
-                                            discount: parseInt(e.target.value) || 0,
-                                          })
-                                        }
+                                        onChange={(e) => setEditingProduct({ ...editingProduct, discount: parseInt(e.target.value) || 0 })}
                                         data-testid="input-edit-product-discount"
                                       />
                                     </div>
                                   </div>
                                   <div className="space-y-2">
+                                    <Label>Categoria</Label>
+                                    <Select
+                                      value={editingProduct.category || ""}
+                                      onValueChange={(v) => setEditingProduct({ ...editingProduct, category: v })}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Selecione" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="action">Acao</SelectItem>
+                                        <SelectItem value="adventure">Aventura</SelectItem>
+                                        <SelectItem value="rpg">RPG</SelectItem>
+                                        <SelectItem value="strategy">Estrategia</SelectItem>
+                                        <SelectItem value="sports">Esportes</SelectItem>
+                                        <SelectItem value="survival">Sobrevivencia</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="space-y-2">
                                     <Label>Descricao</Label>
                                     <Textarea
                                       value={editingProduct.description || ""}
-                                      onChange={(e) =>
-                                        setEditingProduct({ ...editingProduct, description: e.target.value })
-                                      }
+                                      onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
                                       data-testid="input-edit-product-description"
                                     />
                                   </div>
@@ -667,4 +800,42 @@ export default function AdminPage({ onBack }: AdminPageProps) {
       </main>
     </div>
   );
+}
+
+export default function AdminPage({ onBack }: AdminPageProps) {
+  const [admin, setAdmin] = useState<AdminUser | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  const { data: adminData, isLoading, error } = useQuery({
+    queryKey: ["/api/admin/me"],
+    queryFn: () => api.adminMe(),
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (adminData && !error) {
+        setAdmin(adminData);
+      }
+      setIsCheckingAuth(false);
+    }
+  }, [adminData, isLoading, error]);
+
+  const handleLogout = () => {
+    setAdmin(null);
+  };
+
+  if (isCheckingAuth || isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Verificando autenticacao...</div>
+      </div>
+    );
+  }
+
+  if (!admin) {
+    return <AdminLoginForm onLoginSuccess={(user) => setAdmin(user)} />;
+  }
+
+  return <AdminDashboard admin={admin} onLogout={handleLogout} onBack={onBack} />;
 }

@@ -150,4 +150,28 @@ export const api = {
       method: "DELETE",
     });
   },
+
+  // Admin Auth
+  adminLogin: async (email: string, password: string) => {
+    return fetchWithSession("/api/admin/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+  },
+
+  adminMe: async () => {
+    return fetchWithSession("/api/admin/me");
+  },
+
+  adminLogout: async () => {
+    return fetchWithSession("/api/admin/logout", {
+      method: "POST",
+    });
+  },
+
+  seedAdmin: async () => {
+    return fetchWithSession("/api/admin/seed", {
+      method: "POST",
+    });
+  },
 };

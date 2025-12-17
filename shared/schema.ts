@@ -53,3 +53,13 @@ export const siteSettings = pgTable("site_settings", {
 export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({ id: true });
 export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
 export type SiteSettings = typeof siteSettings.$inferSelect;
+
+export const adminSessions = pgTable("admin_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
+export const insertAdminSessionSchema = createInsertSchema(adminSessions).omit({ id: true });
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
+export type AdminSession = typeof adminSessions.$inferSelect;

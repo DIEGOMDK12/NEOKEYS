@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, products, cartItems, siteSettings, type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem, type SiteSettings } from "@shared/schema";
-import { eq, and, lte, ilike, or } from "drizzle-orm";
+import { users, products, cartItems, siteSettings, adminSessions, type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem, type SiteSettings, type AdminSession } from "@shared/schema";
+import { eq, and, lte, ilike, or, gt } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -33,6 +33,12 @@ export interface IStorage {
   getSetting(key: string): Promise<string | null>;
   setSetting(key: string, value: string): Promise<SiteSettings>;
   deleteSetting(key: string): Promise<void>;
+
+  // Admin Sessions
+  createAdminSession(userId: string): Promise<AdminSession>;
+  getAdminSession(sessionId: string): Promise<(AdminSession & { user: User }) | null>;
+  deleteAdminSession(sessionId: string): Promise<void>;
+  seedAdminUser(): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -194,6 +200,51 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSetting(key: string): Promise<void> {
     await db.delete(siteSettings).where(eq(siteSettings.key, key));
+  }
+
+  // Admin Sessions
+  async createAdminSession(userId: string): Promise<AdminSession> {
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const [session] = await db.insert(adminSessions).values({
+      userId,
+      expiresAt,
+    }).returning();
+    return session;
+  }
+
+  async getAdminSession(sessionId: string): Promise<(AdminSession & { user: User }) | null> {
+    const [session] = await db.select().from(adminSessions)
+      .where(and(
+        eq(adminSessions.id, sessionId),
+        gt(adminSessions.expiresAt, new Date())
+      ));
+    if (!session) return null;
+
+    const user = await this.getUser(session.userId);
+    if (!user || !user.isAdmin) return null;
+
+    return { ...session, user };
+  }
+
+  async deleteAdminSession(sessionId: string): Promise<void> {
+    await db.delete(adminSessions).where(eq(adminSessions.id, sessionId));
+  }
+
+  async seedAdminUser(): Promise<User> {
+    const existingAdmin = await db.select().from(users).where(eq(users.isAdmin, true));
+    if (existingAdmin.length > 0) {
+      return existingAdmin[0];
+    }
+
+    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const [admin] = await db.insert(users).values({
+      email: "admin@neonkeys.com",
+      password: hashedPassword,
+      firstName: "Admin",
+      lastName: "NeonKeys",
+      isAdmin: true,
+    }).returning();
+    return admin;
   }
 }
 
