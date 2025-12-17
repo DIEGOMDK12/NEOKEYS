@@ -99,19 +99,6 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
     },
   });
 
-  const seedMutation = useMutation({
-    mutationFn: () => api.seedAdmin(),
-    onSuccess: (data) => {
-      toast({ 
-        title: "Admin Criado", 
-        description: `Email: ${data.email} - Senha: admin123` 
-      });
-    },
-    onError: () => {
-      toast({ title: "Erro", description: "Falha ao criar admin", variant: "destructive" });
-    },
-  });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate();
@@ -162,20 +149,6 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
               {loginMutation.isPending ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-          <div className="mt-4 pt-4 border-t border-border">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => seedMutation.mutate()}
-              disabled={seedMutation.isPending}
-              data-testid="button-seed-admin"
-            >
-              {seedMutation.isPending ? "Criando..." : "Criar Usuario Admin Padrao"}
-            </Button>
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              Cria um admin com email: admin@neonkeys.com e senha: admin123
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -365,10 +365,10 @@ export class DatabaseStorage implements IStorage {
       const hashedPassword = await bcrypt.hash("506731", 10);
       const [updatedAdmin] = await db.update(users)
         .set({
-          email: "Diegomdk",
+          email: "diego.marinho.foda@gmail.com",
           password: hashedPassword,
           firstName: "Diego",
-          lastName: "mdk",
+          lastName: "Marinho",
         })
         .where(eq(users.id, admin.id))
         .returning();
@@ -377,10 +377,10 @@ export class DatabaseStorage implements IStorage {
 
     const hashedPassword = await bcrypt.hash("506731", 10);
     const [admin] = await db.insert(users).values({
-      email: "Diegomdk",
+      email: "diego.marinho.foda@gmail.com",
       password: hashedPassword,
       firstName: "Diego",
-      lastName: "mdk",
+      lastName: "Marinho",
       isAdmin: true,
     }).returning();
     return admin;
