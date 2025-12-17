@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
@@ -9,8 +9,59 @@ import AdminPage from "@/pages/AdminPage";
 import CustomerAuth from "@/pages/CustomerAuth";
 import CustomerDashboard from "@/pages/CustomerDashboard";
 import { Product } from "@/components/ProductCard";
+import { api } from "@/lib/api";
 
 type Page = "home" | "product" | "customer-login" | "customer-dashboard" | "admin";
+
+function hexToHSL(hex: string): string {
+  hex = hex.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
+function ColorApplier() {
+  const { data: settings } = useQuery({
+    queryKey: ["/api/settings"],
+    queryFn: () => api.getSettings(),
+  });
+
+  useEffect(() => {
+    if (settings?.primaryColor) {
+      const hsl = hexToHSL(settings.primaryColor);
+      document.documentElement.style.setProperty("--primary", hsl);
+      document.documentElement.style.setProperty("--ring", hsl);
+      document.documentElement.style.setProperty("--accent", hsl);
+    }
+    if (settings?.backgroundColor) {
+      const hsl = hexToHSL(settings.backgroundColor);
+      document.documentElement.style.setProperty("--background", hsl);
+    }
+    if (settings?.accentColor) {
+      const hsl = hexToHSL(settings.accentColor);
+      document.documentElement.style.setProperty("--chart-1", hsl);
+    }
+  }, [settings]);
+
+  return null;
+}
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
@@ -80,6 +131,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <ColorApplier />
         {currentPage === "home" && (
           <Home
             onNavigateToProduct={handleNavigateToProduct}

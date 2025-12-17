@@ -513,9 +513,26 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
 
           <TabsContent value="site">
             <Card>
-              <CardHeader>
-                <CardTitle>Cores e Configuracoes</CardTitle>
-                <CardDescription>Personalize as cores do seu site</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+                <div>
+                  <CardTitle>Cores e Configuracoes</CardTitle>
+                  <CardDescription>Personalize as cores do seu site</CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSettings({
+                      ...settings,
+                      backgroundColor: defaultSettings.backgroundColor,
+                      primaryColor: defaultSettings.primaryColor,
+                      accentColor: defaultSettings.accentColor,
+                    });
+                    toast({ title: "Cores restauradas", description: "As cores foram restauradas para o padrao" });
+                  }}
+                  data-testid="button-restore-colors"
+                >
+                  Restaurar Padrao
+                </Button>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
