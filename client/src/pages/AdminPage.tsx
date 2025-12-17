@@ -41,6 +41,8 @@ interface Product {
   discount: number;
   description?: string;
   category?: string;
+  galleryImages?: string[];
+  videoUrl?: string;
 }
 
 interface AdminUser {
@@ -398,6 +400,8 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     discount: 0,
     description: "",
     category: "",
+    galleryImages: [] as string[],
+    videoUrl: "",
   });
 
   const createProductMutation = useMutation({
@@ -415,6 +419,8 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
         discount: 0,
         description: "",
         category: "",
+        galleryImages: [],
+        videoUrl: "",
       });
       toast({ title: "Sucesso", description: "Produto criado com sucesso!" });
     },
@@ -598,6 +604,25 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   data-testid="input-product-description"
                 />
               </div>
+              <div className="space-y-2">
+                <Label>URL do Video (YouTube, Vimeo, etc)</Label>
+                <Input
+                  value={newProduct.videoUrl}
+                  onChange={(e) => setNewProduct({ ...newProduct, videoUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/embed/..."
+                  data-testid="input-product-video"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>URLs de Galeria (uma por linha)</Label>
+                <Textarea
+                  value={newProduct.galleryImages.join('\n')}
+                  onChange={(e) => setNewProduct({ ...newProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
+                  placeholder="https://image1.com&#10;https://image2.com&#10;https://image3.com"
+                  rows={4}
+                  data-testid="input-product-gallery"
+                />
+              </div>
               <Button
                 onClick={handleCreateProduct}
                 disabled={createProductMutation.isPending}
@@ -688,6 +713,25 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                               onChange={(e) => setEditingProduct({ ...editingProduct, originalPrice: e.target.value })}
                             />
                           </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>URL do Video</Label>
+                          <Input
+                            value={editingProduct.videoUrl || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, videoUrl: e.target.value })}
+                            placeholder="https://www.youtube.com/embed/..."
+                            data-testid="input-edit-product-video"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>URLs de Galeria (uma por linha)</Label>
+                          <Textarea
+                            value={editingProduct.galleryImages?.join('\n') || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
+                            placeholder="https://image1.com&#10;https://image2.com"
+                            rows={3}
+                            data-testid="input-edit-product-gallery"
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label>Desconto %</Label>

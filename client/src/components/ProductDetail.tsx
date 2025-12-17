@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
-import { Gamepad2 } from "lucide-react";
-import { Globe, Languages, ChevronDown, ChevronUp } from "lucide-react";
+import { Gamepad2, Play } from "lucide-react";
+import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Product } from "./ProductCard";
 
 interface ProductDetailProps {
-  product: Product;
+  product: Product & { galleryImages?: string[]; videoUrl?: string };
   description: string;
   requirements: {
     minimum: string[];
@@ -37,16 +37,112 @@ export default function ProductDetail({
   onBuyNow,
 }: ProductDetailProps) {
   const [showFullRequirements, setShowFullRequirements] = useState(false);
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const PlatformIcon = platformIcons[product.platform] || SiSteam;
+  
+  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
+
+  const handlePreviousImage = () => {
+    setCurrentGalleryIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentGalleryIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <div className="pb-24">
-      <div className="aspect-video bg-card rounded-lg overflow-hidden mb-4">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
+      <div className="space-y-4">
+        {product.videoUrl && (
+          <div className="relative aspect-video bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+              <div className="bg-primary rounded-full p-4">
+                <Play className="h-8 w-8 text-white fill-white" />
+              </div>
+            </div>
+            {showVideoPlayer && (
+              <div className="absolute inset-0 z-50">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowVideoPlayer(false);
+                  }}
+                  className="absolute top-4 right-4 z-50 bg-black/50 rounded-full p-2 hover:bg-black/70"
+                  data-testid="button-close-video"
+                >
+                  ✕
+                </button>
+                <iframe
+                  src={product.videoUrl}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="autoplay"
+                  data-testid="video-player"
+                />
+              </div>
+            )}
+          </div>
+        )}
+        {!product.videoUrl && (
+          <div className="aspect-video bg-card rounded-lg overflow-hidden mb-4">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        {galleryImages.length > 0 && (
+          <div className="space-y-2">
+            <div className="relative aspect-video bg-card rounded-lg overflow-hidden">
+              <img
+                src={galleryImages[currentGalleryIndex]}
+                alt={`Gallery ${currentGalleryIndex + 1}`}
+                className="w-full h-full object-cover"
+              />
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
+                    data-testid="button-gallery-prev"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
+                    data-testid="button-gallery-next"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+            </div>
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentGalleryIndex(idx)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
+                      idx === currentGalleryIndex ? "border-primary" : "border-transparent"
+                    }`}
+                    data-testid={`button-gallery-thumbnail-${idx}`}
+                  >
+                    <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="px-4">

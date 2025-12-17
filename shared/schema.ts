@@ -28,6 +28,8 @@ export const products = pgTable("products", {
   discount: integer("discount").notNull().default(0),
   description: text("description"),
   category: text("category"),
+  galleryImages: text("gallery_images").array(),
+  videoUrl: text("video_url"),
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({ id: true });
