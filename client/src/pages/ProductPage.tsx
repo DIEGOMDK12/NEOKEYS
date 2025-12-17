@@ -27,11 +27,20 @@ function transformProduct(p: any): Product {
   };
 }
 
+interface CheckoutData {
+  productId: string;
+  productName: string;
+  productImage: string;
+  productPrice: number;
+  quantity: number;
+}
+
 interface ProductPageProps {
   product: Product;
   onBack: () => void;
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
+  onNavigateToPixCheckout: (data: CheckoutData) => void;
 }
 
 export default function ProductPage({
@@ -39,6 +48,7 @@ export default function ProductPage({
   onBack,
   onNavigateToProduct,
   onNavigateToLogin,
+  onNavigateToPixCheckout,
 }: ProductPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -182,8 +192,13 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
         requirements={requirements}
         onAddToCart={() => handleAddToCart(product)}
         onBuyNow={() => {
-          handleAddToCart(product);
-          setCartOpen(true);
+          onNavigateToPixCheckout({
+            productId: product.id,
+            productName: product.name,
+            productImage: product.imageUrl,
+            productPrice: product.price,
+            quantity: 1,
+          });
         }}
       />
 

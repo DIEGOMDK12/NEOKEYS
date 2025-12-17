@@ -8,10 +8,11 @@ import ProductPage from "@/pages/ProductPage";
 import AdminPage from "@/pages/AdminPage";
 import CustomerAuth from "@/pages/CustomerAuth";
 import CustomerDashboard from "@/pages/CustomerDashboard";
+import PixCheckout from "@/pages/PixCheckout";
 import { Product } from "@/components/ProductCard";
 import { api } from "@/lib/api";
 
-type Page = "home" | "product" | "customer-login" | "customer-dashboard" | "admin";
+type Page = "home" | "product" | "customer-login" | "customer-dashboard" | "admin" | "pix-checkout";
 
 function hexToHSL(hex: string): string {
   hex = hex.replace("#", "");
@@ -63,6 +64,14 @@ function ColorApplier() {
   return null;
 }
 
+interface CheckoutData {
+  productId: string;
+  productName: string;
+  productImage: string;
+  productPrice: number;
+  quantity: number;
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     const path = window.location.pathname;
@@ -73,6 +82,7 @@ function App() {
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -128,6 +138,18 @@ function App() {
     setCurrentPage("customer-dashboard");
   };
 
+  const handleNavigateToPixCheckout = (data: CheckoutData) => {
+    setCheckoutData(data);
+    window.history.pushState({}, "", "/checkout");
+    setCurrentPage("pix-checkout");
+  };
+
+  const handleCheckoutSuccess = () => {
+    window.history.pushState({}, "", "/minha-conta");
+    setCurrentPage("customer-dashboard");
+    setCheckoutData(null);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -145,6 +167,19 @@ function App() {
             onBack={handleBack}
             onNavigateToProduct={handleNavigateToProduct}
             onNavigateToLogin={handleNavigateToLogin}
+            onNavigateToPixCheckout={handleNavigateToPixCheckout}
+          />
+        )}
+        {currentPage === "pix-checkout" && checkoutData && (
+          <PixCheckout
+            productId={checkoutData.productId}
+            productName={checkoutData.productName}
+            productImage={checkoutData.productImage}
+            productPrice={checkoutData.productPrice}
+            quantity={checkoutData.quantity}
+            onBack={handleBack}
+            onSuccess={handleCheckoutSuccess}
+            onLoginRequired={handleNavigateToLogin}
           />
         )}
         {currentPage === "customer-login" && (

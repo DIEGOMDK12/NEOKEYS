@@ -55,6 +55,10 @@ export const orders = pgTable("orders", {
   totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
   status: text("status").notNull().default("pending"),
   deliveredKey: text("delivered_key"),
+  pixId: text("pix_id"),
+  pixBrCode: text("pix_br_code"),
+  pixQrCodeBase64: text("pix_qr_code_base64"),
+  pixExpiresAt: timestamp("pix_expires_at"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 

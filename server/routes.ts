@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertProductKeySchema } from "@shared/schema";
 import { z } from "zod";
+import { createPixQrCode, checkPixStatus } from "./abacatepay";
 
 // Validation schemas
 const addToCartSchema = z.object({
@@ -345,6 +346,173 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error creating order:", error);
       res.status(500).json({ error: "Falha ao criar pedido" });
+    }
+  });
+
+  // PIX Payment - Create checkout with QR Code
+  app.post("/api/customer/checkout/pix", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Faca login para comprar" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const parsed = createOrderSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Dados invalidos" });
+      }
+      
+      const { productId, quantity } = parsed.data;
+      
+      const product = await storage.getProductById(productId);
+      if (!product) {
+        return res.status(404).json({ error: "Produto nao encontrado" });
+      }
+      
+      const availableKeys = await storage.getAvailableKeyCount(productId);
+      if (availableKeys < quantity) {
+        return res.status(400).json({ error: "Estoque insuficiente" });
+      }
+      
+      const totalPrice = parseFloat(product.price) * quantity;
+      const amountInCents = Math.round(totalPrice * 100);
+      
+      const order = await storage.createOrder({
+        userId: session.user.id,
+        productId,
+        quantity,
+        totalPrice: totalPrice.toFixed(2),
+        status: "awaiting_payment",
+      });
+      
+      const pixResponse = await createPixQrCode({
+        amount: amountInCents,
+        expiresIn: 3600,
+        description: `Compra: ${product.name}`,
+        metadata: {
+          orderId: order.id,
+        },
+      });
+      
+      if (pixResponse.error) {
+        await storage.updateOrderStatus(order.id, "payment_failed");
+        return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
+      }
+      
+      const pixData = pixResponse.data;
+      await storage.updateOrderPix(order.id, {
+        pixId: pixData.id,
+        pixBrCode: pixData.brCode,
+        pixQrCodeBase64: pixData.brCodeBase64,
+        pixExpiresAt: new Date(pixData.expiresAt),
+      });
+      
+      res.json({
+        orderId: order.id,
+        pixId: pixData.id,
+        brCode: pixData.brCode,
+        qrCodeBase64: pixData.brCodeBase64,
+        amount: totalPrice,
+        expiresAt: pixData.expiresAt,
+        product: {
+          name: product.name,
+          imageUrl: product.imageUrl,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating PIX checkout:", error);
+      res.status(500).json({ error: "Falha ao criar pagamento PIX" });
+    }
+  });
+
+  // PIX Payment - Check status
+  app.get("/api/customer/orders/:orderId/pix-status", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const order = await storage.getOrderById(req.params.orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Pedido nao encontrado" });
+      }
+      
+      if (order.userId !== session.user.id) {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+      
+      if (!order.pixId) {
+        return res.status(400).json({ error: "Pedido sem pagamento PIX" });
+      }
+      
+      if (order.status === "delivered") {
+        return res.json({ status: "PAID", orderStatus: "delivered" });
+      }
+      
+      const pixStatus = await checkPixStatus(order.pixId);
+      
+      if (pixStatus.data.status === "PAID" && order.status !== "delivered") {
+        const deliveredOrder = await storage.deliverOrder(order.id);
+        if (deliveredOrder) {
+          return res.json({ 
+            status: "PAID", 
+            orderStatus: "delivered",
+            deliveredKey: deliveredOrder.deliveredKey,
+          });
+        } else {
+          await storage.updateOrderStatus(order.id, "paid");
+          return res.json({ status: "PAID", orderStatus: "paid" });
+        }
+      }
+      
+      res.json({ 
+        status: pixStatus.data.status,
+        orderStatus: order.status,
+      });
+    } catch (error) {
+      console.error("Error checking PIX status:", error);
+      res.status(500).json({ error: "Falha ao verificar status do pagamento" });
+    }
+  });
+
+  // Webhook for AbacatePay (automatic payment confirmation)
+  app.post("/api/webhooks/abacatepay", async (req: Request, res: Response) => {
+    try {
+      const { data } = req.body;
+      
+      if (!data || !data.id) {
+        return res.status(400).json({ error: "Invalid webhook payload" });
+      }
+      
+      const order = await storage.getOrderByPixId(data.id);
+      if (!order) {
+        console.log("Webhook received for unknown PIX ID:", data.id);
+        return res.status(200).json({ received: true });
+      }
+      
+      if (data.status === "PAID" && order.status !== "delivered") {
+        const deliveredOrder = await storage.deliverOrder(order.id);
+        if (!deliveredOrder) {
+          await storage.updateOrderStatus(order.id, "paid");
+        }
+        console.log("Order delivered via webhook:", order.id);
+      }
+      
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
     }
   });
 

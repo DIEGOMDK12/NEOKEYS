@@ -244,6 +244,24 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async updateOrderPix(orderId: string, pixData: {
+    pixId: string;
+    pixBrCode: string;
+    pixQrCodeBase64: string;
+    pixExpiresAt: Date;
+  }): Promise<Order> {
+    const [updated] = await db.update(orders)
+      .set(pixData)
+      .where(eq(orders.id, orderId))
+      .returning();
+    return updated;
+  }
+
+  async getOrderByPixId(pixId: string): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.pixId, pixId));
+    return order;
+  }
+
   // Cart
   async getCartItems(sessionId: string): Promise<(CartItem & { product: Product })[]> {
     const items = await db.select().from(cartItems).where(eq(cartItems.sessionId, sessionId));

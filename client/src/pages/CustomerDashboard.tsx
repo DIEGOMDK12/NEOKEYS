@@ -95,6 +95,12 @@ export default function CustomerDashboard({ onBack, onLoginRequired }: CustomerD
         return <Badge variant="default" className="bg-green-600">Entregue</Badge>;
       case "pending":
         return <Badge variant="secondary">Pendente</Badge>;
+      case "awaiting_payment":
+        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">Aguardando Pagamento</Badge>;
+      case "paid":
+        return <Badge variant="default" className="bg-blue-600">Pago</Badge>;
+      case "payment_failed":
+        return <Badge variant="destructive">Falha no Pagamento</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
