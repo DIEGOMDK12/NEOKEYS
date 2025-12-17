@@ -361,15 +361,26 @@ export class DatabaseStorage implements IStorage {
   async seedAdminUser(): Promise<User> {
     const existingAdmin = await db.select().from(users).where(eq(users.isAdmin, true));
     if (existingAdmin.length > 0) {
-      return existingAdmin[0];
+      const admin = existingAdmin[0];
+      const hashedPassword = await bcrypt.hash("506731", 10);
+      const [updatedAdmin] = await db.update(users)
+        .set({
+          email: "Diegomdk",
+          password: hashedPassword,
+          firstName: "Diego",
+          lastName: "mdk",
+        })
+        .where(eq(users.id, admin.id))
+        .returning();
+      return updatedAdmin;
     }
 
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const hashedPassword = await bcrypt.hash("506731", 10);
     const [admin] = await db.insert(users).values({
-      email: "admin@neonkeys.com",
+      email: "Diegomdk",
       password: hashedPassword,
-      firstName: "Admin",
-      lastName: "NeonKeys",
+      firstName: "Diego",
+      lastName: "mdk",
       isAdmin: true,
     }).returning();
     return admin;
