@@ -388,7 +388,7 @@ export class DatabaseStorage implements IStorage {
 
   // Customer Sessions
   async createCustomerSession(userId: string): Promise<CustomerSession> {
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     const [session] = await db.insert(customerSessions).values({
       userId,
       expiresAt,
