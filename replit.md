@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**December 2024 - PIX Payment Integration with AbacatePay**
+- Integrated AbacatePay gateway for PIX payments (API key stored as secret)
+- New PixCheckout page with QR code display and automatic payment status polling (3-second intervals)
+- Orders schema extended with PIX fields: pixChargeId, pixQrCode, pixExpiresAt
+- Webhook endpoint for automatic payment confirmation (/api/payments/pix/webhook)
+- Automatic product key delivery upon payment confirmation
+- Auto-redirect to "Meus Pedidos" (My Orders) page after successful payment
+- Order status flow: pending -> awaiting_payment -> paid -> delivered
+
 **December 2024 - Modern Admin Panel with Persistent Sessions**
 - Completely redesigned admin panel with modern sidebar navigation using Shadcn UI components
 - Admin panel sections: Dashboard, Products, Keys, Orders, Banner, Colors
