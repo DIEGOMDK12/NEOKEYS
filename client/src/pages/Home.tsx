@@ -10,8 +10,15 @@ import Footer from "@/components/Footer";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
+
+interface CustomerUser {
+  id: string;
+  email: string;
+  firstName: string;
+  whatsapp: string;
+}
 
 interface HomeProps {
   onNavigateToProduct: (product: Product) => void;
@@ -33,12 +40,27 @@ function transformProduct(p: any): Product {
   };
 }
 
-export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomeProps) {
+export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigateToDashboard }: HomeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [selectedPriceFilter, setSelectedPriceFilter] = useState<number>();
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+
+  // Check customer session
+  const { data: customerUser } = useQuery<CustomerUser | null>({
+    queryKey: ["/api/customer/me"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+  });
+
+  // Handle user click - go to dashboard if logged in, otherwise to login
+  const handleUserClick = () => {
+    if (customerUser && onNavigateToDashboard) {
+      onNavigateToDashboard();
+    } else {
+      onNavigateToLogin();
+    }
+  };
 
   // Seed products on first load
   useEffect(() => {
@@ -148,9 +170,10 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
         cartCount={cartCount}
         onMenuClick={() => setMenuOpen(!menuOpen)}
         onCartClick={() => setCartOpen(true)}
-        onUserClick={onNavigateToLogin}
+        onUserClick={handleUserClick}
         onSearch={handleSearch}
         menuOpen={menuOpen}
+        isLoggedIn={!!customerUser}
       />
 
       <SideMenu

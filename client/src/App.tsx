@@ -167,6 +167,7 @@ function App() {
             onBack={handleBack}
             onNavigateToProduct={handleNavigateToProduct}
             onNavigateToLogin={handleNavigateToLogin}
+            onNavigateToDashboard={handleNavigateToDashboard}
             onNavigateToPixCheckout={handleNavigateToPixCheckout}
           />
         )}

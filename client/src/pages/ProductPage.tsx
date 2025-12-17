@@ -11,7 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
+
+interface CustomerUser {
+  id: string;
+  email: string;
+  firstName: string;
+  whatsapp: string;
+}
 
 // Transform API product to frontend Product type
 function transformProduct(p: any): Product {
@@ -40,6 +47,7 @@ interface ProductPageProps {
   onBack: () => void;
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
+  onNavigateToDashboard?: () => void;
   onNavigateToPixCheckout: (data: CheckoutData) => void;
 }
 
@@ -48,11 +56,27 @@ export default function ProductPage({
   onBack,
   onNavigateToProduct,
   onNavigateToLogin,
+  onNavigateToDashboard,
   onNavigateToPixCheckout,
 }: ProductPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { toast } = useToast();
+
+  // Check customer session
+  const { data: customerUser } = useQuery<CustomerUser | null>({
+    queryKey: ["/api/customer/me"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+  });
+
+  // Handle user click - go to dashboard if logged in, otherwise to login
+  const handleUserClick = () => {
+    if (customerUser && onNavigateToDashboard) {
+      onNavigateToDashboard();
+    } else {
+      onNavigateToLogin();
+    }
+  };
 
   // Fetch cart
   const { data: cartData = [] } = useQuery({
@@ -149,9 +173,10 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
         cartCount={cartCount}
         onMenuClick={() => setMenuOpen(!menuOpen)}
         onCartClick={() => setCartOpen(true)}
-        onUserClick={onNavigateToLogin}
+        onUserClick={handleUserClick}
         onSearch={(q) => toast({ title: "Pesquisa", description: q })}
         menuOpen={menuOpen}
+        isLoggedIn={!!customerUser}
       />
 
       <SideMenu

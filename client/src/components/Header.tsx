@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ interface HeaderProps {
   onUserClick: () => void;
   onSearch: (query: string) => void;
   menuOpen?: boolean;
+  isLoggedIn?: boolean;
 }
 
 export default function Header({
@@ -21,6 +22,7 @@ export default function Header({
   onUserClick,
   onSearch,
   menuOpen = false,
+  isLoggedIn = false,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -57,8 +59,9 @@ export default function Header({
             size="icon"
             onClick={onUserClick}
             data-testid="button-user"
+            className={isLoggedIn ? "text-primary" : ""}
           >
-            <User className="h-5 w-5" />
+            {isLoggedIn ? <UserCheck className="h-5 w-5" /> : <User className="h-5 w-5" />}
           </Button>
           <Button
             variant="ghost"
