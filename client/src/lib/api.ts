@@ -121,6 +121,8 @@ export const api = {
     discount: number;
     description?: string;
     category?: string;
+    galleryImages?: string[];
+    videoUrl?: string;
   }) => {
     return fetchWithSession("/api/products", {
       method: "POST",
@@ -138,6 +140,8 @@ export const api = {
     discount: number;
     description?: string;
     category?: string;
+    galleryImages?: string[];
+    videoUrl?: string;
   }>) => {
     return fetchWithSession(`/api/products/${id}`, {
       method: "PUT",
