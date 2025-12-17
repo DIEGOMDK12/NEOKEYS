@@ -1,7 +1,11 @@
 import { db } from "./db";
-import { users, products, cartItems, siteSettings, adminSessions, type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem, type SiteSettings, type AdminSession } from "@shared/schema";
-import { eq, and, lte, ilike, or, gt } from "drizzle-orm";
-import { randomUUID } from "crypto";
+import { 
+  users, products, cartItems, siteSettings, adminSessions, customerSessions, productKeys, orders,
+  type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem, 
+  type SiteSettings, type AdminSession, type CustomerSession, type InsertProductKey, type ProductKey,
+  type InsertOrder, type Order
+} from "@shared/schema";
+import { eq, and, lte, ilike, or, gt, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -21,6 +25,22 @@ export interface IStorage {
   updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product>;
   deleteProduct(id: string): Promise<void>;
 
+  // Product Keys
+  getProductKeys(productId: string): Promise<ProductKey[]>;
+  getAvailableKeys(productId: string): Promise<ProductKey[]>;
+  addProductKey(key: InsertProductKey): Promise<ProductKey>;
+  deleteProductKey(id: string): Promise<void>;
+  markKeyAsUsed(keyId: string, orderId: string): Promise<ProductKey>;
+  getAvailableKeyCount(productId: string): Promise<number>;
+
+  // Orders
+  createOrder(order: InsertOrder): Promise<Order>;
+  getOrdersByUser(userId: string): Promise<(Order & { product: Product })[]>;
+  getOrderById(id: string): Promise<Order | undefined>;
+  updateOrderStatus(id: string, status: string): Promise<Order>;
+  deliverOrder(orderId: string): Promise<Order | null>;
+  getAllOrders(): Promise<(Order & { product: Product; user: User })[]>;
+
   // Cart
   getCartItems(sessionId: string): Promise<(CartItem & { product: Product })[]>;
   addToCart(sessionId: string, productId: string, quantity: number): Promise<CartItem>;
@@ -39,6 +59,11 @@ export interface IStorage {
   getAdminSession(sessionId: string): Promise<(AdminSession & { user: User }) | null>;
   deleteAdminSession(sessionId: string): Promise<void>;
   seedAdminUser(): Promise<User>;
+
+  // Customer Sessions
+  createCustomerSession(userId: string): Promise<CustomerSession>;
+  getCustomerSession(sessionId: string): Promise<(CustomerSession & { user: User }) | null>;
+  deleteCustomerSession(sessionId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -112,7 +137,111 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: string): Promise<void> {
     await db.delete(cartItems).where(eq(cartItems.productId, id));
+    await db.delete(productKeys).where(eq(productKeys.productId, id));
     await db.delete(products).where(eq(products.id, id));
+  }
+
+  // Product Keys
+  async getProductKeys(productId: string): Promise<ProductKey[]> {
+    return db.select().from(productKeys).where(eq(productKeys.productId, productId));
+  }
+
+  async getAvailableKeys(productId: string): Promise<ProductKey[]> {
+    return db.select().from(productKeys).where(
+      and(eq(productKeys.productId, productId), eq(productKeys.isUsed, false))
+    );
+  }
+
+  async addProductKey(key: InsertProductKey): Promise<ProductKey> {
+    const [newKey] = await db.insert(productKeys).values(key).returning();
+    return newKey;
+  }
+
+  async deleteProductKey(id: string): Promise<void> {
+    await db.delete(productKeys).where(eq(productKeys.id, id));
+  }
+
+  async markKeyAsUsed(keyId: string, orderId: string): Promise<ProductKey> {
+    const [updated] = await db.update(productKeys)
+      .set({ isUsed: true, orderId })
+      .where(eq(productKeys.id, keyId))
+      .returning();
+    return updated;
+  }
+
+  async getAvailableKeyCount(productId: string): Promise<number> {
+    const keys = await this.getAvailableKeys(productId);
+    return keys.length;
+  }
+
+  // Orders
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const [newOrder] = await db.insert(orders).values(order).returning();
+    return newOrder;
+  }
+
+  async getOrdersByUser(userId: string): Promise<(Order & { product: Product })[]> {
+    const userOrders = await db.select().from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt));
+    
+    const result: (Order & { product: Product })[] = [];
+    for (const order of userOrders) {
+      const product = await this.getProductById(order.productId);
+      if (product) {
+        result.push({ ...order, product });
+      }
+    }
+    return result;
+  }
+
+  async getOrderById(id: string): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order> {
+    const [updated] = await db.update(orders)
+      .set({ status })
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deliverOrder(orderId: string): Promise<Order | null> {
+    const order = await this.getOrderById(orderId);
+    if (!order) return null;
+
+    const availableKeys = await this.getAvailableKeys(order.productId);
+    if (availableKeys.length === 0) return null;
+
+    const key = availableKeys[0];
+    await this.markKeyAsUsed(key.id, orderId);
+
+    const [updated] = await db.update(orders)
+      .set({ 
+        status: "delivered", 
+        deliveredKey: key.keyValue,
+        productKeyId: key.id
+      })
+      .where(eq(orders.id, orderId))
+      .returning();
+    
+    return updated;
+  }
+
+  async getAllOrders(): Promise<(Order & { product: Product; user: User })[]> {
+    const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
+    
+    const result: (Order & { product: Product; user: User })[] = [];
+    for (const order of allOrders) {
+      const product = await this.getProductById(order.productId);
+      const user = await this.getUser(order.userId);
+      if (product && user) {
+        result.push({ ...order, product, user });
+      }
+    }
+    return result;
   }
 
   // Cart
@@ -131,7 +260,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addToCart(sessionId: string, productId: string, quantity: number): Promise<CartItem> {
-    // Check if item already exists
     const [existing] = await db.select().from(cartItems)
       .where(and(eq(cartItems.sessionId, sessionId), eq(cartItems.productId, productId)));
     
@@ -245,6 +373,34 @@ export class DatabaseStorage implements IStorage {
       isAdmin: true,
     }).returning();
     return admin;
+  }
+
+  // Customer Sessions
+  async createCustomerSession(userId: string): Promise<CustomerSession> {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const [session] = await db.insert(customerSessions).values({
+      userId,
+      expiresAt,
+    }).returning();
+    return session;
+  }
+
+  async getCustomerSession(sessionId: string): Promise<(CustomerSession & { user: User }) | null> {
+    const [session] = await db.select().from(customerSessions)
+      .where(and(
+        eq(customerSessions.id, sessionId),
+        gt(customerSessions.expiresAt, new Date())
+      ));
+    if (!session) return null;
+
+    const user = await this.getUser(session.userId);
+    if (!user) return null;
+
+    return { ...session, user };
+  }
+
+  async deleteCustomerSession(sessionId: string): Promise<void> {
+    await db.delete(customerSessions).where(eq(customerSessions.id, sessionId));
   }
 }
 

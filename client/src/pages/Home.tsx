@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface HomeProps {
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
 // Transform API product to frontend Product type

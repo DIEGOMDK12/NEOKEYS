@@ -5,21 +5,23 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import ProductPage from "@/pages/ProductPage";
-import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
+import CustomerAuth from "@/pages/CustomerAuth";
+import CustomerDashboard from "@/pages/CustomerDashboard";
 import { Product } from "@/components/ProductCard";
 
-type Page = "home" | "product" | "login" | "register" | "admin";
+type Page = "home" | "product" | "customer-login" | "customer-dashboard" | "admin";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     const path = window.location.pathname;
     if (path === "/admin") return "admin";
-    if (path === "/login") return "login";
-    if (path === "/register") return "register";
+    if (path === "/login" || path === "/register") return "customer-login";
+    if (path === "/minha-conta") return "customer-dashboard";
     return "home";
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
   useEffect(() => {
     const handlePopState = () => {
@@ -27,9 +29,13 @@ function App() {
       if (path === "/admin") {
         setCurrentPage("admin");
       } else if (path === "/login") {
-        setCurrentPage("login");
+        setAuthMode("login");
+        setCurrentPage("customer-login");
       } else if (path === "/register") {
-        setCurrentPage("register");
+        setAuthMode("register");
+        setCurrentPage("customer-login");
+      } else if (path === "/minha-conta") {
+        setCurrentPage("customer-dashboard");
       } else {
         setCurrentPage("home");
       }
@@ -45,7 +51,19 @@ function App() {
 
   const handleNavigateToLogin = () => {
     window.history.pushState({}, "", "/login");
-    setCurrentPage("login");
+    setAuthMode("login");
+    setCurrentPage("customer-login");
+  };
+
+  const handleNavigateToRegister = () => {
+    window.history.pushState({}, "", "/register");
+    setAuthMode("register");
+    setCurrentPage("customer-login");
+  };
+
+  const handleNavigateToDashboard = () => {
+    window.history.pushState({}, "", "/minha-conta");
+    setCurrentPage("customer-dashboard");
   };
 
   const handleBack = () => {
@@ -54,14 +72,9 @@ function App() {
     setSelectedProduct(null);
   };
 
-  const handleLoginSuccess = () => {
-    window.history.pushState({}, "", "/");
-    setCurrentPage("home");
-  };
-
-  const handleNavigateToAdmin = () => {
-    window.history.pushState({}, "", "/admin");
-    setCurrentPage("admin");
+  const handleAuthSuccess = () => {
+    window.history.pushState({}, "", "/minha-conta");
+    setCurrentPage("customer-dashboard");
   };
 
   return (
@@ -71,6 +84,7 @@ function App() {
           <Home
             onNavigateToProduct={handleNavigateToProduct}
             onNavigateToLogin={handleNavigateToLogin}
+            onNavigateToDashboard={handleNavigateToDashboard}
           />
         )}
         {currentPage === "product" && selectedProduct && (
@@ -81,11 +95,17 @@ function App() {
             onNavigateToLogin={handleNavigateToLogin}
           />
         )}
-        {(currentPage === "login" || currentPage === "register") && (
-          <AuthPage
-            mode={currentPage}
+        {currentPage === "customer-login" && (
+          <CustomerAuth
+            mode={authMode}
             onBack={handleBack}
-            onLoginSuccess={handleLoginSuccess}
+            onSuccess={handleAuthSuccess}
+          />
+        )}
+        {currentPage === "customer-dashboard" && (
+          <CustomerDashboard
+            onBack={handleBack}
+            onLoginRequired={handleNavigateToLogin}
           />
         )}
         {currentPage === "admin" && <AdminPage onBack={handleBack} />}

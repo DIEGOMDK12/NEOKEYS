@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Save, Plus, Trash2, Edit2, Image, Settings, Package, LayoutDashboard, LogOut, Lock } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Edit2, Image, Settings, Package, LayoutDashboard, LogOut, Lock, Key, ShoppingBag, Palette, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,7 +48,36 @@ const defaultSettings = {
   contactPhone: "000-000-0000",
   contactEmail: "info@neonkeys.com",
   footerText: "2024 NeonKeys. Todos os direitos reservados.",
+  backgroundColor: "#1a1a2e",
+  primaryColor: "#16a34a",
+  accentColor: "#22c55e",
 };
+
+interface ProductKey {
+  id: string;
+  productId: string;
+  keyValue: string;
+  isUsed: boolean;
+  orderId: string | null;
+}
+
+interface Order {
+  id: string;
+  userId: string;
+  productId: string;
+  quantity: number;
+  totalPrice: string;
+  status: string;
+  deliveredKey: string | null;
+  createdAt: string;
+  product: Product;
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    whatsapp: string | null;
+  };
+}
 
 function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) => void }) {
   const { toast } = useToast();
@@ -158,6 +187,10 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
   const [settings, setSettings] = useState(defaultSettings);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [selectedProductForKeys, setSelectedProductForKeys] = useState<Product | null>(null);
+  const [newKeyValue, setNewKeyValue] = useState("");
+  const [bulkKeys, setBulkKeys] = useState("");
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
     imageUrl: "",
@@ -178,6 +211,15 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
   const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ["/api/products"],
     queryFn: () => api.getProducts(),
+  });
+
+  const { data: orders = [], isLoading: ordersLoading } = useQuery<Order[]>({
+    queryKey: ["/api/admin/orders"],
+  });
+
+  const { data: productKeys = [], isLoading: keysLoading, refetch: refetchKeys } = useQuery<ProductKey[]>({
+    queryKey: ["/api/admin/products", selectedProductForKeys?.id, "keys"],
+    enabled: !!selectedProductForKeys,
   });
 
   useEffect(() => {
@@ -254,6 +296,73 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
     },
   });
 
+  const addKeyMutation = useMutation({
+    mutationFn: ({ productId, keyValue }: { productId: string; keyValue: string }) =>
+      fetch(`/api/admin/products/${productId}/keys`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ keyValue }),
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      refetchKeys();
+      setNewKeyValue("");
+      toast({ title: "Sucesso", description: "Chave adicionada!" });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao adicionar chave", variant: "destructive" });
+    },
+  });
+
+  const addBulkKeysMutation = useMutation({
+    mutationFn: ({ productId, keys }: { productId: string; keys: string[] }) =>
+      fetch(`/api/admin/products/${productId}/keys/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ keys }),
+      }).then((r) => r.json()),
+    onSuccess: (data) => {
+      refetchKeys();
+      setBulkKeys("");
+      toast({ title: "Sucesso", description: `${data.count} chaves adicionadas!` });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao adicionar chaves", variant: "destructive" });
+    },
+  });
+
+  const deleteKeyMutation = useMutation({
+    mutationFn: (keyId: string) =>
+      fetch(`/api/admin/keys/${keyId}`, {
+        method: "DELETE",
+        credentials: "include",
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      refetchKeys();
+      toast({ title: "Sucesso", description: "Chave removida!" });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao remover chave", variant: "destructive" });
+    },
+  });
+
+  const copyToClipboard = async (text: string, id: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedKey(id);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const handleSaveSettings = () => {
     saveSettingsMutation.mutate(settings);
   };
@@ -313,18 +422,26 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
 
       <main className="p-4 max-w-6xl mx-auto">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsList className="grid w-full grid-cols-5 mb-4">
             <TabsTrigger value="hero" data-testid="tab-hero">
               <Image className="h-4 w-4 mr-2" />
-              Banner Hero
+              Banner
             </TabsTrigger>
             <TabsTrigger value="site" data-testid="tab-site">
-              <Settings className="h-4 w-4 mr-2" />
-              Configuracoes
+              <Palette className="h-4 w-4 mr-2" />
+              Cores
             </TabsTrigger>
             <TabsTrigger value="products" data-testid="tab-products">
               <Package className="h-4 w-4 mr-2" />
               Produtos
+            </TabsTrigger>
+            <TabsTrigger value="keys" data-testid="tab-keys">
+              <Key className="h-4 w-4 mr-2" />
+              Chaves
+            </TabsTrigger>
+            <TabsTrigger value="orders" data-testid="tab-orders">
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              Pedidos
             </TabsTrigger>
           </TabsList>
 
@@ -424,50 +541,120 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
           <TabsContent value="site">
             <Card>
               <CardHeader>
-                <CardTitle>Configuracoes do Site</CardTitle>
+                <CardTitle>Cores e Configuracoes</CardTitle>
+                <CardDescription>Personalize as cores do seu site</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="siteName">Nome do Site</Label>
-                  <Input
-                    id="siteName"
-                    value={settings.siteName}
-                    onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                    placeholder="Nome do site"
-                    data-testid="input-site-name"
-                  />
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="font-medium">Cores do Site</h3>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="backgroundColor">Cor de Fundo</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          id="backgroundColor"
+                          value={settings.backgroundColor}
+                          onChange={(e) => setSettings({ ...settings, backgroundColor: e.target.value })}
+                          className="w-12 h-9 p-1 cursor-pointer"
+                          data-testid="input-bg-color"
+                        />
+                        <Input
+                          value={settings.backgroundColor}
+                          onChange={(e) => setSettings({ ...settings, backgroundColor: e.target.value })}
+                          placeholder="#1a1a2e"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryColor">Cor Primaria</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          id="primaryColor"
+                          value={settings.primaryColor}
+                          onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
+                          className="w-12 h-9 p-1 cursor-pointer"
+                          data-testid="input-primary-color"
+                        />
+                        <Input
+                          value={settings.primaryColor}
+                          onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
+                          placeholder="#16a34a"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accentColor">Cor de Destaque</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          id="accentColor"
+                          value={settings.accentColor}
+                          onChange={(e) => setSettings({ ...settings, accentColor: e.target.value })}
+                          className="w-12 h-9 p-1 cursor-pointer"
+                          data-testid="input-accent-color"
+                        />
+                        <Input
+                          value={settings.accentColor}
+                          onChange={(e) => setSettings({ ...settings, accentColor: e.target.value })}
+                          placeholder="#22c55e"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-md border" style={{ backgroundColor: settings.backgroundColor }}>
+                    <p className="text-sm" style={{ color: settings.primaryColor }}>Pre-visualizacao das cores</p>
+                    <p className="text-xs mt-1" style={{ color: settings.accentColor }}>Texto de destaque</p>
+                  </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="border-t pt-4 space-y-4">
+                  <h3 className="font-medium">Informacoes do Site</h3>
                   <div className="space-y-2">
-                    <Label htmlFor="contactPhone">Telefone de Contato</Label>
+                    <Label htmlFor="siteName">Nome do Site</Label>
                     <Input
-                      id="contactPhone"
-                      value={settings.contactPhone}
-                      onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
-                      placeholder="(00) 0000-0000"
-                      data-testid="input-contact-phone"
+                      id="siteName"
+                      value={settings.siteName}
+                      onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                      placeholder="Nome do site"
+                      data-testid="input-site-name"
                     />
                   </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="contactPhone">Telefone de Contato</Label>
+                      <Input
+                        id="contactPhone"
+                        value={settings.contactPhone}
+                        onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
+                        placeholder="(00) 0000-0000"
+                        data-testid="input-contact-phone"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactEmail">Email de Contato</Label>
+                      <Input
+                        id="contactEmail"
+                        value={settings.contactEmail}
+                        onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+                        placeholder="email@exemplo.com"
+                        data-testid="input-contact-email"
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2">
-                    <Label htmlFor="contactEmail">Email de Contato</Label>
-                    <Input
-                      id="contactEmail"
-                      value={settings.contactEmail}
-                      onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-                      placeholder="email@exemplo.com"
-                      data-testid="input-contact-email"
+                    <Label htmlFor="footerText">Texto do Rodape</Label>
+                    <Textarea
+                      id="footerText"
+                      value={settings.footerText}
+                      onChange={(e) => setSettings({ ...settings, footerText: e.target.value })}
+                      placeholder="Texto do rodape"
+                      data-testid="input-footer-text"
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="footerText">Texto do Rodape</Label>
-                  <Textarea
-                    id="footerText"
-                    value={settings.footerText}
-                    onChange={(e) => setSettings({ ...settings, footerText: e.target.value })}
-                    placeholder="Texto do rodape"
-                    data-testid="input-footer-text"
-                  />
                 </div>
               </CardContent>
             </Card>
@@ -788,6 +975,226 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="keys">
+            <Card>
+              <CardHeader>
+                <CardTitle>Gerenciar Chaves de Produto</CardTitle>
+                <CardDescription>Adicione e gerencie as chaves de ativacao dos produtos</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Selecione o Produto</Label>
+                  <Select
+                    value={selectedProductForKeys?.id || ""}
+                    onValueChange={(v) => {
+                      const product = products.find((p: Product) => p.id === v);
+                      setSelectedProductForKeys(product || null);
+                    }}
+                  >
+                    <SelectTrigger data-testid="select-product-for-keys">
+                      <SelectValue placeholder="Selecione um produto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((p: Product) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name} - {p.platform}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedProductForKeys && (
+                  <>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label>Adicionar Chave Individual</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={newKeyValue}
+                            onChange={(e) => setNewKeyValue(e.target.value)}
+                            placeholder="XXXXX-XXXXX-XXXXX"
+                            data-testid="input-new-key"
+                          />
+                          <Button
+                            onClick={() => {
+                              if (newKeyValue.trim()) {
+                                addKeyMutation.mutate({
+                                  productId: selectedProductForKeys.id,
+                                  keyValue: newKeyValue.trim(),
+                                });
+                              }
+                            }}
+                            disabled={addKeyMutation.isPending}
+                            data-testid="button-add-key"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Adicionar Multiplas Chaves</Label>
+                        <Textarea
+                          value={bulkKeys}
+                          onChange={(e) => setBulkKeys(e.target.value)}
+                          placeholder="Uma chave por linha..."
+                          rows={3}
+                          data-testid="input-bulk-keys"
+                        />
+                        <Button
+                          className="w-full"
+                          variant="outline"
+                          onClick={() => {
+                            const keys = bulkKeys.split("\n").filter((k) => k.trim());
+                            if (keys.length > 0) {
+                              addBulkKeysMutation.mutate({
+                                productId: selectedProductForKeys.id,
+                                keys,
+                              });
+                            }
+                          }}
+                          disabled={addBulkKeysMutation.isPending}
+                          data-testid="button-add-bulk-keys"
+                        >
+                          {addBulkKeysMutation.isPending ? "Adicionando..." : `Adicionar ${bulkKeys.split("\n").filter((k) => k.trim()).length} Chaves`}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium mb-2">
+                        Chaves do Produto ({productKeys.filter((k) => !k.isUsed).length} disponiveis / {productKeys.length} total)
+                      </h4>
+                      {keysLoading ? (
+                        <div className="text-center py-4 text-muted-foreground">Carregando...</div>
+                      ) : productKeys.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">Nenhuma chave cadastrada</div>
+                      ) : (
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                          {productKeys.map((key) => (
+                            <div
+                              key={key.id}
+                              className={`flex items-center justify-between gap-2 p-2 rounded-md border ${key.isUsed ? "bg-muted opacity-60" : ""}`}
+                              data-testid={`key-row-${key.id}`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Key className={`h-4 w-4 ${key.isUsed ? "text-muted-foreground" : "text-primary"}`} />
+                                <code className="text-sm font-mono truncate">{key.keyValue}</code>
+                                {key.isUsed && <span className="text-xs text-muted-foreground">(Usado)</span>}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => copyToClipboard(key.keyValue, key.id)}
+                                >
+                                  {copiedKey === key.id ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                {!key.isUsed && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => deleteKeyMutation.mutate(key.id)}
+                                    disabled={deleteKeyMutation.isPending}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pedidos</CardTitle>
+                <CardDescription>Visualize todos os pedidos realizados</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {ordersLoading ? (
+                  <div className="text-center py-8 text-muted-foreground">Carregando pedidos...</div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">Nenhum pedido realizado</div>
+                ) : (
+                  <div className="space-y-3">
+                    {orders.map((order) => (
+                      <div
+                        key={order.id}
+                        className="flex items-start gap-4 p-4 rounded-md border"
+                        data-testid={`order-row-${order.id}`}
+                      >
+                        <img
+                          src={order.product.imageUrl}
+                          alt={order.product.name}
+                          className="w-16 h-20 object-cover rounded-md"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 flex-wrap">
+                            <div>
+                              <h3 className="font-medium">{order.product.name}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Cliente: {order.user.firstName} - {order.user.email}
+                              </p>
+                              {order.user.whatsapp && (
+                                <p className="text-sm text-muted-foreground">
+                                  WhatsApp: {order.user.whatsapp}
+                                </p>
+                              )}
+                              <p className="text-sm text-muted-foreground">
+                                {formatDate(order.createdAt)}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold">R$ {order.totalPrice}</p>
+                              <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                                order.status === "delivered" 
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" 
+                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                              }`}>
+                                {order.status === "delivered" ? "Entregue" : "Pendente"}
+                              </span>
+                            </div>
+                          </div>
+                          {order.deliveredKey && (
+                            <div className="mt-2 p-2 bg-muted rounded-md">
+                              <div className="flex items-center gap-2">
+                                <Key className="h-4 w-4 text-primary" />
+                                <code className="text-sm font-mono">{order.deliveredKey}</code>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => copyToClipboard(order.deliveredKey!, order.id)}
+                                >
+                                  {copiedKey === order.id ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema } from "@shared/schema";
+import { insertUserSchema, insertProductKeySchema } from "@shared/schema";
 import { z } from "zod";
 
 // Validation schemas
@@ -12,6 +12,18 @@ const addToCartSchema = z.object({
 
 const updateCartSchema = z.object({
   quantity: z.number().int().min(0),
+});
+
+const createOrderSchema = z.object({
+  productId: z.string().min(1),
+  quantity: z.number().int().min(1).default(1),
+});
+
+const customerRegisterSchema = z.object({
+  firstName: z.string().min(1, "Nome e obrigatorio"),
+  email: z.string().email("Email invalido"),
+  whatsapp: z.string().min(10, "WhatsApp invalido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
 export async function registerRoutes(
@@ -48,7 +60,8 @@ export async function registerRoutes(
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
       }
-      res.json(product);
+      const availableKeys = await storage.getAvailableKeyCount(req.params.id);
+      res.json({ ...product, availableStock: availableKeys });
     } catch (error) {
       console.error("Error fetching product:", error);
       res.status(500).json({ error: "Failed to fetch product" });
@@ -84,7 +97,6 @@ export async function registerRoutes(
       
       const { productId, quantity } = parsed.data;
       
-      // Verify product exists
       const product = await storage.getProductById(productId);
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
@@ -133,7 +145,210 @@ export async function registerRoutes(
     }
   });
 
-  // Auth API
+  // Customer Auth API
+  app.post("/api/customer/register", async (req: Request, res: Response) => {
+    try {
+      const parsed = customerRegisterSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Dados invalidos", details: parsed.error.errors });
+      }
+      
+      const { firstName, email, whatsapp, password } = parsed.data;
+      
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email ja cadastrado" });
+      }
+      
+      const user = await storage.createUser({
+        email,
+        password,
+        firstName,
+        lastName: "",
+        whatsapp,
+        isAdmin: false,
+      });
+      
+      const session = await storage.createCustomerSession(user.id);
+      
+      res.cookie("customer_session", session.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      
+      res.json({ 
+        id: user.id, 
+        email: user.email, 
+        firstName: user.firstName,
+        whatsapp: user.whatsapp
+      });
+    } catch (error) {
+      console.error("Error registering customer:", error);
+      res.status(500).json({ error: "Falha ao criar conta" });
+    }
+  });
+
+  app.post("/api/customer/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email e senha sao obrigatorios" });
+      }
+      
+      const user = await storage.validatePassword(email, password);
+      if (!user) {
+        return res.status(401).json({ error: "Email ou senha incorretos" });
+      }
+      
+      if (user.isAdmin) {
+        return res.status(403).json({ error: "Use o painel de admin para login de administrador" });
+      }
+      
+      const session = await storage.createCustomerSession(user.id);
+      
+      res.cookie("customer_session", session.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      
+      res.json({ 
+        id: user.id, 
+        email: user.email, 
+        firstName: user.firstName,
+        whatsapp: user.whatsapp
+      });
+    } catch (error) {
+      console.error("Error customer login:", error);
+      res.status(500).json({ error: "Falha ao fazer login" });
+    }
+  });
+
+  app.get("/api/customer/me", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        res.clearCookie("customer_session");
+        return res.status(401).json({ error: "Sessao invalida ou expirada" });
+      }
+      
+      res.json({ 
+        id: session.user.id, 
+        email: session.user.email, 
+        firstName: session.user.firstName,
+        whatsapp: session.user.whatsapp
+      });
+    } catch (error) {
+      console.error("Error checking customer session:", error);
+      res.status(500).json({ error: "Falha ao verificar sessao" });
+    }
+  });
+
+  app.post("/api/customer/logout", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (sessionId) {
+        await storage.deleteCustomerSession(sessionId);
+      }
+      res.clearCookie("customer_session");
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error customer logout:", error);
+      res.status(500).json({ error: "Falha ao fazer logout" });
+    }
+  });
+
+  // Customer Orders API
+  app.get("/api/customer/orders", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const orders = await storage.getOrdersByUser(session.user.id);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ error: "Falha ao buscar pedidos" });
+    }
+  });
+
+  app.post("/api/customer/orders", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Faca login para comprar" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const parsed = createOrderSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Dados invalidos" });
+      }
+      
+      const { productId, quantity } = parsed.data;
+      
+      const product = await storage.getProductById(productId);
+      if (!product) {
+        return res.status(404).json({ error: "Produto nao encontrado" });
+      }
+      
+      const availableKeys = await storage.getAvailableKeyCount(productId);
+      if (availableKeys < quantity) {
+        return res.status(400).json({ error: "Estoque insuficiente" });
+      }
+      
+      const totalPrice = (parseFloat(product.price) * quantity).toFixed(2);
+      
+      const order = await storage.createOrder({
+        userId: session.user.id,
+        productId,
+        quantity,
+        totalPrice,
+        status: "pending",
+      });
+      
+      const deliveredOrder = await storage.deliverOrder(order.id);
+      
+      if (deliveredOrder) {
+        res.json({
+          ...deliveredOrder,
+          product,
+          message: "Pedido realizado com sucesso! Sua chave foi entregue."
+        });
+      } else {
+        res.json({
+          ...order,
+          product,
+          message: "Pedido criado. Aguardando processamento."
+        });
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ error: "Falha ao criar pedido" });
+    }
+  });
+
+  // Auth API (legacy - keeping for compatibility)
   app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
       const data = insertUserSchema.parse(req.body);
@@ -269,6 +484,132 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error seeding admin:", error);
       res.status(500).json({ error: "Falha ao criar admin" });
+    }
+  });
+
+  // Admin Orders API
+  app.get("/api/admin/orders", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching admin orders:", error);
+      res.status(500).json({ error: "Falha ao buscar pedidos" });
+    }
+  });
+
+  // Product Keys API (Admin only)
+  app.get("/api/admin/products/:id/keys", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const keys = await storage.getProductKeys(req.params.id);
+      res.json(keys);
+    } catch (error) {
+      console.error("Error fetching product keys:", error);
+      res.status(500).json({ error: "Falha ao buscar chaves" });
+    }
+  });
+
+  app.post("/api/admin/products/:id/keys", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const { keyValue } = req.body;
+      if (!keyValue) {
+        return res.status(400).json({ error: "Chave e obrigatoria" });
+      }
+      
+      const key = await storage.addProductKey({
+        productId: req.params.id,
+        keyValue,
+      });
+      
+      res.json(key);
+    } catch (error) {
+      console.error("Error adding product key:", error);
+      res.status(500).json({ error: "Falha ao adicionar chave" });
+    }
+  });
+
+  app.post("/api/admin/products/:id/keys/bulk", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const { keys } = req.body;
+      if (!keys || !Array.isArray(keys)) {
+        return res.status(400).json({ error: "Lista de chaves e obrigatoria" });
+      }
+      
+      const addedKeys = [];
+      for (const keyValue of keys) {
+        if (keyValue.trim()) {
+          const key = await storage.addProductKey({
+            productId: req.params.id,
+            keyValue: keyValue.trim(),
+          });
+          addedKeys.push(key);
+        }
+      }
+      
+      res.json({ success: true, count: addedKeys.length, keys: addedKeys });
+    } catch (error) {
+      console.error("Error adding bulk keys:", error);
+      res.status(500).json({ error: "Falha ao adicionar chaves" });
+    }
+  });
+
+  app.delete("/api/admin/keys/:id", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      await storage.deleteProductKey(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting key:", error);
+      res.status(500).json({ error: "Falha ao deletar chave" });
     }
   });
 
@@ -426,72 +767,6 @@ export async function registerRoutes(
           discount: 70,
           description: "Estrategia tatica em tempo real",
           category: "strategy",
-        },
-        {
-          name: "Cyberpunk 2077",
-          imageUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=500&fit=crop",
-          platform: "Steam",
-          region: "Global",
-          price: "29.99",
-          originalPrice: "59.99",
-          discount: 50,
-          description: "RPG de mundo aberto em Night City",
-          category: "rpg",
-        },
-        {
-          name: "Elden Ring",
-          imageUrl: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=400&h=500&fit=crop",
-          platform: "Steam",
-          region: "Global",
-          price: "35.99",
-          originalPrice: "69.99",
-          discount: 49,
-          description: "Acao RPG de FromSoftware",
-          category: "rpg",
-        },
-        {
-          name: "Hogwarts Legacy",
-          imageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=500&fit=crop",
-          platform: "Steam",
-          region: "Global",
-          price: "39.99",
-          originalPrice: "79.99",
-          discount: 50,
-          description: "Viva sua fantasia em Hogwarts",
-          category: "rpg",
-        },
-        {
-          name: "Red Dead Redemption 2",
-          imageUrl: "https://images.unsplash.com/photo-1560419015-7c427e8ae5ba?w=400&h=500&fit=crop",
-          platform: "Steam",
-          region: "Global",
-          price: "24.99",
-          originalPrice: "59.99",
-          discount: 58,
-          description: "Aventura epica no velho oeste",
-          category: "adventure",
-        },
-        {
-          name: "FIFA 24",
-          imageUrl: "https://images.unsplash.com/photo-1493711662062-fa541f7f75a3?w=400&h=500&fit=crop",
-          platform: "EA",
-          region: "Global",
-          price: "34.99",
-          originalPrice: "69.99",
-          discount: 50,
-          description: "O melhor futebol do mundo",
-          category: "sports",
-        },
-        {
-          name: "Fortnite Bundle",
-          imageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=500&fit=crop",
-          platform: "Epic",
-          region: "Global",
-          price: "19.99",
-          originalPrice: "39.99",
-          discount: 50,
-          description: "Pack exclusivo Fortnite",
-          category: "action",
         },
       ];
 
