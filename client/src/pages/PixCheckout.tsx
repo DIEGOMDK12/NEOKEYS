@@ -103,8 +103,11 @@ export default function PixCheckout({
           queryClient.invalidateQueries({ queryKey: ["/api/customer/orders"] });
           toast({
             title: "Pagamento confirmado!",
-            description: "Sua compra foi realizada com sucesso.",
+            description: "Redirecionando para seus pedidos...",
           });
+          setTimeout(() => {
+            onSuccess();
+          }, 2000);
         }
       } catch (error) {
         console.error("Error checking status:", error);
