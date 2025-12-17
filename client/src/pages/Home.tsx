@@ -6,7 +6,7 @@ import HeroBanner from "@/components/HeroBanner";
 import PriceFilters from "@/components/PriceFilters";
 import ProductSection from "@/components/ProductSection";
 import CartDrawer, { CartItem } from "@/components/CartDrawer";
-import FloatingChatButton from "@/components/FloatingChatButton";
+import Footer from "@/components/Footer";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
@@ -233,10 +233,7 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
         )}
       </main>
 
-      <FloatingChatButton
-        unreadCount={1}
-        onClick={() => toast({ title: "Chat", description: "Abrindo chat de suporte..." })}
-      />
+      <Footer />
     </div>
   );
 }
