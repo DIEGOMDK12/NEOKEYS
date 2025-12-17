@@ -44,6 +44,12 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
     api.seedProducts().catch(() => {});
   }, []);
 
+  // Fetch settings
+  const { data: settings = {} } = useQuery({
+    queryKey: ["/api/settings"],
+    queryFn: () => api.getSettings(),
+  });
+
   // Fetch products
   const { data: allProducts = [], isLoading: productsLoading } = useQuery({
     queryKey: ["/api/products"],
@@ -172,11 +178,18 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
       <main className="pb-20">
         <div className="p-4">
           <HeroBanner
-            title="RIMS RACING ULTIMATE EDITION"
-            subtitle="DISPONIVEL AGORA!"
-            price="R$ 46,92"
-            imageUrl="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&h=400&fit=crop"
+            title={settings.heroTitle || "RIMS RACING ULTIMATE EDITION"}
+            subtitle={settings.heroSubtitle || "DISPONIVEL AGORA!"}
+            price={settings.heroPrice || "R$ 46,92"}
+            imageUrl={settings.heroImageUrl || "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&h=400&fit=crop"}
             onBuyClick={() => {
+              if (settings.heroProductId && settings.heroProductId !== "none") {
+                const product = transformedProducts.find((p) => p.id === settings.heroProductId);
+                if (product) {
+                  handleAddToCart(product);
+                  return;
+                }
+              }
               toast({ title: "Comprar", description: "Adicionando ao carrinho..." });
             }}
           />

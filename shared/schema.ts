@@ -42,3 +42,13 @@ export const cartItems = pgTable("cart_items", {
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true });
 export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
 export type CartItem = typeof cartItems.$inferSelect;
+
+export const siteSettings = pgTable("site_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+});
+
+export const insertSiteSettingsSchema = createInsertSchema(siteSettings).omit({ id: true });
+export type InsertSiteSettings = z.infer<typeof insertSiteSettingsSchema>;
+export type SiteSettings = typeof siteSettings.$inferSelect;

@@ -90,4 +90,64 @@ export const api = {
       method: "POST",
     });
   },
+
+  // Settings
+  getSettings: async () => {
+    return fetchWithSession("/api/settings");
+  },
+
+  saveSetting: async (key: string, value: string) => {
+    return fetchWithSession("/api/settings", {
+      method: "POST",
+      body: JSON.stringify({ key, value }),
+    });
+  },
+
+  saveSettings: async (settings: Record<string, string>) => {
+    return fetchWithSession("/api/settings/bulk", {
+      method: "POST",
+      body: JSON.stringify(settings),
+    });
+  },
+
+  // Product Management
+  createProduct: async (data: {
+    name: string;
+    imageUrl: string;
+    platform: string;
+    region: string;
+    price: string;
+    originalPrice: string;
+    discount: number;
+    description?: string;
+    category?: string;
+  }) => {
+    return fetchWithSession("/api/products", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateProduct: async (id: string, data: Partial<{
+    name: string;
+    imageUrl: string;
+    platform: string;
+    region: string;
+    price: string;
+    originalPrice: string;
+    discount: number;
+    description?: string;
+    category?: string;
+  }>) => {
+    return fetchWithSession(`/api/products/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteProduct: async (id: string) => {
+    return fetchWithSession(`/api/products/${id}`, {
+      method: "DELETE",
+    });
+  },
 };

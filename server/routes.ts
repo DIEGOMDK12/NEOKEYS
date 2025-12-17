@@ -174,6 +174,108 @@ export async function registerRoutes(
     }
   });
 
+  // Site Settings API
+  app.get("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const settings = await storage.getAllSettings();
+      const settingsMap: Record<string, string> = {};
+      for (const s of settings) {
+        settingsMap[s.key] = s.value;
+      }
+      res.json(settingsMap);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      res.status(500).json({ error: "Failed to fetch settings" });
+    }
+  });
+
+  app.get("/api/settings/:key", async (req: Request, res: Response) => {
+    try {
+      const value = await storage.getSetting(req.params.key);
+      if (value === null) {
+        return res.status(404).json({ error: "Setting not found" });
+      }
+      res.json({ key: req.params.key, value });
+    } catch (error) {
+      console.error("Error fetching setting:", error);
+      res.status(500).json({ error: "Failed to fetch setting" });
+    }
+  });
+
+  app.post("/api/settings", async (req: Request, res: Response) => {
+    try {
+      const { key, value } = req.body;
+      if (!key || value === undefined) {
+        return res.status(400).json({ error: "Key and value are required" });
+      }
+      const setting = await storage.setSetting(key, value);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error saving setting:", error);
+      res.status(500).json({ error: "Failed to save setting" });
+    }
+  });
+
+  app.post("/api/settings/bulk", async (req: Request, res: Response) => {
+    try {
+      const settings = req.body as Record<string, string>;
+      const results = [];
+      for (const [key, value] of Object.entries(settings)) {
+        const setting = await storage.setSetting(key, value);
+        results.push(setting);
+      }
+      res.json({ success: true, count: results.length });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      res.status(500).json({ error: "Failed to save settings" });
+    }
+  });
+
+  app.delete("/api/settings/:key", async (req: Request, res: Response) => {
+    try {
+      await storage.deleteSetting(req.params.key);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting setting:", error);
+      res.status(500).json({ error: "Failed to delete setting" });
+    }
+  });
+
+  // Products management
+  app.put("/api/products/:id", async (req: Request, res: Response) => {
+    try {
+      const product = await storage.getProductById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      const updated = await storage.updateProduct(req.params.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Failed to update product" });
+    }
+  });
+
+  app.delete("/api/products/:id", async (req: Request, res: Response) => {
+    try {
+      await storage.deleteProduct(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      res.status(500).json({ error: "Failed to delete product" });
+    }
+  });
+
+  app.post("/api/products", async (req: Request, res: Response) => {
+    try {
+      const product = await storage.createProduct(req.body);
+      res.json(product);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ error: "Failed to create product" });
+    }
+  });
+
   // Seed products (for initial setup)
   app.post("/api/seed", async (req: Request, res: Response) => {
     try {

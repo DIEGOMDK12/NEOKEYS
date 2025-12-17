@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,13 +6,29 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import ProductPage from "@/pages/ProductPage";
 import AuthPage from "@/pages/AuthPage";
+import AdminPage from "@/pages/AdminPage";
 import { Product } from "@/components/ProductCard";
 
-type Page = "home" | "product" | "login" | "register";
+type Page = "home" | "product" | "login" | "register" | "admin";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    if (window.location.pathname === "/admin") return "admin";
+    return "home";
+  });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (window.location.pathname === "/admin") {
+        setCurrentPage("admin");
+      } else {
+        setCurrentPage("home");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const handleNavigateToProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -24,12 +40,18 @@ function App() {
   };
 
   const handleBack = () => {
+    window.history.pushState({}, "", "/");
     setCurrentPage("home");
     setSelectedProduct(null);
   };
 
   const handleLoginSuccess = () => {
     setCurrentPage("home");
+  };
+
+  const handleNavigateToAdmin = () => {
+    window.history.pushState({}, "", "/admin");
+    setCurrentPage("admin");
   };
 
   return (
@@ -56,6 +78,7 @@ function App() {
             onLoginSuccess={handleLoginSuccess}
           />
         )}
+        {currentPage === "admin" && <AdminPage onBack={handleBack} />}
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

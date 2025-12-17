@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, products, cartItems, type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem } from "@shared/schema";
+import { users, products, cartItems, siteSettings, type InsertUser, type User, type InsertProduct, type Product, type InsertCartItem, type CartItem, type SiteSettings } from "@shared/schema";
 import { eq, and, lte, ilike, or } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
@@ -18,6 +18,8 @@ export interface IStorage {
   getProductsByPlatform(platform: string): Promise<Product[]>;
   searchProducts(query: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product>;
+  deleteProduct(id: string): Promise<void>;
 
   // Cart
   getCartItems(sessionId: string): Promise<(CartItem & { product: Product })[]>;
@@ -25,6 +27,12 @@ export interface IStorage {
   updateCartItemQuantity(sessionId: string, productId: string, quantity: number): Promise<CartItem | null>;
   removeFromCart(sessionId: string, productId: string): Promise<void>;
   clearCart(sessionId: string): Promise<void>;
+
+  // Site Settings
+  getAllSettings(): Promise<SiteSettings[]>;
+  getSetting(key: string): Promise<string | null>;
+  setSetting(key: string, value: string): Promise<SiteSettings>;
+  deleteSetting(key: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -88,6 +96,19 @@ export class DatabaseStorage implements IStorage {
     return newProduct;
   }
 
+  async updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product> {
+    const [updated] = await db.update(products)
+      .set(product)
+      .where(eq(products.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    await db.delete(cartItems).where(eq(cartItems.productId, id));
+    await db.delete(products).where(eq(products.id, id));
+  }
+
   // Cart
   async getCartItems(sessionId: string): Promise<(CartItem & { product: Product })[]> {
     const items = await db.select().from(cartItems).where(eq(cartItems.sessionId, sessionId));
@@ -144,6 +165,35 @@ export class DatabaseStorage implements IStorage {
 
   async clearCart(sessionId: string): Promise<void> {
     await db.delete(cartItems).where(eq(cartItems.sessionId, sessionId));
+  }
+
+  // Site Settings
+  async getAllSettings(): Promise<SiteSettings[]> {
+    return db.select().from(siteSettings);
+  }
+
+  async getSetting(key: string): Promise<string | null> {
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key));
+    return setting?.value ?? null;
+  }
+
+  async setSetting(key: string, value: string): Promise<SiteSettings> {
+    const [existing] = await db.select().from(siteSettings).where(eq(siteSettings.key, key));
+    
+    if (existing) {
+      const [updated] = await db.update(siteSettings)
+        .set({ value })
+        .where(eq(siteSettings.key, key))
+        .returning();
+      return updated;
+    }
+    
+    const [created] = await db.insert(siteSettings).values({ key, value }).returning();
+    return created;
+  }
+
+  async deleteSetting(key: string): Promise<void> {
+    await db.delete(siteSettings).where(eq(siteSettings.key, key));
   }
 }
 
