@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Copy, Check, Clock, CheckCircle, Loader2, QrCode } from "lucide-react";
+import { ArrowLeft, Copy, Check, Clock, CheckCircle, Loader2, QrCode, Mail, Phone } from "lucide-react";
 
 interface PixCheckoutProps {
   productId: string;
@@ -37,6 +40,14 @@ interface PixStatusResponse {
   deliveredKey?: string;
 }
 
+interface CustomerUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  whatsapp?: string;
+}
+
 export default function PixCheckout({
   productId,
   productName,
@@ -52,6 +63,33 @@ export default function PixCheckout({
   const [copied, setCopied] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [deliveredKey, setDeliveredKey] = useState<string | null>(null);
+  const [customerData, setCustomerData] = useState({
+    email: "",
+    whatsapp: "",
+  });
+
+  // Get current user
+  const { data: customerUser } = useQuery<CustomerUser | null>({
+    queryKey: ["/api/customer/me"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/customer/me", { credentials: "include" });
+        if (!res.ok) return null;
+        return res.json();
+      } catch {
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (customerUser) {
+      setCustomerData({
+        email: customerUser.email || "",
+        whatsapp: customerUser.whatsapp || "",
+      });
+    }
+  }, [customerUser]);
 
   const createPixMutation = useMutation({
     mutationFn: async () => {
@@ -81,9 +119,13 @@ export default function PixCheckout({
     },
   });
 
-  useEffect(() => {
+  const handleStartPayment = () => {
+    if (!customerData.email) {
+      toast({ title: "Erro", description: "Preencha seu e-mail", variant: "destructive" });
+      return;
+    }
     createPixMutation.mutate();
-  }, []);
+  };
 
   useEffect(() => {
     if (!pixData?.orderId || isPaid) return;
@@ -122,7 +164,7 @@ export default function PixCheckout({
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast({ title: "Codigo PIX copiado!" });
+      toast({ title: "Copiado para área de transferência!" });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast({ title: "Erro ao copiar", variant: "destructive" });
@@ -148,58 +190,56 @@ export default function PixCheckout({
     return () => clearInterval(interval);
   }, [pixData?.expiresAt]);
 
-  if (createPixMutation.isPending) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-          <p className="mt-4 text-muted-foreground">Gerando QR Code PIX...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (isPaid) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b bg-card sticky top-0 z-50">
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+        <header className="border-b bg-card/50 backdrop-blur sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={onBack} data-testid="button-back">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-bold">Pagamento Confirmado</h1>
+            <h1 className="text-lg font-semibold">Compra Confirmada!</h1>
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-8 max-w-lg">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Pagamento Confirmado!</h2>
-              <p className="text-muted-foreground mb-6">
-                Sua compra foi processada com sucesso.
-              </p>
+          <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-950/20">
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="relative">
+                  <CheckCircle className="h-20 w-20 text-green-500 animate-pulse" />
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Pagamento Confirmado!</h2>
+                <p className="text-muted-foreground">Sua compra foi processada com sucesso</p>
+              </div>
 
               {deliveredKey && (
-                <div className="bg-muted p-4 rounded-lg mb-6">
-                  <p className="text-sm font-medium mb-2">Sua Chave:</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-background px-3 py-2 rounded text-sm font-mono break-all">
-                      {deliveredKey}
-                    </code>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => copyToClipboard(deliveredKey)}
-                      data-testid="button-copy-key"
-                    >
-                      {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+                <>
+                  <Separator />
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                    <p className="text-sm font-semibold text-left">Sua Chave de Ativação:</p>
+                    <div className="flex items-center gap-2 bg-background p-3 rounded-md border">
+                      <code className="flex-1 text-sm font-mono break-all text-primary">
+                        {deliveredKey}
+                      </code>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(deliveredKey)}
+                        data-testid="button-copy-key"
+                        className="flex-shrink-0"
+                      >
+                        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
-              <Button onClick={onSuccess} className="w-full" data-testid="button-view-orders">
+              <Button onClick={onSuccess} className="w-full" size="lg" data-testid="button-view-orders">
                 Ver Meus Pedidos
               </Button>
             </CardContent>
@@ -209,105 +249,167 @@ export default function PixCheckout({
     );
   }
 
-  if (!pixData) {
+  if (createPixMutation.isPending) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive">Erro ao gerar pagamento</p>
-          <Button className="mt-4" onClick={onBack} data-testid="button-try-again">
-            Voltar
-          </Button>
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Gerando QR Code PIX...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+      <header className="border-b bg-card/50 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack} data-testid="button-back">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-bold">Pagamento PIX</h1>
+          <h1 className="text-lg font-semibold">Pagamento PIX</h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-lg">
-        <Card className="mb-4">
+      <main className="container mx-auto px-4 py-6 max-w-lg space-y-4">
+        {/* Resumo do Produto */}
+        <Card>
           <CardContent className="p-4">
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-start">
               <img
                 src={productImage}
                 alt={productName}
-                className="w-16 h-16 object-cover rounded-md"
+                className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
               />
-              <div className="flex-1">
-                <h3 className="font-semibold">{productName}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold truncate">{productName}</h3>
                 <p className="text-sm text-muted-foreground">Quantidade: {quantity}</p>
+                <p className="text-lg font-bold text-primary mt-2">
+                  R$ {(productPrice * quantity).toFixed(2)}
+                </p>
               </div>
-              <p className="text-xl font-bold text-primary">
-                R$ {pixData.amount.toFixed(2)}
-              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between gap-2">
-              <CardTitle className="flex items-center gap-2">
-                <QrCode className="h-5 w-5" />
-                QR Code PIX
+        {/* Informações do Cliente */}
+        {!pixData && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Seus Dados
               </CardTitle>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {timeLeft}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-center">
-              <img
-                src={pixData.qrCodeBase64}
-                alt="QR Code PIX"
-                className="w-64 h-64 rounded-lg border"
-                data-testid="img-qr-code"
-              />
-            </div>
-
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-2">
-                Escaneie o QR Code ou copie o codigo abaixo:
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={pixData.brCode}
-                  className="flex-1 bg-muted px-3 py-2 rounded-md text-xs font-mono truncate"
-                  data-testid="input-pix-code"
+              <CardDescription>Preencha para receber sua chave</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm">E-mail *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={customerData.email}
+                  onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
+                  placeholder="seu@email.com"
+                  data-testid="input-checkout-email"
                 />
-                <Button
-                  variant="outline"
-                  onClick={() => copyToClipboard(pixData.brCode)}
-                  data-testid="button-copy-pix"
-                >
-                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                  Copiar
-                </Button>
               </div>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp" className="text-sm flex items-center gap-2">
+                  <Phone className="h-3 w-3" />
+                  WhatsApp
+                </Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  value={customerData.whatsapp}
+                  onChange={(e) => setCustomerData({ ...customerData, whatsapp: e.target.value })}
+                  placeholder="(11) 99999-9999"
+                  data-testid="input-checkout-whatsapp"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-            <div className="bg-muted/50 p-4 rounded-lg text-center">
-              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
-              <p className="text-sm font-medium">Aguardando pagamento...</p>
-              <p className="text-xs text-muted-foreground">
-                O pagamento sera confirmado automaticamente
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* QR Code PIX */}
+        {pixData && (
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <QrCode className="h-5 w-5" />
+                  QR Code PIX
+                </CardTitle>
+                <Badge variant="destructive" className="flex items-center gap-1 text-xs">
+                  <Clock className="h-3 w-3" />
+                  {timeLeft}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* QR Code */}
+              <div className="flex justify-center">
+                <div className="bg-white p-4 rounded-lg">
+                  <img
+                    src={pixData.qrCodeBase64}
+                    alt="QR Code PIX"
+                    className="w-56 h-56 rounded"
+                    data-testid="img-qr-code"
+                  />
+                </div>
+              </div>
+
+              {/* Código PIX */}
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground text-center">
+                  Escaneie o QR Code com seu banco ou copie o código:
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={pixData.brCode}
+                    className="flex-1 bg-muted px-3 py-2 rounded-md text-xs font-mono truncate"
+                    data-testid="input-pix-code"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(pixData.brCode)}
+                    data-testid="button-copy-pix"
+                  >
+                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg text-center space-y-2">
+                <div className="flex justify-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                </div>
+                <p className="text-sm font-medium">Aguardando pagamento...</p>
+                <p className="text-xs text-muted-foreground">
+                  O pagamento será confirmado automaticamente
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Botão de Iniciar */}
+        {!pixData && (
+          <Button
+            onClick={handleStartPayment}
+            className="w-full"
+            size="lg"
+            disabled={createPixMutation.isPending}
+            data-testid="button-start-payment"
+          >
+            {createPixMutation.isPending ? "Gerando QR Code..." : "Gerar QR Code"}
+          </Button>
+        )}
       </main>
     </div>
   );
