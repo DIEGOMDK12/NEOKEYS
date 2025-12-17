@@ -3,7 +3,7 @@ import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import logoImage from "@assets/generated_images/neonkeys_gaming_logo_green_neon.png";
+import { Zap } from "lucide-react";
 
 interface HeaderProps {
   cartCount: number;
@@ -41,14 +41,11 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-2">
-            <img
-              src={logoImage}
-              alt="NeonKeys Logo"
-              className="h-8 w-8"
-            />
-            <span className="font-bold text-lg text-primary hidden sm:inline">
-              Neon<span className="text-foreground">Keys</span>
+          <div className="flex items-center gap-1">
+            <Zap className="h-6 w-6 text-primary fill-primary" />
+            <span className="font-bold text-lg">
+              <span className="text-foreground">Thunder</span>
+              <span className="text-primary">Keys</span>
             </span>
           </div>
         </div>
@@ -83,22 +80,22 @@ export default function Header({
       </div>
 
       <form onSubmit={handleSearch} className="px-4 pb-3">
-        <div className="relative">
+        <div className="relative flex">
           <Input
             type="search"
             placeholder="Pesquisar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-12 bg-card"
+            className="pr-12 bg-card/50 border-border rounded-r-none flex-1"
             data-testid="input-search"
           />
           <Button
             type="submit"
             size="icon"
-            className="absolute right-0 top-0 h-full rounded-l-none"
+            className="rounded-l-none bg-primary text-primary-foreground px-4"
             data-testid="button-search"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-5 w-5" />
           </Button>
         </div>
       </form>
