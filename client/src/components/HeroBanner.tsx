@@ -16,7 +16,7 @@ export default function HeroBanner({
   onBuyClick,
 }: HeroBannerProps) {
   return (
-    <div className="relative w-full aspect-[21/9] min-h-[200px] overflow-hidden rounded-lg">
+    <div className="relative w-full aspect-[21/9] min-h-[200px] overflow-hidden rounded-2xl shadow-2xl">
       <img
         src={imageUrl}
         alt={title}

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 interface PriceFiltersProps {
   onFilterSelect: (maxPrice: number) => void;
@@ -16,17 +15,17 @@ const priceOptions = [
 
 export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFiltersProps) {
   return (
-    <Card className="mx-4 p-4 bg-card/80">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="px-4 py-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {priceOptions.map((option) => (
           <Button
             key={option.value}
             variant={selectedFilter === option.value ? "default" : "outline"}
-            className={`h-12 font-bold text-base border-2 ${
+            className={`h-10 px-5 font-semibold text-sm rounded-full whitespace-nowrap transition-all ${
               selectedFilter === option.value 
-                ? "bg-primary text-primary-foreground border-primary" 
-                : "border-primary text-primary bg-transparent"
-            } ${option.value === 50 ? "col-span-2" : ""}`}
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" 
+                : "border-primary/50 text-primary hover:bg-primary/10"
+            }`}
             onClick={() => onFilterSelect(option.value)}
             data-testid={`filter-price-${option.value}`}
           >
@@ -34,6 +33,6 @@ export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFi
           </Button>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
