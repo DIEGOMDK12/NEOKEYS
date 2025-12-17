@@ -3,7 +3,7 @@ import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Zap } from "lucide-react";
+import neoKeysLogo from "@assets/generated_images/neo-keys_gaming_logo.png";
 
 interface HeaderProps {
   cartCount: number;
@@ -41,12 +41,13 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-1">
-            <Zap className="h-6 w-6 text-primary fill-primary" />
-            <span className="font-bold text-lg">
-              <span className="text-foreground">NEO</span>
-              <span className="text-primary">-KEYS</span>
-            </span>
+          <div className="flex items-center">
+            <img 
+              src={neoKeysLogo} 
+              alt="NEO-KEYS" 
+              className="h-8 w-auto"
+              data-testid="img-logo"
+            />
           </div>
         </div>
 
