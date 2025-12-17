@@ -8,6 +8,16 @@ NeonKeys is a Brazilian gaming e-commerce platform for selling digital game keys
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**December 2024 - Admin Panel Enhancement**
+- Added background color customization (backgroundColor, primaryColor, accentColor) in admin "Cores" tab
+- Implemented product key management system (add individual/bulk keys, view, delete)
+- Added orders monitoring tab showing customer info (name, email, WhatsApp) and delivered keys
+- Customer registration now includes WhatsApp field
+- Automatic key delivery system assigns available keys to orders on creation
+- Database schema extended with productKeys and orders tables
+
 ## System Architecture
 
 ### Frontend Architecture
