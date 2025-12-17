@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SideMenu from "@/components/SideMenu";
 import HeroBanner from "@/components/HeroBanner";
@@ -8,116 +9,88 @@ import CartDrawer, { CartItem } from "@/components/CartDrawer";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
-
-// todo: remove mock functionality
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "Beholder 2",
-    imageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 9.56,
-    originalPrice: 39.99,
-    discount: 76,
-  },
-  {
-    id: "2",
-    name: "Gravity Circuit",
-    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 8.66,
-    originalPrice: 52.49,
-    discount: 84,
-  },
-  {
-    id: "3",
-    name: "Nomad Survival",
-    imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 4.99,
-    originalPrice: 19.99,
-    discount: 75,
-  },
-  {
-    id: "4",
-    name: "S.W.I.N.E.",
-    imageUrl: "https://images.unsplash.com/photo-1493711662062-fa541f7f75a3?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 7.50,
-    originalPrice: 24.99,
-    discount: 70,
-  },
-];
-
-const mockProductsExpensive: Product[] = [
-  {
-    id: "5",
-    name: "Cyberpunk 2077",
-    imageUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 29.99,
-    originalPrice: 59.99,
-    discount: 50,
-  },
-  {
-    id: "6",
-    name: "Elden Ring",
-    imageUrl: "https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 35.99,
-    originalPrice: 69.99,
-    discount: 49,
-  },
-  {
-    id: "7",
-    name: "Hogwarts Legacy",
-    imageUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 39.99,
-    originalPrice: 79.99,
-    discount: 50,
-  },
-  {
-    id: "8",
-    name: "Red Dead Redemption 2",
-    imageUrl: "https://images.unsplash.com/photo-1560419015-7c427e8ae5ba?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 24.99,
-    originalPrice: 59.99,
-    discount: 58,
-  },
-];
+import { api } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomeProps {
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
 }
 
+// Transform API product to frontend Product type
+function transformProduct(p: any): Product {
+  return {
+    id: p.id,
+    name: p.name,
+    imageUrl: p.imageUrl,
+    platform: p.platform,
+    region: p.region,
+    price: parseFloat(p.price),
+    originalPrice: parseFloat(p.originalPrice),
+    discount: p.discount,
+  };
+}
+
 export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedPriceFilter, setSelectedPriceFilter] = useState<number>();
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
+  // Seed products on first load
+  useEffect(() => {
+    api.seedProducts().catch(() => {});
+  }, []);
+
+  // Fetch products
+  const { data: allProducts = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["/api/products"],
+    queryFn: () => api.getProducts(),
+  });
+
+  // Fetch filtered products
+  const { data: filteredProducts } = useQuery({
+    queryKey: ["/api/products", { maxPrice: selectedPriceFilter, search: searchQuery }],
+    queryFn: () => api.getProducts({ maxPrice: selectedPriceFilter, search: searchQuery || undefined }),
+    enabled: !!selectedPriceFilter || !!searchQuery,
+  });
+
+  // Fetch cart
+  const { data: cartData = [] } = useQuery({
+    queryKey: ["/api/cart"],
+    queryFn: () => api.getCart(),
+  });
+
+  // Add to cart mutation
+  const addToCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
+      api.addToCart(productId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
+  // Update cart mutation
+  const updateCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
+      api.updateCartQuantity(productId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
+  // Remove from cart mutation
+  const removeFromCartMutation = useMutation({
+    mutationFn: (productId: string) => api.removeFromCart(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
   const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
+    addToCartMutation.mutate({ productId: product.id, quantity: 1 });
     toast({
       title: "Adicionado ao carrinho",
       description: `${product.name} foi adicionado ao seu carrinho.`,
@@ -126,29 +99,41 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
 
   const handleUpdateQuantity = (productId: string, quantity: number) => {
     if (quantity === 0) {
-      setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+      removeFromCartMutation.mutate(productId);
     } else {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item
-        )
-      );
+      updateCartMutation.mutate({ productId, quantity });
     }
   };
 
   const handleRemoveItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+    removeFromCartMutation.mutate(productId);
   };
 
   const handleSearch = (query: string) => {
-    console.log("Search:", query);
-    toast({
-      title: "Pesquisando...",
-      description: `Buscando por "${query}"`,
-    });
+    setSearchQuery(query);
+    if (query) {
+      toast({
+        title: "Pesquisando...",
+        description: `Buscando por "${query}"`,
+      });
+    }
   };
 
+  // Transform cart data
+  const cartItems: CartItem[] = cartData.map((item: any) => ({
+    product: transformProduct(item.product),
+    quantity: item.quantity,
+  }));
+
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Transform products
+  const products = (selectedPriceFilter || searchQuery ? filteredProducts : allProducts) || [];
+  const transformedProducts: Product[] = products.map(transformProduct);
+
+  // Split into cheap and expensive for display
+  const cheapProducts = transformedProducts.filter((p) => p.price <= 10);
+  const expensiveProducts = transformedProducts.filter((p) => p.price > 10);
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,7 +150,7 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
         onCategorySelect={(cat) => {
-          console.log("Category:", cat);
+          setSearchQuery(cat);
           toast({ title: "Categoria", description: cat });
         }}
       />
@@ -200,29 +185,52 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin }: HomePro
         <PriceFilters
           selectedFilter={selectedPriceFilter}
           onFilterSelect={(price) => {
-            setSelectedPriceFilter(price === selectedPriceFilter ? undefined : price);
-            toast({
-              title: "Filtro aplicado",
-              description: `Mostrando jogos ate R$ ${price}`,
-            });
+            const newFilter = price === selectedPriceFilter ? undefined : price;
+            setSelectedPriceFilter(newFilter);
+            if (newFilter) {
+              toast({
+                title: "Filtro aplicado",
+                description: `Mostrando jogos ate R$ ${price}`,
+              });
+            }
           }}
         />
 
-        <ProductSection
-          title="ATE 10R$"
-          products={mockProducts}
-          onAddToCart={handleAddToCart}
-          onProductClick={onNavigateToProduct}
-          onViewMore={() => console.log("View more")}
-        />
+        {productsLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="aspect-[3/4] rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <>
+            {cheapProducts.length > 0 && (
+              <ProductSection
+                title="ATE 10R$"
+                products={cheapProducts}
+                onAddToCart={handleAddToCart}
+                onProductClick={onNavigateToProduct}
+                onViewMore={() => setSelectedPriceFilter(10)}
+              />
+            )}
 
-        <ProductSection
-          title="MAIS VENDIDOS"
-          products={mockProductsExpensive}
-          onAddToCart={handleAddToCart}
-          onProductClick={onNavigateToProduct}
-          onViewMore={() => console.log("View more")}
-        />
+            {expensiveProducts.length > 0 && (
+              <ProductSection
+                title="MAIS VENDIDOS"
+                products={expensiveProducts}
+                onAddToCart={handleAddToCart}
+                onProductClick={onNavigateToProduct}
+                onViewMore={() => console.log("View more")}
+              />
+            )}
+
+            {transformedProducts.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                Nenhum produto encontrado
+              </div>
+            )}
+          </>
+        )}
       </main>
 
       <FloatingChatButton

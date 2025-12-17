@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SideMenu from "@/components/SideMenu";
 import CartDrawer, { CartItem } from "@/components/CartDrawer";
@@ -9,40 +10,28 @@ import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import { queryClient } from "@/lib/queryClient";
 
-// todo: remove mock functionality
-const relatedProducts: Product[] = [
-  {
-    id: "r1",
-    name: "Beholder",
-    imageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 4.99,
-    originalPrice: 19.99,
-    discount: 85,
-  },
-  {
-    id: "r2",
-    name: "Papers Please",
-    imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=500&fit=crop",
-    platform: "Steam",
-    region: "Global",
-    price: 6.99,
-    originalPrice: 14.99,
-    discount: 70,
-  },
-];
+// Transform API product to frontend Product type
+function transformProduct(p: any): Product {
+  return {
+    id: p.id,
+    name: p.name,
+    imageUrl: p.imageUrl,
+    platform: p.platform,
+    region: p.region,
+    price: parseFloat(p.price),
+    originalPrice: parseFloat(p.originalPrice),
+    discount: p.discount,
+  };
+}
 
 interface ProductPageProps {
   product: Product;
   onBack: () => void;
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
-  cartItems: CartItem[];
-  onAddToCart: (product: Product) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onRemoveItem: (productId: string) => void;
 }
 
 export default function ProductPage({
@@ -50,23 +39,88 @@ export default function ProductPage({
   onBack,
   onNavigateToProduct,
   onNavigateToLogin,
-  cartItems,
-  onAddToCart,
-  onUpdateQuantity,
-  onRemoveItem,
 }: ProductPageProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { toast } = useToast();
 
+  // Fetch cart
+  const { data: cartData = [] } = useQuery({
+    queryKey: ["/api/cart"],
+    queryFn: () => api.getCart(),
+  });
+
+  // Fetch related products
+  const { data: allProducts = [] } = useQuery({
+    queryKey: ["/api/products"],
+    queryFn: () => api.getProducts(),
+  });
+
+  // Add to cart mutation
+  const addToCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
+      api.addToCart(productId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
+  // Update cart mutation
+  const updateCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
+      api.updateCartQuantity(productId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
+  // Remove from cart mutation
+  const removeFromCartMutation = useMutation({
+    mutationFn: (productId: string) => api.removeFromCart(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
+    },
+  });
+
+  const handleAddToCart = (p: Product) => {
+    addToCartMutation.mutate({ productId: p.id, quantity: 1 });
+    toast({
+      title: "Adicionado ao carrinho",
+      description: `${p.name} foi adicionado.`,
+    });
+  };
+
+  const handleUpdateQuantity = (productId: string, quantity: number) => {
+    if (quantity === 0) {
+      removeFromCartMutation.mutate(productId);
+    } else {
+      updateCartMutation.mutate({ productId, quantity });
+    }
+  };
+
+  const handleRemoveItem = (productId: string) => {
+    removeFromCartMutation.mutate(productId);
+  };
+
+  // Transform cart data
+  const cartItems: CartItem[] = cartData.map((item: any) => ({
+    product: transformProduct(item.product),
+    quantity: item.quantity,
+  }));
+
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // todo: remove mock functionality
-  const description = `${product.name} - Agora voce faz parte do Ministerio!
+  // Get related products (excluding current product)
+  const relatedProducts: Product[] = allProducts
+    .filter((p: any) => p.id !== product.id)
+    .slice(0, 4)
+    .map(transformProduct);
 
-Voce se tornara um oficial responsavel condecorado ou apenas um denunciante?
+  const description = `${product.name} - Uma experiencia incrivel de jogos!
 
-Voce e livre pra moldar seu proprio futuro!`;
+Aproveite esse titulo incrivel com um desconto de ${product.discount}%.
+
+Disponivel para ${product.platform} na regiao ${product.region}.`;
 
   const requirements = {
     minimum: [
@@ -103,8 +157,8 @@ Voce e livre pra moldar seu proprio futuro!`;
         isOpen={cartOpen}
         onClose={() => setCartOpen(false)}
         items={cartItems}
-        onUpdateQuantity={onUpdateQuantity}
-        onRemoveItem={onRemoveItem}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
         onCheckout={() => toast({ title: "Checkout", description: "Redirecionando..." })}
         onViewCart={() => toast({ title: "Carrinho", description: "Visualizando..." })}
       />
@@ -126,28 +180,21 @@ Voce e livre pra moldar seu proprio futuro!`;
         product={product}
         description={description}
         requirements={requirements}
-        onAddToCart={() => {
-          onAddToCart(product);
-          toast({
-            title: "Adicionado ao carrinho",
-            description: `${product.name} foi adicionado.`,
-          });
-        }}
+        onAddToCart={() => handleAddToCart(product)}
         onBuyNow={() => {
-          onAddToCart(product);
+          handleAddToCart(product);
           setCartOpen(true);
         }}
       />
 
-      <ProductSection
-        title="Voce pode gostar"
-        products={relatedProducts}
-        onAddToCart={(p) => {
-          onAddToCart(p);
-          toast({ title: "Adicionado", description: p.name });
-        }}
-        onProductClick={onNavigateToProduct}
-      />
+      {relatedProducts.length > 0 && (
+        <ProductSection
+          title="Voce pode gostar"
+          products={relatedProducts}
+          onAddToCart={handleAddToCart}
+          onProductClick={onNavigateToProduct}
+        />
+      )}
 
       <FloatingChatButton
         unreadCount={1}
