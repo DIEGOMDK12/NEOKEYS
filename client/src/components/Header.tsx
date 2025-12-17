@@ -44,8 +44,8 @@ export default function Header({
           <div className="flex items-center gap-1">
             <Zap className="h-6 w-6 text-primary fill-primary" />
             <span className="font-bold text-lg">
-              <span className="text-foreground">Thunder</span>
-              <span className="text-primary">Keys</span>
+              <span className="text-foreground">NEO</span>
+              <span className="text-primary">-KEYS</span>
             </span>
           </div>
         </div>
