@@ -49,3 +49,4 @@ expertMode = true
 
 [userenv.shared]
 NEON_DATABASE_URL = "postgresql://neondb_owner:npg_fEj5aSPtOu6c@ep-soft-tree-a4ryrpv3-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+WEBHOOK_URL = "https://neokeys.onrender.com/webhook"

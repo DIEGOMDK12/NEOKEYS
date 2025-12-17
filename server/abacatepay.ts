@@ -13,6 +13,8 @@ interface CreatePixQrCodeRequest {
   description?: string;
   customer?: PixCustomer;
   metadata?: Record<string, string>;
+  returnUrl?: string;
+  completionUrl?: string;
 }
 
 interface PixQrCodeResponse {
@@ -42,10 +44,17 @@ interface CheckPixStatusResponse {
 
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
   const apiKey = process.env.ABACATEPAY_API_KEY;
+  const webhookUrl = process.env.WEBHOOK_URL || "https://neokeys.onrender.com/webhook";
   
   if (!apiKey) {
     throw new Error("ABACATEPAY_API_KEY not configured");
   }
+
+  const payload = {
+    ...request,
+    returnUrl: request.returnUrl || webhookUrl,
+    completionUrl: request.completionUrl || webhookUrl,
+  };
 
   const response = await fetch(`${ABACATEPAY_API_URL}/pixQrCode/create`, {
     method: "POST",
@@ -53,7 +62,7 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(request),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
