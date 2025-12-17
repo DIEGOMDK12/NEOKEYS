@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**December 2024 - Modern Admin Panel with Persistent Sessions**
+- Completely redesigned admin panel with modern sidebar navigation using Shadcn UI components
+- Admin panel sections: Dashboard, Products, Keys, Orders, Banner, Colors
+- Dashboard shows statistics (products count, orders, revenue, delivery rate)
+- Extended customer session from 7 days to 1 year (365 days) for persistent login
+- Customer stays logged in until explicitly clicking logout
+
 **December 2024 - Admin Panel Enhancement**
 - Added background color customization (backgroundColor, primaryColor, accentColor) in admin "Cores" tab
 - Implemented product key management system (add individual/bulk keys, view, delete)
