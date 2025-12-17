@@ -13,15 +13,23 @@ type Page = "home" | "product" | "login" | "register" | "admin";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
-    if (window.location.pathname === "/admin") return "admin";
+    const path = window.location.pathname;
+    if (path === "/admin") return "admin";
+    if (path === "/login") return "login";
+    if (path === "/register") return "register";
     return "home";
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const handlePopState = () => {
-      if (window.location.pathname === "/admin") {
+      const path = window.location.pathname;
+      if (path === "/admin") {
         setCurrentPage("admin");
+      } else if (path === "/login") {
+        setCurrentPage("login");
+      } else if (path === "/register") {
+        setCurrentPage("register");
       } else {
         setCurrentPage("home");
       }
@@ -36,6 +44,7 @@ function App() {
   };
 
   const handleNavigateToLogin = () => {
+    window.history.pushState({}, "", "/login");
     setCurrentPage("login");
   };
 
@@ -46,6 +55,7 @@ function App() {
   };
 
   const handleLoginSuccess = () => {
+    window.history.pushState({}, "", "/");
     setCurrentPage("home");
   };
 
