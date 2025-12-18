@@ -3,7 +3,7 @@ import { Menu, Search, ShoppingCart, User, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import neoKeysLogo from "@assets/generated_images/professional_gaming_platform_logo.png";
+import neoKeysLogo from "@assets/generated_images/neo_keys_logo_transparent_background.png";
 
 interface HeaderProps {
   cartCount: number;
