@@ -121,7 +121,7 @@ export default function ProductDetail({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-              <div className="bg-white rounded-full p-4">
+              <div className="bg-red-600 rounded-full p-4">
                 <Play className="h-8 w-8 text-white fill-white" />
               </div>
             </div>
