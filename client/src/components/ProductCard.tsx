@@ -104,14 +104,14 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         
         <Button
           size="sm"
-          className="w-full bg-white text-white-foreground font-medium mt-2"
+          className="w-full bg-white text-black font-bold mt-2 hover:bg-white/90"
           onClick={(e) => {
             e.stopPropagation();
             onAddToCart(product);
           }}
           data-testid={`button-add-cart-${product.id}`}
         >
-          Adicionar ao carrinho
+          Comprar
         </Button>
       </div>
     </div>

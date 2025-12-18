@@ -245,11 +245,11 @@ export default function ProductDetail({
               Essa chave funcionara no Brasil
             </p>
             <div className="space-y-3">
-              <Button className="w-full" onClick={onAddToCart} data-testid="button-detail-add-cart">
-                🛒 Adicionar ao Carrinho
+              <Button className="w-full bg-white text-black font-bold hover:bg-white/90" onClick={onAddToCart} data-testid="button-detail-add-cart">
+                🛒 Adicionar
               </Button>
-              <Button variant="outline" className="w-full" onClick={onBuyNow} data-testid="button-buy-now">
-                💳 Comprar Agora (PIX)
+              <Button variant="outline" className="w-full font-bold" onClick={onBuyNow} data-testid="button-buy-now">
+                💳 Comprar (PIX)
               </Button>
             </div>
           </CardContent>

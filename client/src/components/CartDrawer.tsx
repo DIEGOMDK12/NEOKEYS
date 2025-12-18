@@ -186,11 +186,11 @@ export default function CartDrawer({
                   Editar
                 </Button>
                 <Button 
-                  className="flex-1 bg-white hover:bg-white/90" 
+                  className="flex-1 bg-white text-black font-bold hover:bg-white/90" 
                   onClick={onCheckout} 
                   data-testid="button-checkout"
                 >
-                  Comprar Agora
+                  💳 Comprar
                 </Button>
               </div>
             </div>
