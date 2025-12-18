@@ -34,9 +34,9 @@ const customerRegisterSchema = z.object({
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
-// Helper to get session ID from cookie or header
+// Helper to get session ID from header or cookie
 function getSessionId(req: Request): string | null {
-  return req.cookies?.customer_session || (req.headers["x-session-id"] as string) || null;
+  return (req.headers["x-session-id"] as string) || req.cookies?.customer_session || null;
 }
 
 export async function registerRoutes(
