@@ -77,9 +77,9 @@ export default function ProductDetail({
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isEditingRequirements, setIsEditingRequirements] = useState(false);
-  const [editingRequirements, setEditingRequirements] = useState<string[]>(requirements.minimum);
+  const [editingRequirements, setEditingRequirements] = useState<string[]>(Array.isArray(requirements) ? requirements : (requirements?.minimum || []));
   const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [editingDescription, setEditingDescription] = useState(description);
+  const [editingDescription, setEditingDescription] = useState(description || "");
   const galleryRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const PlatformIcon = platformIcons[product.platform] || SiSteam;

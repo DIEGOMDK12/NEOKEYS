@@ -41,6 +41,7 @@ function transformProduct(p: any): Product {
     videoUrl: p.videoUrl,
     galleryImages: p.galleryImages,
     systemRequirements: p.systemRequirements,
+    description: p.description,
   };
 }
 
