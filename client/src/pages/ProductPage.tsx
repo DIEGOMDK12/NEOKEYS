@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SideMenu from "@/components/SideMenu";
@@ -161,21 +161,32 @@ export default function ProductPage({
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Sync product with latest data from allProducts
+  const currentProduct: Product = useMemo(() => {
+    if (allProducts.length > 0) {
+      const updated = allProducts.find((p: any) => p.id === product.id);
+      if (updated) {
+        return transformProduct(updated);
+      }
+    }
+    return product;
+  }, [allProducts, product.id]);
+
   // Get related products (excluding current product)
   const relatedProducts: Product[] = allProducts
-    .filter((p: any) => p.id !== product.id)
+    .filter((p: any) => p.id !== currentProduct.id)
     .slice(0, 4)
     .map(transformProduct);
 
-  const description = product.description || `${product.name} - Uma experiencia incrivel de jogos!
+  const description = currentProduct.description || `${currentProduct.name} - Uma experiencia incrivel de jogos!
 
-Aproveite esse titulo incrivel com um desconto de ${product.discount}%.
+Aproveite esse titulo incrivel com um desconto de ${currentProduct.discount}%.
 
-Disponivel para ${product.platform} na regiao ${product.region}.`;
+Disponivel para ${currentProduct.platform} na regiao ${currentProduct.region}.`;
 
   const requirements = {
-    minimum: product.systemRequirements 
-      ? product.systemRequirements.split("\n").filter(r => r.trim())
+    minimum: currentProduct.systemRequirements 
+      ? currentProduct.systemRequirements.split("\n").filter(r => r.trim())
       : [
           "Sistema Operacional: Windows 7/8/10 (64-bit OS)",
           "Processador: Intel Core i3 or AMD Athlon II",
@@ -253,20 +264,20 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
       </div>
 
       <ProductDetail
-        product={product}
+        product={currentProduct}
         description={description}
-        requirements={requirements}
+        requirements={requirements.minimum}
         onAddToCart={() => {
           console.log("✅ Cart button clicked - just adding to cart");
-          handleAddToCart(product);
+          handleAddToCart(currentProduct);
         }}
         onBuyNow={() => {
           console.log("💳 Buy now button clicked - going to checkout");
           onNavigateToPixCheckout({
-            productId: product.id,
-            productName: product.name,
-            productImage: product.imageUrl,
-            productPrice: product.price,
+            productId: currentProduct.id,
+            productName: currentProduct.name,
+            productImage: currentProduct.imageUrl,
+            productPrice: currentProduct.price,
             quantity: 1,
           });
         }}
