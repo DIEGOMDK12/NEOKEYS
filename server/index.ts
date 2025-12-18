@@ -36,6 +36,21 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+// Middleware to handle x-session-id header from frontend
+app.use((req, res, next) => {
+  const xSessionId = req.headers["x-session-id"];
+  if (xSessionId && !req.cookies?.customer_session) {
+    // Set the x-session-id as customer_session cookie for cart operations
+    res.cookie("customer_session", xSessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+    });
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
