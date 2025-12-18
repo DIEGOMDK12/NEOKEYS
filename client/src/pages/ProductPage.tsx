@@ -135,9 +135,10 @@ export default function ProductPage({
   const handleAddToCart = (p: Product) => {
     console.log("🛒 Adding to cart:", p.id, p.name);
     addToCartMutation.mutate({ productId: p.id, quantity: 1 });
+    setCartOpen(true);
     toast({
       title: "Adicionado ao carrinho!",
-      description: `${p.name} foi adicionado. Abra o carrinho para comprar.`,
+      description: `${p.name} foi adicionado.`,
     });
   };
 

@@ -10,12 +10,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**December 18, 2024 - Dynamic Product Page Routing & URL Persistence**
-- Implemented dynamic route `/product/:id` to persist product page on page refresh
-- URL now changes to `/product/{productId}` when viewing a product
-- Refactored App.tsx to fetch product by ID from URL on page load
-- Automatic redirect to the same product page when refreshing browser
-- Product data is fetched from API when URL contains product ID
+**December 18, 2024 - Cart Drawer Auto-Open & Dynamic Product Routing**
+- **Cart Auto-Open**: Cart drawer now opens automatically when user clicks "Adicionar ao Carrinho"
+- **Dynamic Product Routes**: Implemented `/product/:id` route to persist product page on refresh
+- URL changes to `/product/{productId}` when viewing a product
+- Product data is fetched from API when URL contains product ID, showing the same product on page reload
 
 **December 18, 2024 - Product Detail Page Related Products Section**
 - Added "Você pode gostar" (related products) section at bottom of product detail pages
