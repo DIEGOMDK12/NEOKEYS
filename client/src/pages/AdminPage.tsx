@@ -93,9 +93,9 @@ const defaultSettings = {
   contactPhone: "000-000-0000",
   contactEmail: "info@neonkeys.com",
   footerText: "2024 NeonKeys. Todos os direitos reservados.",
-  backgroundColor: "#1a1a2e",
-  primaryColor: "#16a34a",
-  accentColor: "#22c55e",
+  backgroundColor: "#1f1a3d",
+  primaryColor: "#8b5cf6",
+  accentColor: "#fbbf24",
 };
 
 type AdminSection = "dashboard" | "products" | "keys" | "orders" | "banner" | "colors";
@@ -1289,7 +1289,7 @@ function ColorsSection({ settings, setSettings }: { settings: typeof defaultSett
                 <Input
                   value={settings.primaryColor}
                   onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
-                  placeholder="#16a34a"
+                  placeholder="#8b5cf6"
                   className="flex-1"
                 />
               </div>
@@ -1308,7 +1308,7 @@ function ColorsSection({ settings, setSettings }: { settings: typeof defaultSett
                 <Input
                   value={settings.accentColor}
                   onChange={(e) => setSettings({ ...settings, accentColor: e.target.value })}
-                  placeholder="#22c55e"
+                  placeholder="#fbbf24"
                   className="flex-1"
                 />
               </div>
