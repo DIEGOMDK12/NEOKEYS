@@ -500,13 +500,26 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                 />
               </div>
               <div className="space-y-2">
-                <Label>URL da Imagem</Label>
-                <Input
-                  value={newProduct.imageUrl}
-                  onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  data-testid="input-product-image"
+                <Label>Imagem do Produto</Label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setNewProduct({ ...newProduct, imageUrl: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="block w-full text-sm border border-input rounded-md cursor-pointer px-3 py-2"
+                  data-testid="input-product-image-file"
                 />
+                {newProduct.imageUrl && (
+                  <img src={newProduct.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md mt-2" />
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -688,11 +701,25 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>URL da Imagem</Label>
-                          <Input
-                            value={editingProduct.imageUrl}
-                            onChange={(e) => setEditingProduct({ ...editingProduct, imageUrl: e.target.value })}
+                          <Label>Imagem do Produto</Label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setEditingProduct({ ...editingProduct, imageUrl: reader.result as string });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="block w-full text-sm border border-input rounded-md cursor-pointer px-3 py-2"
                           />
+                          {editingProduct.imageUrl && (
+                            <img src={editingProduct.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md mt-2" />
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
