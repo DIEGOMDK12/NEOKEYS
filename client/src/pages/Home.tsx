@@ -198,6 +198,7 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
         onCartClick={() => setCartOpen(true)}
         onUserClick={handleUserClick}
         onSearch={handleSearch}
+        onLogoClick={() => window.location.href = "/"}
         menuOpen={menuOpen}
         isLoggedIn={!!customerUser}
       />

@@ -189,6 +189,7 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
         onCartClick={() => setCartOpen(true)}
         onUserClick={handleUserClick}
         onSearch={(q) => toast({ title: "Pesquisa", description: q })}
+        onLogoClick={onBack}
         menuOpen={menuOpen}
         isLoggedIn={!!customerUser}
       />

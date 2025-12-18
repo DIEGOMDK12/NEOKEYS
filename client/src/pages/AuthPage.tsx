@@ -147,6 +147,7 @@ export default function AuthPage({
         onCartClick={() => setCartOpen(true)}
         onUserClick={() => {}}
         onSearch={(q) => toast({ title: "Pesquisa", description: q })}
+        onLogoClick={onBack}
         menuOpen={menuOpen}
       />
 

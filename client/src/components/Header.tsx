@@ -10,6 +10,7 @@ interface HeaderProps {
   onCartClick: () => void;
   onUserClick: () => void;
   onSearch: (query: string) => void;
+  onLogoClick?: () => void;
   menuOpen?: boolean;
   isLoggedIn?: boolean;
 }
@@ -20,6 +21,7 @@ export default function Header({
   onCartClick,
   onUserClick,
   onSearch,
+  onLogoClick,
   menuOpen = false,
   isLoggedIn = false,
 }: HeaderProps) {
@@ -42,9 +44,13 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-1">
+          <button
+            onClick={onLogoClick}
+            className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+            data-testid="button-logo"
+          >
             <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
