@@ -68,9 +68,15 @@ export default function PixCheckout({
   useEffect(() => {
     const createPix = async () => {
       try {
+        console.log("🚀 Starting PIX checkout...");
+        console.log("Is cart checkout?", isCartCheckout);
+        console.log("Cart items:", cartItems);
+        console.log("Product ID:", productId);
+        
         let response;
         
         if (isCartCheckout) {
+          console.log("📦 Creating cart checkout with items:", cartItems);
           // Cart checkout
           response = await apiRequest("POST", "/api/customer/checkout/cart", {
             items: cartItems!.map(item => ({
@@ -79,6 +85,7 @@ export default function PixCheckout({
             })),
           });
         } else {
+          console.log("📄 Creating single product checkout:", { productId, quantity });
           // Single product checkout
           response = await apiRequest("POST", "/api/customer/checkout/pix", {
             productId,
@@ -86,9 +93,12 @@ export default function PixCheckout({
           });
         }
         
+        console.log("✅ Response received:", response.status);
         const data = await response.json();
+        console.log("📊 Response data:", data);
 
         if (data.error) {
+          console.error("❌ Error in response:", data.error);
           if (data.error.includes("login") || data.error.includes("Sessao")) {
             onLoginRequired();
             return;
@@ -98,8 +108,10 @@ export default function PixCheckout({
           return;
         }
 
+        console.log("🎉 PIX data set successfully");
         setPixData(data);
       } catch (error: any) {
+        console.error("💥 Exception caught:", error);
         toast({
           title: "Erro ao criar pagamento",
           description: error.message || "Tente novamente",
