@@ -24,6 +24,7 @@ interface HomeProps {
   onNavigateToProduct: (product: Product) => void;
   onNavigateToLogin: () => void;
   onNavigateToDashboard?: () => void;
+  onNavigateToPixCheckout?: (data: any) => void;
 }
 
 // Transform API product to frontend Product type
@@ -40,7 +41,7 @@ function transformProduct(p: any): Product {
   };
 }
 
-export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigateToDashboard }: HomeProps) {
+export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigateToDashboard, onNavigateToPixCheckout }: HomeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [selectedPriceFilter, setSelectedPriceFilter] = useState<number>();
@@ -192,7 +193,24 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onCheckout={() => {
-          toast({ title: "Checkout", description: "Redirecionando para pagamento..." });
+          if (!customerUser) {
+            onNavigateToLogin();
+            return;
+          }
+          if (cartItems.length > 0 && onNavigateToPixCheckout) {
+            onNavigateToPixCheckout({
+              cartItems: cartItems.map(item => ({
+                productId: item.product.id,
+                name: item.product.name,
+                imageUrl: item.product.imageUrl,
+                quantity: item.quantity,
+                price: item.product.price,
+              })),
+            });
+            setCartOpen(false);
+          } else {
+            toast({ title: "Erro", description: "Carrinho vazio", variant: "destructive" });
+          }
         }}
         onViewCart={() => {
           toast({ title: "Carrinho", description: "Visualizando carrinho completo" });

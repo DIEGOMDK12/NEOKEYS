@@ -166,6 +166,7 @@ function App() {
             onNavigateToProduct={handleNavigateToProduct}
             onNavigateToLogin={handleNavigateToLogin}
             onNavigateToDashboard={handleNavigateToDashboard}
+            onNavigateToPixCheckout={handleNavigateToPixCheckout}
           />
         )}
         {currentPage === "product" && selectedProduct && (
