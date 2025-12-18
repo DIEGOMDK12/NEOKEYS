@@ -118,14 +118,14 @@ export async function registerRoutes(
       // Validate stock availability
       const availableKeys = await storage.getAvailableKeyCount(productId);
       if (availableKeys < quantity) {
-        console.warn(`⚠️ Stock insufficient for ${productId}: requested ${quantity}, available ${availableKeys}`);
+        console.warn(`Stock insufficient for ${productId}: requested ${quantity}, available ${availableKeys}`);
         return res.status(400).json({ 
           error: `Estoque insuficiente. Disponível: ${availableKeys} un.` 
         });
       }
       
       const item = await storage.addToCart(sessionId, productId, quantity);
-      console.log(`✅ Added to cart: ${productId} x${quantity}`);
+      console.log(`Added to cart: ${productId} x${quantity}`);
       res.json(item);
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -385,7 +385,7 @@ export async function registerRoutes(
   // PIX Payment - Checkout entire cart
   app.post("/api/customer/checkout/cart", async (req: Request, res: Response) => {
     try {
-      console.log("📦 Cart checkout requested:", req.body);
+      console.log(" Cart checkout requested:", req.body);
       const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Faca login para comprar" });
@@ -398,12 +398,12 @@ export async function registerRoutes(
       
       const parsed = checkoutCartSchema.safeParse(req.body);
       if (!parsed.success) {
-        console.error("❌ Validation error:", parsed.error);
+        console.error(" Validation error:", parsed.error);
         return res.status(400).json({ error: "Dados invalidos" });
       }
       
       const { items } = parsed.data;
-      console.log("✅ Items validated:", items);
+      console.log(" Items validated:", items);
       
       // Validate all products and calculate total
       let totalPrice = 0;
@@ -450,7 +450,7 @@ export async function registerRoutes(
       console.log("📱 PIX Response:", pixResponse);
       
       if (pixResponse.error) {
-        console.error("❌ PIX Error:", pixResponse.error);
+        console.error(" PIX Error:", pixResponse.error);
         await storage.updateOrderStatus(order.id, "payment_failed");
         return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
       }
@@ -859,10 +859,10 @@ export async function registerRoutes(
         keyValue,
       });
       
-      console.log(`✅ Key added successfully: ${key.id}`);
+      console.log(` Key added successfully: ${key.id}`);
       res.json(key);
     } catch (error) {
-      console.error("❌ Error adding product key:", error);
+      console.error(" Error adding product key:", error);
       res.status(500).json({ error: "Falha ao adicionar chave", details: String(error) });
     }
   });
@@ -897,14 +897,14 @@ export async function registerRoutes(
             keyValue: keyValue.trim(),
           });
           addedKeys.push(key);
-          console.log(`✅ Added key: ${key.id}`);
+          console.log(` Added key: ${key.id}`);
         }
       }
       
-      console.log(`✅ Bulk add complete: ${addedKeys.length} keys added`);
+      console.log(` Bulk add complete: ${addedKeys.length} keys added`);
       res.json({ success: true, count: addedKeys.length, keys: addedKeys });
     } catch (error) {
-      console.error("❌ Error adding bulk keys:", error);
+      console.error(" Error adding bulk keys:", error);
       res.status(500).json({ error: "Falha ao adicionar chaves", details: String(error) });
     }
   });
@@ -1018,7 +1018,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Product not found" });
       }
       await storage.deleteProduct(req.params.id);
-      console.log(`✅ Product deleted: ${req.params.id}`);
+      console.log(` Product deleted: ${req.params.id}`);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting product:", error);

@@ -92,13 +92,13 @@ export default function CustomerDashboard({ onBack, onLoginRequired }: CustomerD
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "delivered":
-        return <Badge variant="default" className="bg-green-600">Entregue</Badge>;
+        return <Badge className="bg-green-600 hover:bg-green-700">Entregue</Badge>;
       case "pending":
         return <Badge variant="secondary">Pendente</Badge>;
       case "awaiting_payment":
-        return <Badge variant="outline" className="border-yellow-500 text-yellow-600">Aguardando Pagamento</Badge>;
+        return <Badge variant="outline">Aguardando Pagamento</Badge>;
       case "paid":
-        return <Badge variant="default" className="bg-blue-600">Pago</Badge>;
+        return <Badge className="bg-blue-600 hover:bg-blue-700">Pago</Badge>;
       case "payment_failed":
         return <Badge variant="destructive">Falha no Pagamento</Badge>;
       default:

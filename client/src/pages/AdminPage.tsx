@@ -1373,15 +1373,6 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
   // Filter only paid and delivered orders
   const orders = allOrders.filter(o => o.status === "paid" || o.status === "delivered");
 
-  useEffect(() => {
-    if (Object.keys(savedSettings).length > 0) {
-      setSettings((prev) => ({
-        ...prev,
-        ...savedSettings,
-      }));
-    }
-  }, [savedSettings]);
-
   const logoutMutation = useMutation({
     mutationFn: () => api.adminLogout(),
     onSuccess: () => {
@@ -1393,13 +1384,21 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
   const saveSettingsMutation = useMutation({
     mutationFn: (newSettings: Record<string, string>) => api.saveSettings(newSettings),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
       toast({ title: "Sucesso", description: "Configuracoes salvas com sucesso!" });
     },
     onError: () => {
       toast({ title: "Erro", description: "Falha ao salvar configuracoes", variant: "destructive" });
     },
   });
+
+  useEffect(() => {
+    if (Object.keys(savedSettings).length > 0 && !saveSettingsMutation.isPending) {
+      setSettings((prev) => ({
+        ...prev,
+        ...savedSettings,
+      }));
+    }
+  }, [savedSettings, saveSettingsMutation.isPending]);
 
   const handleSaveSettings = () => {
     saveSettingsMutation.mutate(settings);
