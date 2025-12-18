@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**December 18, 2024 - Dynamic Product Page Routing & URL Persistence**
+- Implemented dynamic route `/product/:id` to persist product page on page refresh
+- URL now changes to `/product/{productId}` when viewing a product
+- Refactored App.tsx to fetch product by ID from URL on page load
+- Automatic redirect to the same product page when refreshing browser
+- Product data is fetched from API when URL contains product ID
+
 **December 18, 2024 - Product Detail Page Related Products Section**
 - Added "Você pode gostar" (related products) section at bottom of product detail pages
 - Section displays with green neon accent background (primary color at 10% opacity)
