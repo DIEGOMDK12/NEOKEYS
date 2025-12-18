@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**December 2024 - External PostgreSQL Database Migration**
+- Migrated from Replit internal database to external Neon PostgreSQL
+- Configured NEON_DATABASE_URL environment variable for external database connection
+- All data now persists in external Neon database for reliability
+- Connection configured in server/db.ts with SSL support
+
 **December 2024 - PIX Payment Integration with AbacatePay**
 - Integrated AbacatePay gateway for PIX payments (API key stored as secret)
 - New PixCheckout page with QR code display and automatic payment status polling (3-second intervals)
