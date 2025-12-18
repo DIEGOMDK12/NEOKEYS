@@ -830,28 +830,34 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
+        console.warn("⚠️ No admin session when adding key");
         return res.status(401).json({ error: "Nao autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
       if (!session) {
+        console.warn("⚠️ Invalid admin session when adding key");
         return res.status(401).json({ error: "Sessao invalida" });
       }
       
       const { keyValue } = req.body;
       if (!keyValue) {
+        console.warn("⚠️ No keyValue provided");
         return res.status(400).json({ error: "Chave e obrigatoria" });
       }
+      
+      console.log(`➕ Adding key to product ${req.params.id}: ${keyValue.substring(0, 10)}...`);
       
       const key = await storage.addProductKey({
         productId: req.params.id,
         keyValue,
       });
       
+      console.log(`✅ Key added successfully: ${key.id}`);
       res.json(key);
     } catch (error) {
-      console.error("Error adding product key:", error);
-      res.status(500).json({ error: "Falha ao adicionar chave" });
+      console.error("❌ Error adding product key:", error);
+      res.status(500).json({ error: "Falha ao adicionar chave", details: String(error) });
     }
   });
 
@@ -859,18 +865,23 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
+        console.warn("⚠️ No admin session when adding bulk keys");
         return res.status(401).json({ error: "Nao autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
       if (!session) {
+        console.warn("⚠️ Invalid admin session when adding bulk keys");
         return res.status(401).json({ error: "Sessao invalida" });
       }
       
       const { keys } = req.body;
       if (!keys || !Array.isArray(keys)) {
+        console.warn("⚠️ Invalid keys array:", keys);
         return res.status(400).json({ error: "Lista de chaves e obrigatoria" });
       }
+      
+      console.log(`➕ Adding ${keys.length} keys to product ${req.params.id}`);
       
       const addedKeys = [];
       for (const keyValue of keys) {
@@ -880,13 +891,15 @@ export async function registerRoutes(
             keyValue: keyValue.trim(),
           });
           addedKeys.push(key);
+          console.log(`✅ Added key: ${key.id}`);
         }
       }
       
+      console.log(`✅ Bulk add complete: ${addedKeys.length} keys added`);
       res.json({ success: true, count: addedKeys.length, keys: addedKeys });
     } catch (error) {
-      console.error("Error adding bulk keys:", error);
-      res.status(500).json({ error: "Falha ao adicionar chaves" });
+      console.error("❌ Error adding bulk keys:", error);
+      res.status(500).json({ error: "Falha ao adicionar chaves", details: String(error) });
     }
   });
 
