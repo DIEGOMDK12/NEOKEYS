@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { rm, readFile, cp } from "fs/promises";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 
@@ -68,6 +68,12 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  console.log("copying public folder...");
+  const publicSrc = resolve(rootDir, "public");
+  const publicDest = resolve(distDir, "public");
+  await cp(publicSrc, publicDest, { recursive: true });
+  console.log("build complete!");
 }
 
 buildAll().catch((err) => {
