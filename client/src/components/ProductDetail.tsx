@@ -55,7 +55,7 @@ export default function ProductDetail({
     <div className="pb-24">
       <div className="space-y-4">
         {product.videoUrl && (
-          <div className="relative aspect-video bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
+          <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
             <img
               src={product.imageUrl}
               alt={product.name}
@@ -90,7 +90,7 @@ export default function ProductDetail({
           </div>
         )}
         {!product.videoUrl && (
-          <div className="aspect-video bg-card rounded-lg overflow-hidden mb-4">
+          <div className="aspect-square bg-card rounded-lg overflow-hidden mb-4">
             <img
               src={product.imageUrl}
               alt={product.name}
@@ -100,7 +100,7 @@ export default function ProductDetail({
         )}
         {galleryImages.length > 0 && (
           <div className="space-y-2">
-            <div className="relative aspect-video bg-card rounded-lg overflow-hidden">
+            <div className="relative aspect-square bg-card rounded-lg overflow-hidden">
               <img
                 src={galleryImages[currentGalleryIndex]}
                 alt={`Gallery ${currentGalleryIndex + 1}`}
