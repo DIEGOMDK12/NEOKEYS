@@ -1366,9 +1366,12 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
     queryFn: () => api.getProducts(),
   });
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery<Order[]>({
+  const { data: allOrders = [], isLoading: ordersLoading } = useQuery<Order[]>({
     queryKey: ["/api/admin/orders"],
   });
+
+  // Filter only paid and delivered orders
+  const orders = allOrders.filter(o => o.status === "paid" || o.status === "delivered");
 
   useEffect(() => {
     if (Object.keys(savedSettings).length > 0) {

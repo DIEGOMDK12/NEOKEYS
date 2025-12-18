@@ -789,7 +789,7 @@ export async function registerRoutes(
     }
   });
 
-  // Admin Orders API
+  // Admin Orders API - returns only paid and delivered orders
   app.get("/api/admin/orders", async (req: Request, res: Response) => {
     try {
       const sessionId = req.cookies?.admin_session;
@@ -802,8 +802,9 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Sessao invalida" });
       }
       
-      const orders = await storage.getAllOrders();
-      res.json(orders);
+      const allOrders = await storage.getAllOrders();
+      const paidOrders = allOrders.filter(o => o.status === "paid" || o.status === "delivered");
+      res.json(paidOrders);
     } catch (error) {
       console.error("Error fetching admin orders:", error);
       res.status(500).json({ error: "Falha ao buscar pedidos" });
