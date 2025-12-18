@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
 import { Gamepad2, Play, X } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
@@ -77,6 +78,8 @@ export default function ProductDetail({
   const [touchEnd, setTouchEnd] = useState(0);
   const [isEditingRequirements, setIsEditingRequirements] = useState(false);
   const [editingRequirements, setEditingRequirements] = useState<string[]>(requirements.minimum);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(description);
   const galleryRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const PlatformIcon = platformIcons[product.platform] || SiSteam;
@@ -94,6 +97,22 @@ export default function ProductDetail({
     },
     onError: () => {
       toast({ title: "Erro ao salvar requisitos", variant: "destructive" });
+    },
+  });
+
+  const descriptionMutation = useMutation({
+    mutationFn: async () => {
+      await api.updateProduct(product.id, {
+        description: editingDescription,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      setIsEditingDescription(false);
+      toast({ title: "Descrição salva com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro ao salvar descrição", variant: "destructive" });
     },
   });
   
@@ -282,8 +301,40 @@ export default function ProductDetail({
         <Separator className="my-6" />
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold mb-3">Descricao</h2>
-          <p className="text-muted-foreground whitespace-pre-line">{description}</p>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold">Descricao</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditingDescription(!isEditingDescription)}
+              data-testid="button-edit-description"
+            >
+              {isEditingDescription ? "Cancelar" : "Editar"}
+            </Button>
+          </div>
+          
+          {isEditingDescription ? (
+            <div className="space-y-2">
+              <Textarea
+                value={editingDescription}
+                onChange={(e) => setEditingDescription(e.target.value)}
+                className="min-h-32"
+                data-testid="textarea-description"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => descriptionMutation.mutate()}
+                  disabled={descriptionMutation.isPending}
+                  className="flex-1"
+                  data-testid="button-save-description"
+                >
+                  {descriptionMutation.isPending ? "Salvando..." : "Salvar Descrição"}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground whitespace-pre-line">{editingDescription}</p>
+          )}
         </div>
 
         <Separator className="my-6" />

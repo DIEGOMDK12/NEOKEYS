@@ -166,7 +166,7 @@ export default function ProductPage({
     .slice(0, 4)
     .map(transformProduct);
 
-  const description = `${product.name} - Uma experiencia incrivel de jogos!
+  const description = product.description || `${product.name} - Uma experiencia incrivel de jogos!
 
 Aproveite esse titulo incrivel com um desconto de ${product.discount}%.
 
