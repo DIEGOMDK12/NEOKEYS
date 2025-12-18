@@ -129,12 +129,12 @@ export default function ProductDetail({
           </div>
         )}
         {galleryImages.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="relative aspect-square bg-card rounded-lg overflow-hidden">
               <img
                 src={galleryImages[currentGalleryIndex]}
                 alt={`Gallery ${currentGalleryIndex + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-opacity duration-300"
               />
               {galleryImages.length > 1 && (
                 <>
@@ -156,13 +156,15 @@ export default function ProductDetail({
               )}
             </div>
             {galleryImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-2 overflow-x-auto pb-2 px-1">
                 {galleryImages.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentGalleryIndex(idx)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
-                      idx === currentGalleryIndex ? "border-primary" : "border-transparent"
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden transition-all duration-200 hover-elevate ${
+                      idx === currentGalleryIndex 
+                        ? "border-2 border-primary shadow-md" 
+                        : "border-2 border-transparent hover:border-primary/50"
                     }`}
                     data-testid={`button-gallery-thumbnail-${idx}`}
                   >
