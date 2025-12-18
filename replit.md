@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**December 18, 2024 - Product Detail Page Related Products Section**
+- Added "Você pode gostar" (related products) section at bottom of product detail pages
+- Section displays with green neon accent background (primary color at 10% opacity)
+- Enhanced title styling with larger font (text-2xl) and bold weight in primary green color
+- Improved spacing and visual hierarchy with py-8 padding
+- Related products fetched and displayed in responsive grid layout
+
 **December 2024 - External PostgreSQL Database Migration**
 - Migrated from Replit internal database to external Neon PostgreSQL
 - Configured NEON_DATABASE_URL environment variable for external database connection

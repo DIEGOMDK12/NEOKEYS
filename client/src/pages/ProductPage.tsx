@@ -289,6 +289,7 @@ Disponivel para ${currentProduct.platform} na regiao ${currentProduct.region}.`;
           products={relatedProducts}
           onAddToCart={handleAddToCart}
           onProductClick={onNavigateToProduct}
+          highlighted={true}
         />
       )}
     </div>

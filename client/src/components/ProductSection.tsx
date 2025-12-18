@@ -7,6 +7,7 @@ interface ProductSectionProps {
   onAddToCart: (product: Product) => void;
   onProductClick: (product: Product) => void;
   onViewMore?: () => void;
+  highlighted?: boolean;
 }
 
 export default function ProductSection({
@@ -15,11 +16,12 @@ export default function ProductSection({
   onAddToCart,
   onProductClick,
   onViewMore,
+  highlighted = false,
 }: ProductSectionProps) {
   return (
-    <section className="py-4">
+    <section className={`py-8 ${highlighted ? 'bg-primary/10' : ''}`}>
       <div className="flex items-center justify-between gap-4 mb-4 px-4">
-        <h2 className="text-lg font-bold">{title}</h2>
+        <h2 className="text-2xl font-bold text-primary">{title}</h2>
         {onViewMore && (
           <Button
             variant="ghost"
