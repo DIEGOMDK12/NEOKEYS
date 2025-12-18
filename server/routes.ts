@@ -110,7 +110,17 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Product not found" });
       }
       
+      // Validate stock availability
+      const availableKeys = await storage.getAvailableKeyCount(productId);
+      if (availableKeys < quantity) {
+        console.warn(`⚠️ Stock insufficient for ${productId}: requested ${quantity}, available ${availableKeys}`);
+        return res.status(400).json({ 
+          error: `Estoque insuficiente. Disponível: ${availableKeys} un.` 
+        });
+      }
+      
       const item = await storage.addToCart(sessionId, productId, quantity);
+      console.log(`✅ Added to cart: ${productId} x${quantity}`);
       res.json(item);
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -131,6 +141,17 @@ export async function registerRoutes(
       }
       
       const { quantity } = parsed.data;
+      
+      // Validate stock availability on update
+      if (quantity > 0) {
+        const availableKeys = await storage.getAvailableKeyCount(req.params.productId);
+        if (availableKeys < quantity) {
+          return res.status(400).json({ 
+            error: `Estoque insuficiente. Disponível: ${availableKeys} un.` 
+          });
+        }
+      }
+      
       const item = await storage.updateCartItemQuantity(sessionId, req.params.productId, quantity);
       res.json(item);
     } catch (error) {
