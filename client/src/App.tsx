@@ -12,6 +12,16 @@ import PixCheckout from "@/pages/PixCheckout";
 import { Product } from "@/components/ProductCard";
 import { api } from "@/lib/api";
 
+// Initialize session ID on app load
+const getSessionId = (): string => {
+  let sessionId = localStorage.getItem("neonkeys-session-id");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("neonkeys-session-id", sessionId);
+  }
+  return sessionId;
+};
+
 type Page = "home" | "product" | "customer-login" | "customer-dashboard" | "admin" | "pix-checkout";
 
 function getProductIdFromPath(pathname: string): string | null {
@@ -50,6 +60,11 @@ function AppContent() {
     const path = window.location.pathname;
     return getProductIdFromPath(path);
   });
+
+  // Initialize session ID on mount
+  useEffect(() => {
+    getSessionId();
+  }, []);
 
   // Fetch product by ID if URL contains product ID
   const { data: fetchedProduct } = useQuery({
