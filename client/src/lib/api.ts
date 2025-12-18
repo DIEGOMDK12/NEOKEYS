@@ -142,6 +142,7 @@ export const api = {
     category?: string;
     galleryImages?: string[];
     videoUrl?: string;
+    systemRequirements?: string;
   }>) => {
     return fetchWithSession(`/api/products/${id}`, {
       method: "PUT",

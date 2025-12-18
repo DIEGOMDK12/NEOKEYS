@@ -173,14 +173,16 @@ Aproveite esse titulo incrivel com um desconto de ${product.discount}%.
 Disponivel para ${product.platform} na regiao ${product.region}.`;
 
   const requirements = {
-    minimum: [
-      "Sistema Operacional: Windows 7/8/10 (64-bit OS)",
-      "Processador: Intel Core i3 or AMD Athlon II",
-      "Memoria: 4 GB de RAM",
-      "Placa de video: Intel HD Graphics 4000",
-      "DirectX: Versao 11",
-      "Armazenamento: 2 GB de espaco disponivel",
-    ],
+    minimum: product.systemRequirements 
+      ? product.systemRequirements.split("\n").filter(r => r.trim())
+      : [
+          "Sistema Operacional: Windows 7/8/10 (64-bit OS)",
+          "Processador: Intel Core i3 or AMD Athlon II",
+          "Memoria: 4 GB de RAM",
+          "Placa de video: Intel HD Graphics 4000",
+          "DirectX: Versao 11",
+          "Armazenamento: 2 GB de espaco disponivel",
+        ],
   };
 
   return (
