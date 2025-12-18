@@ -3,7 +3,6 @@ import { Menu, Search, ShoppingCart, User, UserCheck, X, CheckCircle2 } from "lu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import eliteVaultLogo from "@assets/generated_images/elitevault_premium_vault_logo.png";
 
 interface HeaderProps {
   cartCount: number;
@@ -43,17 +42,9 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-2">
-            <img 
-              src={eliteVaultLogo} 
-              alt="ELITEVAULT" 
-              className="h-8 w-auto"
-              data-testid="img-logo"
-            />
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-semibold text-foreground">ELITEVAULT</span>
-              <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" data-testid="icon-verified" />
-            </div>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
+            <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" data-testid="icon-verified" />
           </div>
         </div>
 
