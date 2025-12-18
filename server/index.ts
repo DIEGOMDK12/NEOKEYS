@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import path from "path";
 
 const app = express();
 const httpServer = createServer(app);
@@ -12,6 +13,9 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+// Serve static files from public folder (images, logos, etc)
+app.use(express.static(path.resolve(import.meta.dirname, "public")));
 
 app.use(cookieParser());
 app.use(
