@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Menu, Search, ShoppingCart, User, UserCheck, X, CheckCircle2 } from "lucide-react";
-import { SiInstagram } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -51,9 +50,9 @@ export default function Header({
               className="h-8 w-auto"
               data-testid="img-logo"
             />
-            <div className="relative">
-              <SiInstagram className="h-5 w-5 text-pink-500" data-testid="icon-instagram" />
-              <CheckCircle2 className="absolute -top-1 -right-1 h-3 w-3 text-blue-500 fill-blue-500" data-testid="icon-verified" />
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-semibold text-foreground">ELITEVAULT</span>
+              <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" data-testid="icon-verified" />
             </div>
           </div>
         </div>
