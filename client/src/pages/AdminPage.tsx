@@ -627,14 +627,51 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                 />
               </div>
               <div className="space-y-2">
-                <Label>URLs de Galeria (uma por linha)</Label>
-                <Textarea
-                  value={newProduct.galleryImages.join('\n')}
-                  onChange={(e) => setNewProduct({ ...newProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
-                  placeholder="https://image1.com&#10;https://image2.com&#10;https://image3.com"
-                  rows={4}
-                  data-testid="input-product-gallery"
+                <Label>Imagens da Galeria</Label>
+                <p className="text-xs text-muted-foreground mb-2">Carregue imagens do seu dispositivo</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    Promise.all(
+                      files.map(file => {
+                        return new Promise<string>((resolve) => {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            resolve(reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                      })
+                    ).then(dataUrls => {
+                      setNewProduct({ ...newProduct, galleryImages: [...newProduct.galleryImages, ...dataUrls] });
+                    });
+                  }}
+                  className="block w-full text-sm border border-input rounded-md cursor-pointer px-3 py-2"
+                  data-testid="input-product-gallery-upload"
                 />
+                {newProduct.galleryImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {newProduct.galleryImages.map((img, idx) => (
+                      <div key={idx} className="relative">
+                        <img src={img} alt={`Gallery ${idx}`} className="w-full h-20 object-cover rounded-md" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newGallery = newProduct.galleryImages.filter((_, i) => i !== idx);
+                            setNewProduct({ ...newProduct, galleryImages: newGallery });
+                          }}
+                          className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 hover:bg-destructive/80"
+                          data-testid={`button-remove-gallery-${idx}`}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <Button
                 onClick={handleCreateProduct}
@@ -751,14 +788,54 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>URLs de Galeria (uma por linha)</Label>
-                          <Textarea
-                            value={editingProduct.galleryImages?.join('\n') || ""}
-                            onChange={(e) => setEditingProduct({ ...editingProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
-                            placeholder="https://image1.com&#10;https://image2.com"
-                            rows={3}
-                            data-testid="input-edit-product-gallery"
+                          <Label>Imagens da Galeria</Label>
+                          <p className="text-xs text-muted-foreground mb-2">Carregue imagens do seu dispositivo</p>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              Promise.all(
+                                files.map(file => {
+                                  return new Promise<string>((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      resolve(reader.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  });
+                                })
+                              ).then(dataUrls => {
+                                setEditingProduct({ 
+                                  ...editingProduct, 
+                                  galleryImages: [...(editingProduct.galleryImages || []), ...dataUrls] 
+                                });
+                              });
+                            }}
+                            className="block w-full text-sm border border-input rounded-md cursor-pointer px-3 py-2"
+                            data-testid="input-edit-product-gallery-upload"
                           />
+                          {editingProduct.galleryImages && editingProduct.galleryImages.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                              {editingProduct.galleryImages.map((img, idx) => (
+                                <div key={idx} className="relative">
+                                  <img src={img} alt={`Gallery ${idx}`} className="w-full h-20 object-cover rounded-md" />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newGallery = editingProduct.galleryImages!.filter((_, i) => i !== idx);
+                                      setEditingProduct({ ...editingProduct, galleryImages: newGallery });
+                                    }}
+                                    className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 hover:bg-destructive/80"
+                                    data-testid={`button-edit-remove-gallery-${idx}`}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label>Desconto %</Label>

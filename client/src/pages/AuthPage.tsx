@@ -24,6 +24,8 @@ function transformProduct(p: any): Product {
     price: parseFloat(p.price),
     originalPrice: parseFloat(p.originalPrice),
     discount: p.discount,
+    videoUrl: p.videoUrl,
+    galleryImages: p.galleryImages,
   };
 }
 

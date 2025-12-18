@@ -13,6 +13,8 @@ export interface Product {
   price: number;
   originalPrice: number;
   discount: number;
+  videoUrl?: string;
+  galleryImages?: string[];
 }
 
 interface ProductCardProps {
