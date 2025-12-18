@@ -3,7 +3,7 @@ import { Menu, Search, ShoppingCart, User, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import neoKeysLogo from "@assets/generated_images/neo_keys_logo_transparent_background.png";
+import eliteVaultLogo from "@assets/generated_images/elitevault_premium_vault_logo.png";
 
 interface HeaderProps {
   cartCount: number;
@@ -45,8 +45,8 @@ export default function Header({
           </Button>
           <div className="flex items-center">
             <img 
-              src={neoKeysLogo} 
-              alt="NEO-KEYS" 
+              src={eliteVaultLogo} 
+              alt="ELITEVAULT" 
               className="h-8 w-auto"
               data-testid="img-logo"
             />
