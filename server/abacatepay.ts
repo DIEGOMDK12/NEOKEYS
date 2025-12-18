@@ -46,7 +46,10 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
   const apiKey = process.env.ABACATEPAY_API_KEY;
   const webhookUrl = process.env.WEBHOOK_URL || "https://neokeys.onrender.com/webhook";
   
+  console.log("🔑 API Key exists:", !!apiKey);
+  
   if (!apiKey) {
+    console.error("❌ ABACATEPAY_API_KEY is not configured!");
     throw new Error("ABACATEPAY_API_KEY not configured");
   }
 
@@ -56,21 +59,37 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
     completionUrl: request.completionUrl || webhookUrl,
   };
 
-  const response = await fetch(`${ABACATEPAY_API_URL}/pixQrCode/create`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+  console.log("📤 Sending PIX request to AbacatePay:", {
+    url: `${ABACATEPAY_API_URL}/pixQrCode/create`,
+    amount: request.amount,
+    description: request.description,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`AbacatePay API error: ${response.status} - ${errorText}`);
-  }
+  try {
+    const response = await fetch(`${ABACATEPAY_API_URL}/pixQrCode/create`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  return response.json();
+    console.log("📨 AbacatePay response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ AbacatePay error response:", errorText);
+      throw new Error(`AbacatePay API error: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log("✅ PIX QR Code created successfully:", result.data?.id);
+    return result;
+  } catch (error) {
+    console.error("❌ Error calling AbacatePay API:", error);
+    throw error;
+  }
 }
 
 export async function checkPixStatus(pixId: string): Promise<CheckPixStatusResponse> {
