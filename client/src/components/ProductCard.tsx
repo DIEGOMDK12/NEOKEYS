@@ -16,6 +16,7 @@ export interface Product {
   videoUrl?: string;
   galleryImages?: string[];
   systemRequirements?: string;
+  description?: string;
 }
 
 interface ProductCardProps {
