@@ -78,16 +78,29 @@ export default function ProductPage({
     }
   };
 
-  // Fetch cart
+  // Fetch cart - only fetch when session exists
   const { data: cartData = [] } = useQuery({
     queryKey: ["/api/cart"],
-    queryFn: () => api.getCart(),
+    queryFn: async () => {
+      try {
+        return await api.getCart();
+      } catch (error) {
+        return [];
+      }
+    },
   });
 
   // Fetch related products
   const { data: allProducts = [] } = useQuery({
     queryKey: ["/api/products"],
-    queryFn: () => api.getProducts(),
+    queryFn: async () => {
+      try {
+        return await api.getProducts();
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        return [];
+      }
+    },
   });
 
   // Add to cart mutation

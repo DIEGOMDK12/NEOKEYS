@@ -71,26 +71,51 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
   // Fetch settings
   const { data: settings = {} } = useQuery({
     queryKey: ["/api/settings"],
-    queryFn: () => api.getSettings(),
+    queryFn: async () => {
+      try {
+        return await api.getSettings();
+      } catch (error) {
+        return {};
+      }
+    },
   });
 
   // Fetch products
   const { data: allProducts = [], isLoading: productsLoading } = useQuery({
     queryKey: ["/api/products"],
-    queryFn: () => api.getProducts(),
+    queryFn: async () => {
+      try {
+        return await api.getProducts();
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        return [];
+      }
+    },
   });
 
   // Fetch filtered products
   const { data: filteredProducts } = useQuery({
     queryKey: ["/api/products", { maxPrice: selectedPriceFilter, search: searchQuery }],
-    queryFn: () => api.getProducts({ maxPrice: selectedPriceFilter, search: searchQuery || undefined }),
+    queryFn: async () => {
+      try {
+        return await api.getProducts({ maxPrice: selectedPriceFilter, search: searchQuery || undefined });
+      } catch (error) {
+        return [];
+      }
+    },
     enabled: !!selectedPriceFilter || !!searchQuery,
   });
 
   // Fetch cart
   const { data: cartData = [] } = useQuery({
     queryKey: ["/api/cart"],
-    queryFn: () => api.getCart(),
+    queryFn: async () => {
+      try {
+        return await api.getCart();
+      } catch (error) {
+        return [];
+      }
+    },
   });
 
   // Add to cart mutation
