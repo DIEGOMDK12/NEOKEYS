@@ -140,7 +140,7 @@ export default function CartDrawer({
                   Ver carrinho
                 </Button>
                 <Button className="flex-1" onClick={onCheckout} data-testid="button-checkout">
-                  Checkout
+                  Comprar Agora
                 </Button>
               </div>
             </div>
