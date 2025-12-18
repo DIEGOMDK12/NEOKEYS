@@ -29,6 +29,35 @@ const platformIcons: Record<string, any> = {
   PlayStation: SiPlaystation,
 };
 
+function convertVideoUrl(url: string): string {
+  if (!url) return "";
+  
+  // If already an embed URL, return as is
+  if (url.includes("youtube.com/embed") || url.includes("vimeo.com/video")) {
+    return url;
+  }
+  
+  // Convert YouTube URLs to embed format
+  if (url.includes("youtube.com/watch")) {
+    const videoId = url.split("v=")[1]?.split("&")[0];
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+  
+  // Convert youtu.be short URLs to embed format
+  if (url.includes("youtu.be/")) {
+    const videoId = url.split("youtu.be/")[1]?.split("?")[0];
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+  }
+  
+  // Convert Vimeo URLs to embed format
+  if (url.includes("vimeo.com/")) {
+    const videoId = url.split("vimeo.com/")[1]?.split("?")[0];
+    if (videoId) return `https://player.vimeo.com/video/${videoId}`;
+  }
+  
+  return url;
+}
+
 export default function ProductDetail({
   product,
   description,
@@ -42,6 +71,7 @@ export default function ProductDetail({
   const PlatformIcon = platformIcons[product.platform] || SiSteam;
   
   const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
+  const videoEmbedUrl = product.videoUrl ? convertVideoUrl(product.videoUrl) : "";
 
   const handlePreviousImage = () => {
     setCurrentGalleryIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
@@ -54,7 +84,7 @@ export default function ProductDetail({
   return (
     <div className="pb-24">
       <div className="space-y-4">
-        {product.videoUrl && (
+        {videoEmbedUrl && (
           <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
             <img
               src={product.imageUrl}
@@ -79,7 +109,7 @@ export default function ProductDetail({
                   ✕
                 </button>
                 <iframe
-                  src={product.videoUrl}
+                  src={videoEmbedUrl}
                   className="w-full h-full"
                   allowFullScreen
                   allow="autoplay"
@@ -89,7 +119,7 @@ export default function ProductDetail({
             )}
           </div>
         )}
-        {!product.videoUrl && (
+        {!videoEmbedUrl && (
           <div className="aspect-square bg-card rounded-lg overflow-hidden mb-4">
             <img
               src={product.imageUrl}
