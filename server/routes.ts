@@ -1012,11 +1012,16 @@ export async function registerRoutes(
 
   app.delete("/api/products/:id", async (req: Request, res: Response) => {
     try {
+      const product = await storage.getProductById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
       await storage.deleteProduct(req.params.id);
+      console.log(`✅ Product deleted: ${req.params.id}`);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting product:", error);
-      res.status(500).json({ error: "Failed to delete product" });
+      res.status(500).json({ error: "Erro ao deletar produto. Verifique se nao ha pedidos associados." });
     }
   });
 
