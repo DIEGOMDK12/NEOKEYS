@@ -359,6 +359,7 @@ export async function registerRoutes(
   // PIX Payment - Checkout entire cart
   app.post("/api/customer/checkout/cart", async (req: Request, res: Response) => {
     try {
+      console.log("📦 Cart checkout requested:", req.body);
       const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
         return res.status(401).json({ error: "Faca login para comprar" });
@@ -371,10 +372,12 @@ export async function registerRoutes(
       
       const parsed = checkoutCartSchema.safeParse(req.body);
       if (!parsed.success) {
+        console.error("❌ Validation error:", parsed.error);
         return res.status(400).json({ error: "Dados invalidos" });
       }
       
       const { items } = parsed.data;
+      console.log("✅ Items validated:", items);
       
       // Validate all products and calculate total
       let totalPrice = 0;
@@ -407,6 +410,7 @@ export async function registerRoutes(
         status: "awaiting_payment",
       });
       
+      console.log("🔐 Creating PIX QR Code with amount:", amountInCents);
       const pixResponse = await createPixQrCode({
         amount: amountInCents,
         expiresIn: 3600,
@@ -417,7 +421,10 @@ export async function registerRoutes(
         },
       });
       
+      console.log("📱 PIX Response:", pixResponse);
+      
       if (pixResponse.error) {
+        console.error("❌ PIX Error:", pixResponse.error);
         await storage.updateOrderStatus(order.id, "payment_failed");
         return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
       }
