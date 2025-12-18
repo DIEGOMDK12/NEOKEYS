@@ -40,7 +40,7 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
           </Button>
           <div className="flex items-center gap-2">
             <span className="font-bold text-lg">
-              Elite<span className="text-primary">Vault</span>
+              Elite<span className="text-white">Vault</span>
             </span>
           </div>
           <div className="w-9" />

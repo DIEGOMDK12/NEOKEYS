@@ -32,7 +32,7 @@ export default function HeroBanner({
           )}
           <h2 className="text-xl md:text-3xl font-bold text-white mb-2">{title}</h2>
           <p className="text-sm text-white/80 mb-3">
-            POR APENAS <span className="text-primary font-bold text-lg">{price}</span>
+            POR APENAS <span className="text-white font-bold text-lg">{price}</span>
           </p>
           <Button onClick={onBuyClick} data-testid="button-hero-buy">
             COMPRE AGORA!

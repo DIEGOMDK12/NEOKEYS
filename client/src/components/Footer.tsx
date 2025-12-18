@@ -19,11 +19,11 @@ function FooterSection({ title, children }: FooterSectionProps) {
         className="flex items-center justify-between w-full py-4 px-4 text-left"
         data-testid={`button-footer-${title.toLowerCase().replace(/\s+/g, '-')}`}
       >
-        <span className="text-primary font-semibold text-sm uppercase">{title}</span>
+        <span className="text-white font-semibold text-sm uppercase">{title}</span>
         {isOpen ? (
-          <ChevronUp className="h-5 w-5 text-primary" />
+          <ChevronUp className="h-5 w-5 text-white" />
         ) : (
-          <ChevronDown className="h-5 w-5 text-primary" />
+          <ChevronDown className="h-5 w-5 text-white" />
         )}
       </button>
       {isOpen && (
@@ -61,7 +61,7 @@ export default function Footer() {
       </FooterSection>
 
       <div className="border-t border-border p-4">
-        <h3 className="text-primary font-semibold text-sm uppercase mb-3">NEWSLETTER</h3>
+        <h3 className="text-white font-semibold text-sm uppercase mb-3">NEWSLETTER</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Inscreva-se para receber as últimas novidades no seu e-mail
         </p>
@@ -77,7 +77,7 @@ export default function Footer() {
           <Button 
             type="submit" 
             variant="outline" 
-            className="border-primary text-primary"
+            className="border-white text-white"
             data-testid="button-newsletter-submit"
           >
             Enviar

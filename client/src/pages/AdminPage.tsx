@@ -130,8 +130,8 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <Lock className="h-8 w-8 text-primary" />
+          <div className="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4">
+            <Lock className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl">Painel Administrativo</CardTitle>
           <CardDescription>Entre com suas credenciais de administrador</CardDescription>
@@ -203,8 +203,8 @@ function AdminSidebar({
     <Sidebar>
       <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center">
-            <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
+          <div className="w-10 h-10 bg-white rounded-md flex items-center justify-center">
+            <LayoutDashboard className="h-5 w-5 text-white-foreground" />
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="font-semibold text-sm truncate">Admin Panel</h2>
@@ -375,7 +375,7 @@ function DashboardSection({ products, orders }: { products: Product[]; orders: O
                         <p className="text-xs text-muted-foreground">{product.platform}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-medium text-primary">R$ {product.price}</span>
+                    <span className="text-sm font-medium text-white">R$ {product.price}</span>
                   </div>
                 ))}
               </div>
@@ -718,7 +718,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
               <h3 className="font-semibold truncate">{product.name}</h3>
               <p className="text-sm text-muted-foreground">{product.platform} - {product.region}</p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="font-bold text-primary">R$ {product.price}</span>
+                <span className="font-bold text-white">R$ {product.price}</span>
                 {parseFloat(product.originalPrice) > parseFloat(product.price) && (
                   <span className="text-sm text-muted-foreground line-through">R$ {product.originalPrice}</span>
                 )}
@@ -1114,7 +1114,7 @@ function KeysSection({ products }: { products: Product[] }) {
                         data-testid={`key-row-${key.id}`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <Key className={`h-4 w-4 ${key.isUsed ? "text-muted-foreground" : "text-primary"}`} />
+                          <Key className={`h-4 w-4 ${key.isUsed ? "text-muted-foreground" : "text-white"}`} />
                           <code className="text-sm font-mono truncate">{key.keyValue}</code>
                           {key.isUsed && <span className="text-xs text-muted-foreground">(Usado)</span>}
                         </div>
@@ -1227,7 +1227,7 @@ function OrdersSection({ orders }: { orders: Order[] }) {
                     {order.deliveredKey && (
                       <div className="mt-2 p-2 bg-muted rounded-md">
                         <div className="flex items-center gap-2">
-                          <Key className="h-4 w-4 text-primary" />
+                          <Key className="h-4 w-4 text-white" />
                           <code className="text-sm font-mono">{order.deliveredKey}</code>
                           <Button
                             variant="ghost"
@@ -1341,7 +1341,7 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
                   <p className="text-xs text-white/80 uppercase">{settings.heroSubtitle}</p>
                   <h2 className="text-xl font-bold text-white">{settings.heroTitle}</h2>
                   <p className="text-sm text-white/80">
-                    POR APENAS <span className="text-primary font-bold">{settings.heroPrice}</span>
+                    POR APENAS <span className="text-white font-bold">{settings.heroPrice}</span>
                   </p>
                 </div>
               </div>

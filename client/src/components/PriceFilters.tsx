@@ -23,8 +23,8 @@ export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFi
             variant={selectedFilter === option.value ? "default" : "outline"}
             className={`h-10 px-5 font-semibold text-sm rounded-full whitespace-nowrap transition-all ${
               selectedFilter === option.value 
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" 
-                : "border-primary/50 text-primary hover:bg-primary/10"
+                ? "bg-white text-black shadow-lg shadow-white/30" 
+                : "border-white/50 text-white hover:bg-white/10"
             }`}
             onClick={() => onFilterSelect(option.value)}
             data-testid={`filter-price-${option.value}`}

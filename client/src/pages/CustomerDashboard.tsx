@@ -228,7 +228,7 @@ export default function CustomerDashboard({ onBack, onLoginRequired }: CustomerD
                           {order.deliveredKey && (
                             <div className="mt-4 p-3 bg-muted rounded-md">
                               <div className="flex items-center gap-2 mb-2">
-                                <Key className="h-4 w-4 text-primary" />
+                                <Key className="h-4 w-4 text-white" />
                                 <span className="text-sm font-medium">Sua Chave:</span>
                               </div>
                               <div className="flex items-center gap-2">

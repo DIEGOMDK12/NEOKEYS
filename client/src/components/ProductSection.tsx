@@ -19,13 +19,13 @@ export default function ProductSection({
   highlighted = false,
 }: ProductSectionProps) {
   return (
-    <section className={`py-8 ${highlighted ? 'bg-primary/10' : ''}`}>
+    <section className={`py-8 ${highlighted ? 'bg-white/10' : ''}`}>
       <div className="flex items-center justify-between gap-4 mb-4 px-4">
-        <h2 className="text-2xl font-bold text-primary">{title}</h2>
+        <h2 className="text-2xl font-bold text-white">{title}</h2>
         {onViewMore && (
           <Button
             variant="ghost"
-            className="text-primary p-0 h-auto"
+            className="text-white p-0 h-auto"
             onClick={onViewMore}
             data-testid={`button-view-more-${title.toLowerCase().replace(/\s+/g, "-")}`}
           >

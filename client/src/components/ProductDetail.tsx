@@ -121,7 +121,7 @@ export default function ProductDetail({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-              <div className="bg-primary rounded-full p-4">
+              <div className="bg-white rounded-full p-4">
                 <Play className="h-8 w-8 text-white fill-white" />
               </div>
             </div>
@@ -241,7 +241,7 @@ export default function ProductDetail({
 
         <Card className="mb-4">
           <CardContent className="p-4">
-            <p className="text-primary font-medium mb-4">
+            <p className="text-white font-medium mb-4">
               Essa chave funcionara no Brasil
             </p>
             <div className="space-y-3">
@@ -272,7 +272,7 @@ export default function ProductDetail({
             <h2 className="text-xl font-bold">REQUISITOS DE SISTEMA</h2>
           </div>
           
-          <h3 className="text-sm font-semibold text-primary mb-2">MINIMOS:</h3>
+          <h3 className="text-sm font-semibold text-white mb-2">MINIMOS:</h3>
           <ul className="space-y-1 text-sm text-muted-foreground">
             {editingRequirements
               .slice(0, showFullRequirements ? undefined : 3)
@@ -284,7 +284,7 @@ export default function ProductDetail({
           {editingRequirements.filter(r => r.trim()).length > 3 && (
             <Button
               variant="ghost"
-              className="text-primary p-0 h-auto mt-2"
+              className="text-white p-0 h-auto mt-2"
               onClick={() => setShowFullRequirements(!showFullRequirements)}
               data-testid="button-toggle-requirements"
             >

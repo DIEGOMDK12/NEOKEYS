@@ -207,7 +207,7 @@ export default function PixCheckout({
                   <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                     <p className="text-sm font-semibold text-left">Sua Chave de Ativação:</p>
                     <div className="flex items-center gap-2 bg-background p-3 rounded-md border">
-                      <code className="flex-1 text-sm font-mono break-all text-primary">
+                      <code className="flex-1 text-sm font-mono break-all text-white">
                         {deliveredKey}
                       </code>
                       <Button
@@ -239,7 +239,7 @@ export default function PixCheckout({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-white" />
           <p className="text-muted-foreground">Gerando QR Code PIX...</p>
         </div>
       </div>
@@ -286,7 +286,7 @@ export default function PixCheckout({
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-sm truncate">{item.name}</h3>
                   <p className="text-xs text-muted-foreground">Qtd: {item.quantity}</p>
-                  <p className="text-sm font-bold text-primary mt-1">
+                  <p className="text-sm font-bold text-white mt-1">
                     R$ {(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
@@ -298,7 +298,7 @@ export default function PixCheckout({
                 <Separator className="my-2" />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total ({totalItems} itens):</span>
-                  <span className="text-primary">R$ {pixData.amount.toFixed(2)}</span>
+                  <span className="text-white">R$ {pixData.amount.toFixed(2)}</span>
                 </div>
               </>
             )}
@@ -357,9 +357,9 @@ export default function PixCheckout({
             </div>
 
             {/* Status */}
-            <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg text-center space-y-2">
+            <div className="bg-white/5 border border-white/20 p-4 rounded-lg text-center space-y-2">
               <div className="flex justify-center">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <Loader2 className="h-5 w-5 animate-spin text-white" />
               </div>
               <p className="text-sm font-medium">Aguardando pagamento...</p>
               <p className="text-xs text-muted-foreground">

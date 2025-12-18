@@ -49,7 +49,7 @@ export default function CartDrawer({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-sm">
           <div className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5 text-primary" />
+            <ShoppingCart className="h-5 w-5 text-white" />
             <h2 className="font-bold text-lg">Seu Carrinho</h2>
             {items.length > 0 && (
               <Badge variant="default" className="ml-2">
@@ -103,7 +103,7 @@ export default function CartDrawer({
                       </div>
                       <div className="space-y-2 mt-2">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-primary font-bold text-sm">
+                          <span className="text-white font-bold text-sm">
                             R$ {(item.product.price).toFixed(2).replace(".", ",")}
                           </span>
                           <span className="text-xs text-muted-foreground line-through">
@@ -174,7 +174,7 @@ export default function CartDrawer({
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Total</span>
-                <span className="text-2xl font-bold text-primary">R$ {total.toFixed(2).replace(".", ",")} BRL</span>
+                <span className="text-2xl font-bold text-white">R$ {total.toFixed(2).replace(".", ",")} BRL</span>
               </div>
               <div className="flex gap-2 pt-2">
                 <Button
@@ -186,7 +186,7 @@ export default function CartDrawer({
                   Editar
                 </Button>
                 <Button 
-                  className="flex-1 bg-primary hover:bg-primary/90" 
+                  className="flex-1 bg-white hover:bg-white/90" 
                   onClick={onCheckout} 
                   data-testid="button-checkout"
                 >

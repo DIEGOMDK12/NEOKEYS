@@ -75,7 +75,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         </div>
         
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-3 pt-8">
-          <Badge variant="secondary" className="text-[10px] bg-primary text-primary-foreground border-0 font-bold px-2 py-0.5 rounded-sm">
+          <Badge variant="secondary" className="text-[10px] bg-white text-white-foreground border-0 font-bold px-2 py-0.5 rounded-sm">
             MÍDIA DIGITAL
           </Badge>
         </div>
@@ -104,7 +104,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         
         <Button
           size="sm"
-          className="w-full bg-primary text-primary-foreground font-medium mt-2"
+          className="w-full bg-white text-white-foreground font-medium mt-2"
           onClick={(e) => {
             e.stopPropagation();
             onAddToCart(product);

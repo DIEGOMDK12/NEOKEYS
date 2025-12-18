@@ -83,7 +83,7 @@ export default function RegisterForm({ onRegister, onLogin }: RegisterFormProps)
         <div className="text-center mt-6">
           <p className="text-sm">
             Ja tem uma conta?{" "}
-            <button onClick={onLogin} className="text-primary hover:underline" data-testid="link-login">
+            <button onClick={onLogin} className="text-white hover:underline" data-testid="link-login">
               Entre aqui
             </button>
           </p>

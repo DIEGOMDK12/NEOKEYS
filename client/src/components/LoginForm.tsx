@@ -64,7 +64,7 @@ export default function LoginForm({ onLogin, onCreateAccount, onForgotPassword }
             Novo cliente?{" "}
             <button
               onClick={onCreateAccount}
-              className="text-primary hover:underline"
+              className="text-white hover:underline"
               data-testid="link-create-account"
             >
               Criar sua conta
@@ -74,7 +74,7 @@ export default function LoginForm({ onLogin, onCreateAccount, onForgotPassword }
             Esqueceu sua senha?{" "}
             <button
               onClick={onForgotPassword}
-              className="text-primary hover:underline"
+              className="text-white hover:underline"
               data-testid="link-forgot-password"
             >
               Recuperar senha

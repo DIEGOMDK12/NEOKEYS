@@ -181,7 +181,7 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
                   Nao tem conta?{" "}
                   <Button 
                     variant="ghost" 
-                    className="p-0 h-auto text-primary underline" 
+                    className="p-0 h-auto text-white underline" 
                     onClick={() => setIsLogin(false)}
                     data-testid="link-register"
                   >
@@ -193,7 +193,7 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
                   Ja tem conta?{" "}
                   <Button 
                     variant="ghost" 
-                    className="p-0 h-auto text-primary underline" 
+                    className="p-0 h-auto text-white underline" 
                     onClick={() => setIsLogin(true)}
                     data-testid="link-login"
                   >
