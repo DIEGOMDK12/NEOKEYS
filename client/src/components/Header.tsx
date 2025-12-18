@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, ShoppingCart, User, UserCheck, X, CheckCircle2 } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, UserCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -42,9 +42,9 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
-            <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" data-testid="icon-verified" />
+          <div className="flex items-center gap-2">
+            <img src="/keys-jogos-logo.png" alt="KEYS JOGOS" className="h-6 w-6 object-contain" data-testid="img-logo" />
+            <span className="text-sm font-bold text-foreground">KEYS JOGOS</span>
           </div>
         </div>
 

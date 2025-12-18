@@ -1,8 +1,8 @@
 const getSessionId = (): string => {
-  let sessionId = localStorage.getItem("neonkeys-session-id");
+  let sessionId = localStorage.getItem("keysjogos-session-id");
   if (!sessionId) {
     sessionId = crypto.randomUUID();
-    localStorage.setItem("neonkeys-session-id", sessionId);
+    localStorage.setItem("keysjogos-session-id", sessionId);
   }
   return sessionId;
 };

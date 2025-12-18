@@ -2,7 +2,6 @@ import { X, Phone, Mail, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import logoImage from "@assets/generated_images/neonkeys_gaming_logo_green_neon.png";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
 import { Gamepad2 } from "lucide-react";
 
@@ -40,10 +39,8 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
             <X className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-2">
-            <img src={logoImage} alt="NeonKeys" className="h-8 w-8" />
-            <span className="font-bold text-lg text-primary">
-              Neon<span className="text-foreground">Keys</span>
-            </span>
+            <img src="/keys-jogos-logo.png" alt="KEYS JOGOS" className="h-8 w-8 object-contain" />
+            <span className="font-bold text-lg text-foreground">KEYS JOGOS</span>
           </div>
           <div className="w-9" />
         </div>
@@ -79,13 +76,9 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
         <Separator />
         <div className="p-4">
           <p className="text-sm font-medium text-muted-foreground mb-3">PRECISA DE AJUDA?</p>
-          <div className="flex items-center gap-3 text-sm text-foreground mb-2">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <span>Call us 000-000-0000</span>
-          </div>
           <div className="flex items-center gap-3 text-sm text-foreground">
             <Mail className="h-4 w-4 text-muted-foreground" />
-            <span>info@neonkeys.com</span>
+            <span>support@keysjogos.com</span>
           </div>
         </div>
       </div>
