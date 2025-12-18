@@ -190,20 +190,20 @@ export default function ProductDetail({
               )}
             </div>
             {galleryImages.length > 1 && (
-              <div className="w-full mt-4">
-                <div className="flex gap-2 justify-center items-center overflow-x-auto pb-2 px-1">
+              <div className="w-full mt-4 px-2">
+                <div className="flex flex-row flex-nowrap gap-2 items-center overflow-x-auto pb-2">
                   {galleryImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentGalleryIndex(idx)}
-                      className={`flex-shrink-0 w-24 h-24 rounded-md overflow-hidden transition-all duration-300 ${
+                      className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 ${
                         idx === currentGalleryIndex 
-                          ? "ring-3 ring-primary shadow-lg scale-105" 
-                          : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 hover:scale-105 opacity-75 hover:opacity-100"
+                          ? "ring-3 ring-primary shadow-lg" 
+                          : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 opacity-75 hover:opacity-100"
                       }`}
                       data-testid={`button-gallery-thumbnail-${idx}`}
                     >
-                      <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover transition-transform duration-300" />
+                      <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
