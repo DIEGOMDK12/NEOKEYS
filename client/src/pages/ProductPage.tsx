@@ -5,7 +5,6 @@ import SideMenu from "@/components/SideMenu";
 import CartDrawer, { CartItem } from "@/components/CartDrawer";
 import ProductDetail from "@/components/ProductDetail";
 import ProductSection from "@/components/ProductSection";
-import FloatingChatButton from "@/components/FloatingChatButton";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
@@ -33,6 +32,7 @@ function transformProduct(p: any): Product {
     discount: p.discount,
     videoUrl: p.videoUrl,
     galleryImages: p.galleryImages,
+    systemRequirements: p.systemRequirements,
   };
 }
 
@@ -277,11 +277,6 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
           onProductClick={onNavigateToProduct}
         />
       )}
-
-      <FloatingChatButton
-        unreadCount={1}
-        onClick={() => toast({ title: "Chat", description: "Abrindo chat..." })}
-      />
     </div>
   );
 }

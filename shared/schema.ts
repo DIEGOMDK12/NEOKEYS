@@ -30,6 +30,7 @@ export const products = pgTable("products", {
   category: text("category"),
   galleryImages: text("gallery_images").array(),
   videoUrl: text("video_url"),
+  systemRequirements: text("system_requirements"),
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({ id: true });

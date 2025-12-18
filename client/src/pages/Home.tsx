@@ -40,6 +40,7 @@ function transformProduct(p: any): Product {
     discount: p.discount,
     videoUrl: p.videoUrl,
     galleryImages: p.galleryImages,
+    systemRequirements: p.systemRequirements,
   };
 }
 

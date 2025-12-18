@@ -43,6 +43,7 @@ interface Product {
   category?: string;
   galleryImages?: string[];
   videoUrl?: string;
+  systemRequirements?: string;
 }
 
 interface AdminUser {
@@ -402,6 +403,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     category: "",
     galleryImages: [] as string[],
     videoUrl: "",
+    systemRequirements: "",
   });
 
   const createProductMutation = useMutation({
@@ -421,6 +423,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
         category: "",
         galleryImages: [],
         videoUrl: "",
+        systemRequirements: "",
       });
       toast({ title: "Sucesso", description: "Produto criado com sucesso!" });
     },
@@ -627,6 +630,16 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                 />
               </div>
               <div className="space-y-2">
+                <Label>Requisitos de Sistema</Label>
+                <Textarea
+                  value={newProduct.systemRequirements}
+                  onChange={(e) => setNewProduct({ ...newProduct, systemRequirements: e.target.value })}
+                  placeholder="Sistema Operacional: Windows 7/8/10&#10;Processador: Intel Core i3&#10;Memoria: 4 GB de RAM&#10;etc..."
+                  rows={3}
+                  data-testid="input-product-system-requirements"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Imagens da Galeria</Label>
                 <p className="text-xs text-muted-foreground mb-2">Carregue imagens do seu dispositivo</p>
                 <input
@@ -785,6 +798,16 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                             onChange={(e) => setEditingProduct({ ...editingProduct, videoUrl: e.target.value })}
                             placeholder="https://www.youtube.com/embed/..."
                             data-testid="input-edit-product-video"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Requisitos de Sistema</Label>
+                          <Textarea
+                            value={editingProduct.systemRequirements || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, systemRequirements: e.target.value })}
+                            placeholder="Sistema Operacional: Windows 7/8/10&#10;Processador: Intel Core i3&#10;etc..."
+                            rows={3}
+                            data-testid="input-edit-product-system-requirements"
                           />
                         </div>
                         <div className="space-y-2">

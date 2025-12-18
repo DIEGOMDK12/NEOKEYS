@@ -5,7 +5,6 @@ import SideMenu from "@/components/SideMenu";
 import CartDrawer, { CartItem } from "@/components/CartDrawer";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from "@/components/RegisterForm";
-import FloatingChatButton from "@/components/FloatingChatButton";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ function transformProduct(p: any): Product {
     discount: p.discount,
     videoUrl: p.videoUrl,
     galleryImages: p.galleryImages,
+    systemRequirements: p.systemRequirements,
   };
 }
 
@@ -198,11 +198,6 @@ export default function AuthPage({
           <RegisterForm onRegister={handleRegister} onLogin={() => setMode("login")} />
         )}
       </div>
-
-      <FloatingChatButton
-        unreadCount={1}
-        onClick={() => toast({ title: "Chat", description: "Abrindo chat..." })}
-      />
     </div>
   );
 }

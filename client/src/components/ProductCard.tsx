@@ -15,6 +15,7 @@ export interface Product {
   discount: number;
   videoUrl?: string;
   galleryImages?: string[];
+  systemRequirements?: string;
 }
 
 interface ProductCardProps {
