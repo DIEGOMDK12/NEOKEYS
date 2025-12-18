@@ -34,6 +34,11 @@ const customerRegisterSchema = z.object({
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
+// Helper to get session ID from cookie or header
+function getSessionId(req: Request): string | null {
+  return req.cookies?.customer_session || (req.headers["x-session-id"] as string) || null;
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -79,7 +84,7 @@ export async function registerRoutes(
   // Cart API
   app.get("/api/cart", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -93,7 +98,7 @@ export async function registerRoutes(
 
   app.post("/api/cart", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -130,7 +135,7 @@ export async function registerRoutes(
 
   app.patch("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -162,7 +167,7 @@ export async function registerRoutes(
 
   app.delete("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -259,7 +264,7 @@ export async function registerRoutes(
 
   app.get("/api/customer/me", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -284,7 +289,7 @@ export async function registerRoutes(
 
   app.post("/api/customer/logout", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (sessionId) {
         await storage.deleteCustomerSession(sessionId);
       }
@@ -299,7 +304,7 @@ export async function registerRoutes(
   // Customer Orders API
   app.get("/api/customer/orders", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Nao autenticado" });
       }
@@ -319,7 +324,7 @@ export async function registerRoutes(
 
   app.post("/api/customer/orders", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Faca login para comprar" });
       }
@@ -381,7 +386,7 @@ export async function registerRoutes(
   app.post("/api/customer/checkout/cart", async (req: Request, res: Response) => {
     try {
       console.log("📦 Cart checkout requested:", req.body);
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Faca login para comprar" });
       }
@@ -481,7 +486,7 @@ export async function registerRoutes(
   // PIX Payment - Create checkout with QR Code
   app.post("/api/customer/checkout/pix", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.cookies?.customer_session;
+      const sessionId = getSessionId(req);
       if (!sessionId) {
         return res.status(401).json({ error: "Faca login para comprar" });
       }
