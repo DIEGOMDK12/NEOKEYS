@@ -791,57 +791,88 @@ function KeysSection({ products }: { products: Product[] }) {
 
   const { data: productKeys = [], isLoading: keysLoading, refetch: refetchKeys } = useQuery<ProductKey[]>({
     queryKey: ["/api/admin/products", selectedProductForKeys?.id, "keys"],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/products/${selectedProductForKeys?.id}/keys`, {
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to fetch keys");
+      return response.json();
+    },
     enabled: !!selectedProductForKeys,
   });
 
   const addKeyMutation = useMutation({
-    mutationFn: ({ productId, keyValue }: { productId: string; keyValue: string }) =>
-      fetch(`/api/admin/products/${productId}/keys`, {
+    mutationFn: async ({ productId, keyValue }: { productId: string; keyValue: string }) => {
+      const response = await fetch(`/api/admin/products/${productId}/keys`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ keyValue }),
-      }).then((r) => r.json()),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Falha ao adicionar chave");
+      }
+      return response.json();
+    },
     onSuccess: () => {
+      console.log("✅ Key added! Refetching...");
       refetchKeys();
       setNewKeyValue("");
       toast({ title: "Sucesso", description: "Chave adicionada!" });
     },
-    onError: () => {
-      toast({ title: "Erro", description: "Falha ao adicionar chave", variant: "destructive" });
+    onError: (error: Error) => {
+      console.error("❌ Error adding key:", error);
+      toast({ title: "Erro", description: error.message || "Falha ao adicionar chave", variant: "destructive" });
     },
   });
 
   const addBulkKeysMutation = useMutation({
-    mutationFn: ({ productId, keys }: { productId: string; keys: string[] }) =>
-      fetch(`/api/admin/products/${productId}/keys/bulk`, {
+    mutationFn: async ({ productId, keys }: { productId: string; keys: string[] }) => {
+      const response = await fetch(`/api/admin/products/${productId}/keys/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ keys }),
-      }).then((r) => r.json()),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Falha ao adicionar chaves");
+      }
+      return response.json();
+    },
     onSuccess: (data) => {
+      console.log("✅ Keys added! Count:", data.count);
       refetchKeys();
       setBulkKeys("");
       toast({ title: "Sucesso", description: `${data.count} chaves adicionadas!` });
     },
-    onError: () => {
-      toast({ title: "Erro", description: "Falha ao adicionar chaves", variant: "destructive" });
+    onError: (error: Error) => {
+      console.error("❌ Error adding bulk keys:", error);
+      toast({ title: "Erro", description: error.message || "Falha ao adicionar chaves", variant: "destructive" });
     },
   });
 
   const deleteKeyMutation = useMutation({
-    mutationFn: (keyId: string) =>
-      fetch(`/api/admin/keys/${keyId}`, {
+    mutationFn: async (keyId: string) => {
+      const response = await fetch(`/api/admin/keys/${keyId}`, {
         method: "DELETE",
         credentials: "include",
-      }).then((r) => r.json()),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Falha ao remover chave");
+      }
+      return response.json();
+    },
     onSuccess: () => {
+      console.log("✅ Key deleted! Refetching...");
       refetchKeys();
       toast({ title: "Sucesso", description: "Chave removida!" });
     },
-    onError: () => {
-      toast({ title: "Erro", description: "Falha ao remover chave", variant: "destructive" });
+    onError: (error: Error) => {
+      console.error("❌ Error deleting key:", error);
+      toast({ title: "Erro", description: error.message || "Falha ao remover chave", variant: "destructive" });
     },
   });
 
