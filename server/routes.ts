@@ -417,7 +417,7 @@ export async function registerRoutes(
         description: `Compra de ${items.length} produtos`,
         metadata: {
           orderId: order.id,
-          itemCount: items.length,
+          itemCount: items.length.toString(),
         },
       });
       
