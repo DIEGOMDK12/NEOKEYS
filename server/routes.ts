@@ -79,9 +79,9 @@ export async function registerRoutes(
   // Cart API
   app.get("/api/cart", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.headers["x-session-id"] as string;
+      const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
+        return res.status(401).json({ error: "Nao autenticado" });
       }
       const items = await storage.getCartItems(sessionId);
       res.json(items);
@@ -93,9 +93,9 @@ export async function registerRoutes(
 
   app.post("/api/cart", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.headers["x-session-id"] as string;
+      const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
+        return res.status(401).json({ error: "Nao autenticado" });
       }
       
       const parsed = addToCartSchema.safeParse(req.body);
@@ -120,9 +120,9 @@ export async function registerRoutes(
 
   app.patch("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.headers["x-session-id"] as string;
+      const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
+        return res.status(401).json({ error: "Nao autenticado" });
       }
       
       const parsed = updateCartSchema.safeParse(req.body);
@@ -141,9 +141,9 @@ export async function registerRoutes(
 
   app.delete("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = req.headers["x-session-id"] as string;
+      const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
-        return res.status(400).json({ error: "Session ID is required" });
+        return res.status(401).json({ error: "Nao autenticado" });
       }
       await storage.removeFromCart(sessionId, req.params.productId);
       res.json({ success: true });
