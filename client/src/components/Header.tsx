@@ -42,9 +42,8 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center gap-2">
-            <img src="/keys-jogos-logo.png" alt="KEYS JOGOS" className="h-6 w-6 object-contain" data-testid="img-logo" />
-            <span className="text-sm font-bold text-foreground">KEYS JOGOS</span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
           </div>
         </div>
 

@@ -39,8 +39,9 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
             <X className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-2">
-            <img src="/keys-jogos-logo.png" alt="KEYS JOGOS" className="h-8 w-8 object-contain" />
-            <span className="font-bold text-lg text-foreground">KEYS JOGOS</span>
+            <span className="font-bold text-lg">
+              Elite<span className="text-primary">Vault</span>
+            </span>
           </div>
           <div className="w-9" />
         </div>
@@ -76,9 +77,13 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
         <Separator />
         <div className="p-4">
           <p className="text-sm font-medium text-muted-foreground mb-3">PRECISA DE AJUDA?</p>
+          <div className="flex items-center gap-3 text-sm text-foreground mb-2">
+            <Phone className="h-4 w-4 text-muted-foreground" />
+            <span>Call us 000-000-0000</span>
+          </div>
           <div className="flex items-center gap-3 text-sm text-foreground">
             <Mail className="h-4 w-4 text-muted-foreground" />
-            <span>support@keysjogos.com</span>
+            <span>info@elitevault.com</span>
           </div>
         </div>
       </div>
