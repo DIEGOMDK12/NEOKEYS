@@ -4,11 +4,6 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
@@ -20,7 +15,8 @@ declare module "http" {
 }
 
 // Serve static files from public folder (images, logos, etc)
-app.use(express.static(path.resolve(__dirname, "..", "public")));
+const publicDir = path.join(process.cwd(), "public");
+app.use(express.static(publicDir));
 
 app.use(cookieParser());
 app.use(
