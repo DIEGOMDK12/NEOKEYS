@@ -231,7 +231,7 @@ export default function ProductDetail({
 
         <div className="flex items-center gap-3 mb-4">
           <span className="text-muted-foreground">Preco:</span>
-          <span className="text-2xl font-bold text-primary">
+          <span className="text-2xl font-bold text-success">
             R$ {product.price.toFixed(2).replace(".", ",")}
           </span>
           <span className="text-muted-foreground line-through">

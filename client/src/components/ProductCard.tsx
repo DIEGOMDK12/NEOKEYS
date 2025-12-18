@@ -92,7 +92,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         </div>
         
         <div className="flex items-baseline gap-2">
-          <span className="text-primary font-bold" data-testid={`text-price-${product.id}`}>
+          <span className="text-success font-bold" data-testid={`text-price-${product.id}`}>
             R$ {product.price.toFixed(2).replace(".", ",")}
           </span>
           {product.originalPrice > product.price && (
