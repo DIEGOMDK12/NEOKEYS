@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
 import { Gamepad2, Play } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Product } from "./ProductCard";
 
 interface ProductDetailProps {
@@ -68,6 +68,9 @@ export default function ProductDetail({
   const [showFullRequirements, setShowFullRequirements] = useState(false);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const galleryRef = useRef<HTMLDivElement>(null);
   const PlatformIcon = platformIcons[product.platform] || SiSteam;
   
   const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
@@ -79,6 +82,32 @@ export default function ProductDetail({
 
   const handleNextImage = () => {
     setCurrentGalleryIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
+    if (touchStart === 0 || touchEnd === 0) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      handleNextImage();
+    } else if (isRightSwipe) {
+      handlePreviousImage();
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
   };
 
   return (
@@ -130,11 +159,16 @@ export default function ProductDetail({
         )}
         {galleryImages.length > 0 && (
           <div className="space-y-3">
-            <div className="relative aspect-square bg-card rounded-lg overflow-hidden">
+            <div 
+              ref={galleryRef}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className="relative aspect-square bg-card rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none"
+            >
               <img
                 src={galleryImages[currentGalleryIndex]}
                 alt={`Gallery ${currentGalleryIndex + 1}`}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
               />
               {galleryImages.length > 1 && (
                 <>
