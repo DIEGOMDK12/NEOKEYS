@@ -65,11 +65,18 @@ function ColorApplier() {
 }
 
 interface CheckoutData {
-  productId: string;
-  productName: string;
-  productImage: string;
-  productPrice: number;
-  quantity: number;
+  productId?: string;
+  productName?: string;
+  productImage?: string;
+  productPrice?: number;
+  quantity?: number;
+  cartItems?: Array<{
+    productId: string;
+    name: string;
+    imageUrl: string;
+    quantity: number;
+    price: number;
+  }>;
 }
 
 function App() {
@@ -178,6 +185,7 @@ function App() {
             productImage={checkoutData.productImage}
             productPrice={checkoutData.productPrice}
             quantity={checkoutData.quantity}
+            cartItems={checkoutData.cartItems}
             onBack={handleBack}
             onSuccess={handleCheckoutSuccess}
             onLoginRequired={handleNavigateToLogin}

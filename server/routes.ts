@@ -20,6 +20,13 @@ const createOrderSchema = z.object({
   quantity: z.number().int().min(1).default(1),
 });
 
+const checkoutCartSchema = z.object({
+  items: z.array(z.object({
+    productId: z.string().min(1),
+    quantity: z.number().int().min(1),
+  })).min(1),
+});
+
 const customerRegisterSchema = z.object({
   firstName: z.string().min(1, "Nome e obrigatorio"),
   email: z.string().email("Email invalido"),
@@ -346,6 +353,100 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error creating order:", error);
       res.status(500).json({ error: "Falha ao criar pedido" });
+    }
+  });
+
+  // PIX Payment - Checkout entire cart
+  app.post("/api/customer/checkout/cart", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.customer_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Faca login para comprar" });
+      }
+      
+      const session = await storage.getCustomerSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const parsed = checkoutCartSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Dados invalidos" });
+      }
+      
+      const { items } = parsed.data;
+      
+      // Validate all products and calculate total
+      let totalPrice = 0;
+      const orderItems: any[] = [];
+      
+      for (const item of items) {
+        const product = await storage.getProductById(item.productId);
+        if (!product) {
+          return res.status(404).json({ error: `Produto nao encontrado: ${item.productId}` });
+        }
+        
+        const availableKeys = await storage.getAvailableKeyCount(item.productId);
+        if (availableKeys < item.quantity) {
+          return res.status(400).json({ error: `Estoque insuficiente: ${product.name}` });
+        }
+        
+        const itemPrice = parseFloat(product.price) * item.quantity;
+        totalPrice += itemPrice;
+        orderItems.push({ product, quantity: item.quantity, price: itemPrice });
+      }
+      
+      const amountInCents = Math.round(totalPrice * 100);
+      
+      // Create master order for cart checkout
+      const order = await storage.createOrder({
+        userId: session.user.id,
+        productId: items[0].productId, // Primary product (first item)
+        quantity: items.length, // Number of different products
+        totalPrice: totalPrice.toFixed(2),
+        status: "awaiting_payment",
+      });
+      
+      const pixResponse = await createPixQrCode({
+        amount: amountInCents,
+        expiresIn: 3600,
+        description: `Compra de ${items.length} produtos`,
+        metadata: {
+          orderId: order.id,
+          itemCount: items.length,
+        },
+      });
+      
+      if (pixResponse.error) {
+        await storage.updateOrderStatus(order.id, "payment_failed");
+        return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
+      }
+      
+      const pixData = pixResponse.data;
+      await storage.updateOrderPix(order.id, {
+        pixId: pixData.id,
+        pixBrCode: pixData.brCode,
+        pixQrCodeBase64: pixData.brCodeBase64,
+        pixExpiresAt: new Date(pixData.expiresAt),
+      });
+      
+      res.json({
+        orderId: order.id,
+        pixId: pixData.id,
+        brCode: pixData.brCode,
+        qrCodeBase64: pixData.brCodeBase64,
+        amount: totalPrice,
+        expiresAt: pixData.expiresAt,
+        items: orderItems.map(item => ({
+          name: item.product.name,
+          imageUrl: item.product.imageUrl,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      });
+    } catch (error) {
+      console.error("Error creating cart checkout:", error);
+      res.status(500).json({ error: "Falha ao criar pagamento PIX" });
     }
   });
 

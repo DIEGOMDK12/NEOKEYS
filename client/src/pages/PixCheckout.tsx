@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,12 +7,21 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Copy, Check, Clock, CheckCircle, Loader2, QrCode } from "lucide-react";
 
-interface PixCheckoutProps {
+interface CartItem {
   productId: string;
-  productName: string;
-  productImage: string;
-  productPrice: number;
+  name: string;
+  imageUrl: string;
   quantity: number;
+  price: number;
+}
+
+interface PixCheckoutProps {
+  productId?: string;
+  productName?: string;
+  productImage?: string;
+  productPrice?: number;
+  quantity?: number;
+  cartItems?: CartItem[];
   onBack: () => void;
   onSuccess: () => void;
   onLoginRequired: () => void;
@@ -26,10 +34,7 @@ interface PixData {
   qrCodeBase64: string;
   amount: number;
   expiresAt: string;
-  product: {
-    name: string;
-    imageUrl: string;
-  };
+  items?: CartItem[];
 }
 
 interface PixStatusResponse {
@@ -44,6 +49,7 @@ export default function PixCheckout({
   productImage,
   productPrice,
   quantity,
+  cartItems,
   onBack,
   onSuccess,
   onLoginRequired,
@@ -55,14 +61,31 @@ export default function PixCheckout({
   const [deliveredKey, setDeliveredKey] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Determine if this is a cart checkout or single product
+  const isCartCheckout = !!cartItems && cartItems.length > 0;
+
   // Create PIX on mount
   useEffect(() => {
     const createPix = async () => {
       try {
-        const response = await apiRequest("POST", "/api/customer/checkout/pix", {
-          productId,
-          quantity,
-        });
+        let response;
+        
+        if (isCartCheckout) {
+          // Cart checkout
+          response = await apiRequest("POST", "/api/customer/checkout/cart", {
+            items: cartItems!.map(item => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            })),
+          });
+        } else {
+          // Single product checkout
+          response = await apiRequest("POST", "/api/customer/checkout/pix", {
+            productId,
+            quantity: quantity || 1,
+          });
+        }
+        
         const data = await response.json();
 
         if (data.error) {
@@ -88,7 +111,7 @@ export default function PixCheckout({
     };
 
     createPix();
-  }, [productId, quantity, onLoginRequired, toast]);
+  }, [productId, quantity, cartItems, isCartCheckout, onLoginRequired, toast]);
 
   // Poll for payment status
   useEffect(() => {
@@ -122,7 +145,7 @@ export default function PixCheckout({
 
     const interval = setInterval(checkStatus, 3000);
     return () => clearInterval(interval);
-  }, [pixData?.orderId, isPaid, toast]);
+  }, [pixData?.orderId, isPaid, toast, onSuccess]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -224,6 +247,17 @@ export default function PixCheckout({
     );
   }
 
+  // Calcular total
+  const displayItems = isCartCheckout ? pixData.items || [] : [{
+    productId: productId || "",
+    name: productName || "",
+    imageUrl: productImage || "",
+    quantity: quantity || 1,
+    price: productPrice || 0,
+  }];
+
+  const totalItems = displayItems.reduce((sum, item) => sum + item.quantity, 0);
+
   // QR Code PIX
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
@@ -237,23 +271,38 @@ export default function PixCheckout({
       </header>
 
       <main className="container mx-auto px-4 py-6 max-w-lg space-y-4">
-        {/* Resumo do Produto */}
+        {/* Resumo dos Itens */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex gap-4 items-start">
-              <img
-                src={productImage}
-                alt={productName}
-                className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold truncate">{productName}</h3>
-                <p className="text-sm text-muted-foreground">Quantidade: {quantity}</p>
-                <p className="text-lg font-bold text-primary mt-2">
-                  R$ {(productPrice * quantity).toFixed(2)}
-                </p>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">{isCartCheckout ? "Itens do Carrinho" : "Produto"}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {displayItems.map((item, idx) => (
+              <div key={idx} className="flex gap-3 items-start">
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm truncate">{item.name}</h3>
+                  <p className="text-xs text-muted-foreground">Qtd: {item.quantity}</p>
+                  <p className="text-sm font-bold text-primary mt-1">
+                    R$ {(item.price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
               </div>
-            </div>
+            ))}
+            
+            {displayItems.length > 1 && (
+              <>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total ({totalItems} itens):</span>
+                  <span className="text-primary">R$ {pixData.amount.toFixed(2)}</span>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

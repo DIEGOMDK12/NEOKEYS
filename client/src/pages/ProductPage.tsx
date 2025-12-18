@@ -194,7 +194,28 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
         items={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
-        onCheckout={() => toast({ title: "Checkout", description: "Redirecionando..." })}
+        onCheckout={() => {
+          if (customerUser && cartItems.length > 0) {
+            const checkoutItems = cartItems.map(item => ({
+              productId: item.product.id,
+              name: item.product.name,
+              imageUrl: item.product.imageUrl,
+              quantity: item.quantity,
+              price: item.product.price,
+            }));
+            onNavigateToPixCheckout({
+              productId: checkoutItems[0]?.productId || "",
+              productName: checkoutItems[0]?.name || "",
+              productImage: checkoutItems[0]?.imageUrl || "",
+              productPrice: checkoutItems[0]?.price || 0,
+              quantity: 1,
+              cartItems: checkoutItems as any,
+            } as any);
+            setCartOpen(false);
+          } else if (!customerUser) {
+            onNavigateToLogin();
+          }
+        }}
         onViewCart={() => toast({ title: "Carrinho", description: "Visualizando..." })}
       />
 
