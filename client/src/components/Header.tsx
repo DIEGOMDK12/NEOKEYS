@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Menu, Search, ShoppingCart, User, UserCheck, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, UserCheck, X, CheckCircle2 } from "lucide-react";
+import { SiInstagram } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -43,13 +44,17 @@ export default function Header({
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <img 
               src={eliteVaultLogo} 
               alt="ELITEVAULT" 
               className="h-8 w-auto"
               data-testid="img-logo"
             />
+            <div className="relative">
+              <SiInstagram className="h-5 w-5 text-pink-500" data-testid="icon-instagram" />
+              <CheckCircle2 className="absolute -top-1 -right-1 h-3 w-3 text-blue-500 fill-blue-500" data-testid="icon-verified" />
+            </div>
           </div>
         </div>
 
