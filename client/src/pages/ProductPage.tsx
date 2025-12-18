@@ -117,10 +117,11 @@ export default function ProductPage({
   });
 
   const handleAddToCart = (p: Product) => {
+    console.log("🛒 Adding to cart:", p.id, p.name);
     addToCartMutation.mutate({ productId: p.id, quantity: 1 });
     toast({
-      title: "Adicionado ao carrinho",
-      description: `${p.name} foi adicionado.`,
+      title: "Adicionado ao carrinho!",
+      description: `${p.name} foi adicionado. Abra o carrinho para comprar.`,
     });
   };
 
@@ -236,8 +237,12 @@ Disponivel para ${product.platform} na regiao ${product.region}.`;
         product={product}
         description={description}
         requirements={requirements}
-        onAddToCart={() => handleAddToCart(product)}
+        onAddToCart={() => {
+          console.log("✅ Cart button clicked - just adding to cart");
+          handleAddToCart(product);
+        }}
         onBuyNow={() => {
+          console.log("💳 Buy now button clicked - going to checkout");
           onNavigateToPixCheckout({
             productId: product.id,
             productName: product.name,

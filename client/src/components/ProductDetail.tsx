@@ -180,10 +180,10 @@ export default function ProductDetail({
             </p>
             <div className="space-y-3">
               <Button className="w-full" onClick={onAddToCart} data-testid="button-detail-add-cart">
-                Adicionar ao carrinho
+                🛒 Adicionar ao Carrinho
               </Button>
               <Button variant="outline" className="w-full" onClick={onBuyNow} data-testid="button-buy-now">
-                Compre ja
+                💳 Comprar Agora (PIX)
               </Button>
             </div>
           </CardContent>
