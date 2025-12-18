@@ -2,25 +2,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
-import { Gamepad2, Play, X } from "lucide-react";
+import { Gamepad2, Play } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { Product } from "./ProductCard";
-import { useMutation } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 
 interface ProductDetailProps {
   product: Product & { galleryImages?: string[]; videoUrl?: string };
   description: string;
-  requirements: {
-    minimum: string[];
-    recommended?: string[];
-  };
+  requirements: string[];
   relatedProducts?: Product[];
   onAddToCart: () => void;
   onBuyNow: () => void;
@@ -76,45 +67,11 @@ export default function ProductDetail({
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const [isEditingRequirements, setIsEditingRequirements] = useState(false);
-  const [editingRequirements, setEditingRequirements] = useState<string[]>(Array.isArray(requirements) ? requirements : (requirements?.minimum || []));
-  const [isEditingDescription, setIsEditingDescription] = useState(false);
-  const [editingDescription, setEditingDescription] = useState(description || "");
   const galleryRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
   const PlatformIcon = platformIcons[product.platform] || SiSteam;
-
-  const updateMutation = useMutation({
-    mutationFn: async () => {
-      await api.updateProduct(product.id, {
-        systemRequirements: editingRequirements.join("\n"),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-      setIsEditingRequirements(false);
-      toast({ title: "Requisitos salvos com sucesso!" });
-    },
-    onError: () => {
-      toast({ title: "Erro ao salvar requisitos", variant: "destructive" });
-    },
-  });
-
-  const descriptionMutation = useMutation({
-    mutationFn: async () => {
-      await api.updateProduct(product.id, {
-        description: editingDescription,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-      setIsEditingDescription(false);
-      toast({ title: "Descrição salva com sucesso!" });
-    },
-    onError: () => {
-      toast({ title: "Erro ao salvar descrição", variant: "destructive" });
-    },
-  });
+  
+  const editingRequirements = Array.isArray(requirements) ? requirements : [];
+  const editingDescription = description || "";
   
   const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
   const videoEmbedUrl = product.videoUrl ? convertVideoUrl(product.videoUrl) : "";
@@ -301,133 +258,46 @@ export default function ProductDetail({
         <Separator className="my-6" />
 
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h2 className="text-xl font-bold">Descricao</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditingDescription(!isEditingDescription)}
-              data-testid="button-edit-description"
-            >
-              {isEditingDescription ? "Cancelar" : "Editar"}
-            </Button>
           </div>
           
-          {isEditingDescription ? (
-            <div className="space-y-2">
-              <Textarea
-                value={editingDescription}
-                onChange={(e) => setEditingDescription(e.target.value)}
-                className="min-h-32"
-                data-testid="textarea-description"
-              />
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => descriptionMutation.mutate()}
-                  disabled={descriptionMutation.isPending}
-                  className="flex-1"
-                  data-testid="button-save-description"
-                >
-                  {descriptionMutation.isPending ? "Salvando..." : "Salvar Descrição"}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground whitespace-pre-line">{editingDescription}</p>
-          )}
+          <p className="text-muted-foreground whitespace-pre-line">{editingDescription}</p>
         </div>
 
         <Separator className="my-6" />
 
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <h2 className="text-xl font-bold">REQUISITOS DE SISTEMA</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditingRequirements(!isEditingRequirements)}
-              data-testid="button-edit-requirements"
-            >
-              {isEditingRequirements ? "Cancelar" : "Editar"}
-            </Button>
           </div>
           
-          {isEditingRequirements ? (
-            <div className="space-y-2 mb-4">
-              <h3 className="text-sm font-semibold text-primary mb-2">MINIMOS:</h3>
-              {editingRequirements.map((req, idx) => (
-                <div key={idx} className="flex gap-2">
-                  <Input
-                    value={req}
-                    onChange={(e) => {
-                      const newReqs = [...editingRequirements];
-                      newReqs[idx] = e.target.value;
-                      setEditingRequirements(newReqs);
-                    }}
-                    className="flex-1"
-                    data-testid={`input-requirement-${idx}`}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setEditingRequirements(editingRequirements.filter((_, i) => i !== idx));
-                    }}
-                    data-testid={`button-remove-requirement-${idx}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+          <h3 className="text-sm font-semibold text-primary mb-2">MINIMOS:</h3>
+          <ul className="space-y-1 text-sm text-muted-foreground">
+            {editingRequirements
+              .slice(0, showFullRequirements ? undefined : 3)
+              .filter(req => req.trim())
+              .map((req, idx) => (
+                <li key={idx}>• {req}</li>
               ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setEditingRequirements([...editingRequirements, ""])}
-                data-testid="button-add-requirement"
-              >
-                + Adicionar
-              </Button>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  onClick={() => updateMutation.mutate()}
-                  disabled={updateMutation.isPending}
-                  className="flex-1"
-                  data-testid="button-save-requirements"
-                >
-                  {updateMutation.isPending ? "Salvando..." : "Salvar Requisitos"}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <h3 className="text-sm font-semibold text-primary mb-2">MINIMOS:</h3>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                {editingRequirements
-                  .slice(0, showFullRequirements ? undefined : 3)
-                  .filter(req => req.trim())
-                  .map((req, idx) => (
-                    <li key={idx}>• {req}</li>
-                  ))}
-              </ul>
-              {editingRequirements.filter(r => r.trim()).length > 3 && (
-                <Button
-                  variant="ghost"
-                  className="text-primary p-0 h-auto mt-2"
-                  onClick={() => setShowFullRequirements(!showFullRequirements)}
-                  data-testid="button-toggle-requirements"
-                >
-                  {showFullRequirements ? (
-                    <>
-                      <ChevronUp className="h-4 w-4 mr-1" /> Ver menos
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4 mr-1" /> Ver mais
-                    </>
-                  )}
-                </Button>
+          </ul>
+          {editingRequirements.filter(r => r.trim()).length > 3 && (
+            <Button
+              variant="ghost"
+              className="text-primary p-0 h-auto mt-2"
+              onClick={() => setShowFullRequirements(!showFullRequirements)}
+              data-testid="button-toggle-requirements"
+            >
+              {showFullRequirements ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" /> Ver menos
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-4 w-4 mr-1" /> Ver mais
+                </>
               )}
-            </>
+            </Button>
           )}
         </div>
       </div>
