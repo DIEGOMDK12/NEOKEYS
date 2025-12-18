@@ -112,7 +112,7 @@ export default function ProductDetail({
 
   return (
     <div className="pb-24">
-      <div className="space-y-4">
+      <div>
         {videoEmbedUrl && (
           <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
             <img
@@ -157,59 +157,59 @@ export default function ProductDetail({
             />
           </div>
         )}
-        {galleryImages.length > 0 && (
-          <div>
-            <div 
-              ref={galleryRef}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-              className="relative aspect-square bg-card rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none mb-3"
-            >
-              <img
-                src={galleryImages[currentGalleryIndex]}
-                alt={`Gallery ${currentGalleryIndex + 1}`}
-                className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
-              />
-              {galleryImages.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePreviousImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
-                    data-testid="button-gallery-prev"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
-                    data-testid="button-gallery-next"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </>
-              )}
-            </div>
+      </div>
+      {galleryImages.length > 0 && (
+        <div className="mb-4">
+          <div 
+            ref={galleryRef}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className="relative aspect-square bg-card rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none"
+          >
+            <img
+              src={galleryImages[currentGalleryIndex]}
+              alt={`Gallery ${currentGalleryIndex + 1}`}
+              className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
+            />
             {galleryImages.length > 1 && (
-              <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto py-2 px-1">
-                {galleryImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentGalleryIndex(idx)}
-                    className={`min-w-max flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 ${
-                      idx === currentGalleryIndex 
-                        ? "ring-3 ring-primary shadow-lg" 
-                        : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 opacity-75 hover:opacity-100"
-                    }`}
-                    data-testid={`button-gallery-thumbnail-${idx}`}
-                  >
-                    <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <button
+                  onClick={handlePreviousImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
+                  data-testid="button-gallery-prev"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 rounded-full p-2 text-white transition-all"
+                  data-testid="button-gallery-next"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </>
             )}
           </div>
-        )}
-      </div>
+          {galleryImages.length > 1 && (
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto mt-3 pb-2">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentGalleryIndex(idx)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 ${
+                    idx === currentGalleryIndex 
+                      ? "ring-3 ring-primary shadow-lg" 
+                      : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 opacity-75 hover:opacity-100"
+                  }`}
+                  data-testid={`button-gallery-thumbnail-${idx}`}
+                >
+                  <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="px-4">
         <h1 className="text-2xl font-bold mb-3">{product.name}</h1>
