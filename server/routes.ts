@@ -532,7 +532,7 @@ export async function registerRoutes(
           orderId: order.id.toString(),
         },
         customer: {
-          name: session.user.username,
+          name: `${session.user.firstName} ${session.user.lastName}`,
           cellphone: (session.user as any).whatsapp || "00000000000",
           email: (session.user as any).email || "contato@elitevault.fun",
           taxId: "00000000000", // Requerido pela AbacatePay para PIX
