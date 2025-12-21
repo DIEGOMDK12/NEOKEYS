@@ -2,6 +2,43 @@ const ABACATEPAY_API_URL = "https://api.abacatepay.com/v1";
 const ABACATEPAY_WEBHOOK_ID = process.env.ABACATEPAY_WEBHOOK_KEY || "webh_prod_Qr2yP6eRNfsrDZNfqZ5ELtka";
 const ABACATEPAY_WEBHOOK_URL = process.env.WEBHOOK_URL || "https://elitevault.fun/webhook";
 
+// Validate and format Brazilian CPF
+function validateAndFormatCPF(cpf: string | null | undefined): string | null {
+  if (!cpf) return null;
+  
+  // Remove any non-digit characters
+  const cleanCpf = cpf.replace(/\D/g, '');
+  
+  // Must be 11 digits
+  if (cleanCpf.length !== 11) return null;
+  
+  // Check if all digits are the same (invalid CPF)
+  if (/^(\d)\1{10}$/.test(cleanCpf)) return null;
+  
+  // Basic CPF validation (check digit validation)
+  let sum = 0;
+  let remainder = 0;
+  
+  // First check digit
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(cleanCpf.substring(i - 1, i)) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCpf.substring(9, 10))) return null;
+  
+  // Second check digit
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(cleanCpf.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCpf.substring(10, 11))) return null;
+  
+  return cleanCpf;
+}
+
 interface PixCustomer {
   name: string;
   cellphone: string;
@@ -57,6 +94,13 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       throw new Error("ABACATEPAY_API_KEY not configured");
     }
 
+    // Validate CPF before sending to API
+    const validatedCpf = validateAndFormatCPF(request.customer?.taxId);
+    if (!validatedCpf) {
+      console.error("❌ CPF validation failed:", request.customer?.taxId);
+      throw new Error("CPF/CNPJ invalido. Por favor, forneca um CPF valido para continuar com o pagamento.");
+    }
+
     const payload = {
       amount: request.amount,
       expiresIn: request.expiresIn || 3600,
@@ -69,7 +113,7 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
         name: request.customer?.name || "Cliente EliteVault",
         cellphone: request.customer?.cellphone || "11999999999",
         email: request.customer?.email || "contato@elitevault.fun",
-        taxId: (request.customer?.taxId && request.customer.taxId.length >= 11) ? request.customer.taxId.replace(/\D/g, '') : "00000000000"
+        taxId: validatedCpf
       }
     };
 
