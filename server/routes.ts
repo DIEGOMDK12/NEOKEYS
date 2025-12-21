@@ -442,7 +442,7 @@ export async function registerRoutes(
         expiresIn: 3600,
         description: `Compra de ${items.length} produtos`,
         metadata: {
-          orderId: order.id,
+          orderId: order.id.toString(),
           itemCount: items.length.toString(),
         },
       });
@@ -529,7 +529,7 @@ export async function registerRoutes(
         expiresIn: 3600,
         description: `Compra: ${product.name}`,
         metadata: {
-          orderId: order.id,
+          orderId: order.id.toString(),
         },
       });
       
