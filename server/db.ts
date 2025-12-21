@@ -1,11 +1,16 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon, neonConfig } from "@neondatabase/serverless";
 import * as schema from "@shared/schema";
+
+neonConfig.fetchConnectionCache = true;
 
 const databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
-const pool = new pg.Pool({
-  connectionString: databaseUrl,
-});
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL or NEON_DATABASE_URL must be set.",
+  );
+}
 
-export const db = drizzle(pool, { schema });
+const sql = neon(databaseUrl);
+export const db = drizzle(sql, { schema });
