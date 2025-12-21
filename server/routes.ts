@@ -31,6 +31,7 @@ const customerRegisterSchema = z.object({
   firstName: z.string().min(1, "Nome e obrigatorio"),
   email: z.string().email("Email invalido"),
   whatsapp: z.string().min(10, "WhatsApp invalido"),
+  taxId: z.string().min(11, "CPF/CNPJ invalido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
@@ -187,7 +188,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Dados invalidos", details: parsed.error.errors });
       }
       
-      const { firstName, email, whatsapp, password } = parsed.data;
+      const { firstName, email, whatsapp, taxId, password } = parsed.data;
       
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -200,6 +201,7 @@ export async function registerRoutes(
         firstName,
         lastName: "",
         whatsapp,
+        taxId,
         isAdmin: false,
       });
       
@@ -445,6 +447,12 @@ export async function registerRoutes(
           orderId: order.id.toString(),
           itemCount: items.length.toString(),
         },
+        customer: {
+          name: `${session.user.firstName}`,
+          cellphone: (session.user as any).whatsapp || "11999999999",
+          email: (session.user as any).email || "contato@elitevault.fun",
+          taxId: (session.user as any).taxId || "",
+        },
       });
       
       console.log("📱 PIX Response:", pixResponse);
@@ -535,6 +543,7 @@ export async function registerRoutes(
           name: `${session.user.firstName}`,
           cellphone: (session.user as any).whatsapp || "11999999999",
           email: (session.user as any).email || "contato@elitevault.fun",
+          taxId: (session.user as any).taxId || "",
         },
         returnUrl: `https://elitevault.fun/orders`,
         completionUrl: `https://elitevault.fun/orders`,

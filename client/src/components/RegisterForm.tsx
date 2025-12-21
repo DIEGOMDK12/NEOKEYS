@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RegisterFormProps {
-  onRegister: (data: { firstName: string; lastName: string; email: string; password: string }) => void;
+  onRegister: (data: { firstName: string; lastName: string; email: string; whatsapp: string; taxId: string; password: string }) => void;
   onLogin: () => void;
 }
 
@@ -13,11 +13,13 @@ export default function RegisterForm({ onRegister, onLogin }: RegisterFormProps)
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [taxId, setTaxId] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onRegister({ firstName, lastName, email, password });
+    onRegister({ firstName, lastName, email, whatsapp, taxId, password });
   };
 
   return (
@@ -57,6 +59,27 @@ export default function RegisterForm({ onRegister, onLogin }: RegisterFormProps)
               onChange={(e) => setEmail(e.target.value)}
               placeholder="E-mail"
               data-testid="input-register-email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="whatsapp">WhatsApp</Label>
+            <Input
+              id="whatsapp"
+              type="tel"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              placeholder="(11) 99999-9999"
+              data-testid="input-register-whatsapp"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="taxId">CPF/CNPJ</Label>
+            <Input
+              id="taxId"
+              value={taxId}
+              onChange={(e) => setTaxId(e.target.value)}
+              placeholder="Apenas números (11 ou 14 dígitos)"
+              data-testid="input-register-taxid"
             />
           </div>
           <div className="space-y-2">

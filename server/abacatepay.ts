@@ -6,7 +6,7 @@ interface PixCustomer {
   name: string;
   cellphone: string;
   email: string;
-  taxId?: string;
+  taxId: string;
 }
 
 interface CreatePixQrCodeRequest {

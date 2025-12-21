@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   whatsapp: text("whatsapp"),
+  taxId: text("tax_id").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
 });
 

@@ -70,8 +70,8 @@ export const api = {
   },
 
   // Auth
-  register: async (data: { email: string; password: string; firstName: string; lastName: string }) => {
-    return fetchWithSession("/api/auth/register", {
+  register: async (data: { email: string; password: string; firstName: string; lastName: string; whatsapp: string; taxId: string }) => {
+    return fetchWithSession("/api/customer/register", {
       method: "POST",
       body: JSON.stringify(data),
     });

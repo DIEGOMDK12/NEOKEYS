@@ -90,7 +90,7 @@ export default function AuthPage({
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: (data: { email: string; password: string; firstName: string; lastName: string }) =>
+    mutationFn: (data: { email: string; password: string; firstName: string; lastName: string; whatsapp: string; taxId: string }) =>
       api.register(data),
     onSuccess: () => {
       toast({
@@ -117,6 +117,8 @@ export default function AuthPage({
     lastName: string;
     email: string;
     password: string;
+    whatsapp: string;
+    taxId: string;
   }) => {
     registerMutation.mutate(data);
   };
