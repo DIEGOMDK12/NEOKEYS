@@ -73,7 +73,7 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       }
     };
 
-    console.log("📦 Payload AbacatePay:", JSON.stringify({ ...payload, customer: "HIDDEN" }, null, 2));
+    console.log("📦 Payload AbacatePay (Full):", JSON.stringify(payload, null, 2));
 
   try {
     console.log(`🚀 Enviando requisição para: ${ABACATEPAY_API_URL}/pixQrCode/create`);

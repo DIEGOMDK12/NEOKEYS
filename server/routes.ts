@@ -443,54 +443,60 @@ export async function registerRoutes(
       const baseUrl = `${protocol}://${host}`;
 
       console.log("🔐 Creating PIX QR Code with amount:", amountInCents);
-      const pixResponse = await createPixQrCode({
-        amount: amountInCents,
-        expiresIn: 3600,
-        description: `Compra de ${items.length} produtos`,
-        metadata: {
-          orderId: order.id.toString(),
-          itemCount: items.length.toString(),
-        },
-        customer: {
-          name: session.user.firstName || "Cliente",
-          cellphone: session.user.whatsapp || "11999999999",
-          email: session.user.email || "contato@elitevault.fun",
-          taxId: (session.user as any).taxId || "00000000000",
-        },
-        returnUrl: `${baseUrl}/orders`,
-        completionUrl: `${baseUrl}/orders`,
-      });
-      
-      console.log("📱 PIX Response:", pixResponse);
-      
-      if (pixResponse.error) {
-        console.error(" PIX Error:", pixResponse.error);
+      try {
+        const pixResponse = await createPixQrCode({
+          amount: amountInCents,
+          expiresIn: 3600,
+          description: `Compra de ${items.length} produtos`,
+          metadata: {
+            orderId: order.id.toString(),
+            itemCount: items.length.toString(),
+          },
+          customer: {
+            name: session.user.firstName || "Cliente",
+            cellphone: session.user.whatsapp || "11999999999",
+            email: session.user.email || "contato@elitevault.fun",
+            taxId: (session.user as any).taxId || "00000000000",
+          },
+          returnUrl: `${baseUrl}/orders`,
+          completionUrl: `${baseUrl}/orders`,
+        });
+        
+        console.log("📱 PIX Response:", JSON.stringify(pixResponse, null, 2));
+        
+        if (pixResponse.error) {
+          console.error(" PIX Error from API:", pixResponse.error);
+          await storage.updateOrderStatus(order.id, "payment_failed");
+          return res.status(500).json({ error: "Falha ao gerar QR Code PIX", details: pixResponse.error });
+        }
+        
+        const pixData = pixResponse.data;
+        await storage.updateOrderPix(order.id, {
+          pixId: pixData.id,
+          pixBrCode: pixData.brCode,
+          pixQrCodeBase64: pixData.brCodeBase64,
+          pixExpiresAt: new Date(pixData.expiresAt),
+        });
+        
+        res.json({
+          orderId: order.id,
+          pixId: pixData.id,
+          brCode: pixData.brCode,
+          qrCodeBase64: pixData.brCodeBase64,
+          amount: totalPrice,
+          expiresAt: pixData.expiresAt,
+          items: orderItems.map(item => ({
+            name: item.product.name,
+            imageUrl: item.product.imageUrl,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        });
+      } catch (pixError: any) {
+        console.error("💥 Critical PIX Error:", pixError.message);
         await storage.updateOrderStatus(order.id, "payment_failed");
-        return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
+        return res.status(500).json({ error: "Erro interno ao processar PIX", message: pixError.message });
       }
-      
-      const pixData = pixResponse.data;
-      await storage.updateOrderPix(order.id, {
-        pixId: pixData.id,
-        pixBrCode: pixData.brCode,
-        pixQrCodeBase64: pixData.brCodeBase64,
-        pixExpiresAt: new Date(pixData.expiresAt),
-      });
-      
-      res.json({
-        orderId: order.id,
-        pixId: pixData.id,
-        brCode: pixData.brCode,
-        qrCodeBase64: pixData.brCodeBase64,
-        amount: totalPrice,
-        expiresAt: pixData.expiresAt,
-        items: orderItems.map(item => ({
-          name: item.product.name,
-          imageUrl: item.product.imageUrl,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      });
     } catch (error) {
       console.error("Error creating cart checkout:", error);
       res.status(500).json({ error: "Falha ao criar pagamento PIX" });
@@ -542,48 +548,55 @@ export async function registerRoutes(
       const host = req.get("host");
       const baseUrl = `${protocol}://${host}`;
 
-      const pixResponse = await createPixQrCode({
-        amount: amountInCents,
-        expiresIn: 3600,
-        description: `Compra: ${product.name}`,
-        metadata: {
-          orderId: order.id.toString(),
-        },
-        customer: {
-          name: session.user.firstName || "Cliente",
-          cellphone: session.user.whatsapp || "11999999999",
-          email: session.user.email || "contato@elitevault.fun",
-          taxId: (session.user as any).taxId || "00000000000",
-        },
-        returnUrl: `${baseUrl}/orders`,
-        completionUrl: `${baseUrl}/orders`,
-      });
-      
-      if (pixResponse.error) {
+      try {
+        const pixResponse = await createPixQrCode({
+          amount: amountInCents,
+          expiresIn: 3600,
+          description: `Compra: ${product.name}`,
+          metadata: {
+            orderId: order.id.toString(),
+          },
+          customer: {
+            name: session.user.firstName || "Cliente",
+            cellphone: session.user.whatsapp || "11999999999",
+            email: session.user.email || "contato@elitevault.fun",
+            taxId: (session.user as any).taxId || "00000000000",
+          },
+          returnUrl: `${baseUrl}/orders`,
+          completionUrl: `${baseUrl}/orders`,
+        });
+        
+        if (pixResponse.error) {
+          console.error(" PIX Error from API:", pixResponse.error);
+          await storage.updateOrderStatus(order.id, "payment_failed");
+          return res.status(500).json({ error: "Falha ao gerar QR Code PIX", details: pixResponse.error });
+        }
+        
+        const pixData = pixResponse.data;
+        await storage.updateOrderPix(order.id, {
+          pixId: pixData.id,
+          pixBrCode: pixData.brCode,
+          pixQrCodeBase64: pixData.brCodeBase64,
+          pixExpiresAt: new Date(pixData.expiresAt),
+        });
+        
+        res.json({
+          orderId: order.id,
+          pixId: pixData.id,
+          brCode: pixData.brCode,
+          qrCodeBase64: pixData.brCodeBase64,
+          amount: totalPrice,
+          expiresAt: pixData.expiresAt,
+          product: {
+            name: product.name,
+            imageUrl: product.imageUrl,
+          },
+        });
+      } catch (pixError: any) {
+        console.error("💥 Critical PIX Error:", pixError.message);
         await storage.updateOrderStatus(order.id, "payment_failed");
-        return res.status(500).json({ error: "Falha ao gerar QR Code PIX" });
+        return res.status(500).json({ error: "Erro interno ao processar PIX", message: pixError.message });
       }
-      
-      const pixData = pixResponse.data;
-      await storage.updateOrderPix(order.id, {
-        pixId: pixData.id,
-        pixBrCode: pixData.brCode,
-        pixQrCodeBase64: pixData.brCodeBase64,
-        pixExpiresAt: new Date(pixData.expiresAt),
-      });
-      
-      res.json({
-        orderId: order.id,
-        pixId: pixData.id,
-        brCode: pixData.brCode,
-        qrCodeBase64: pixData.brCodeBase64,
-        amount: totalPrice,
-        expiresAt: pixData.expiresAt,
-        product: {
-          name: product.name,
-          imageUrl: product.imageUrl,
-        },
-      });
     } catch (error) {
       console.error("Error creating PIX checkout:", error);
       res.status(500).json({ error: "Falha ao criar pagamento PIX" });
