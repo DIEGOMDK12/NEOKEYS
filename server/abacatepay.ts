@@ -63,8 +63,8 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       description: request.description,
       metadata: request.metadata,
       methods: ["PIX"],
-      returnUrl: request.returnUrl || "https://elitevault.fun/orders",
-      completionUrl: request.completionUrl || "https://elitevault.fun/orders",
+      returnUrl: request.returnUrl || `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
+      completionUrl: request.completionUrl || `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
       customer: {
         name: request.customer?.name || "Cliente EliteVault",
         cellphone: request.customer?.cellphone || "11999999999",
