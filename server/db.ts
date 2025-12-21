@@ -1,8 +1,6 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon, neonConfig } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 import * as schema from "@shared/schema";
-
-neonConfig.fetchConnectionCache = true;
 
 const databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
@@ -12,5 +10,9 @@ if (!databaseUrl) {
   );
 }
 
-const sql = neon(databaseUrl);
-export const db = drizzle(sql, { schema });
+const client = new pg.Client({ connectionString: databaseUrl });
+client.connect().catch(err => {
+  console.error("Failed to connect to database:", err);
+});
+
+export const db = drizzle(client, { schema });
