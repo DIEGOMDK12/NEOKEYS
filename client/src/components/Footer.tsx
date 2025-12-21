@@ -55,7 +55,7 @@ export default function Footer() {
       </FooterSection>
 
       <FooterSection title="CONTATO:">
-        <p>Email: contato@neokeys.com</p>
+        <p>Email: contato@elitevault.com</p>
         <p>WhatsApp: (00) 00000-0000</p>
         <p>Horário: Seg-Sex 9h às 18h</p>
       </FooterSection>
