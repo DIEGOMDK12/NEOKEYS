@@ -406,6 +406,25 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     systemRequirements: "",
   });
 
+  const handleImportProduct = (productData: any) => {
+    setNewProduct({
+      name: productData.name || "",
+      imageUrl: productData.imageUrl || "",
+      platform: productData.platform || "Steam",
+      region: productData.region || "Global",
+      price: productData.price || "",
+      originalPrice: productData.originalPrice || "",
+      discount: productData.discount || 0,
+      description: productData.description || "",
+      category: productData.category || "",
+      galleryImages: productData.galleryImages || [],
+      videoUrl: productData.videoUrl || "",
+      systemRequirements: productData.systemRequirements || "",
+    });
+    setIsAddingProduct(true);
+    toast({ title: "Dados importados", description: "Verifique as informações antes de salvar." });
+  };
+
   const createProductMutation = useMutation({
     mutationFn: (data: typeof newProduct) => api.createProduct(data),
     onSuccess: () => {
@@ -481,7 +500,24 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
           <h2 className="text-2xl font-bold">Produtos</h2>
           <p className="text-muted-foreground">Gerencie seu catalogo de produtos</p>
         </div>
-        <Dialog open={isAddingProduct} onOpenChange={setIsAddingProduct}>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              try {
+                const clipboardText = prompt("Cole o JSON do produto aqui:");
+                if (clipboardText) {
+                  const data = JSON.parse(clipboardText);
+                  handleImportProduct(data);
+                }
+              } catch (e) {
+                toast({ title: "Erro na importação", description: "JSON inválido", variant: "destructive" });
+              }
+            }}
+          >
+            Importar JSON
+          </Button>
+          <Dialog open={isAddingProduct} onOpenChange={setIsAddingProduct}>
           <DialogTrigger asChild>
             <Button data-testid="button-add-product">
               <Plus className="h-4 w-4 mr-2" />
@@ -698,6 +734,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
           </DialogContent>
         </Dialog>
       </div>
+    </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (

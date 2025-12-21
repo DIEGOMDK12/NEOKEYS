@@ -69,7 +69,8 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AbacatePay error response:", errorText);
+      console.error("AbacatePay API Error Status:", response.status);
+      console.error("AbacatePay API Error Body:", errorText);
       throw new Error(`AbacatePay API error: ${response.status} - ${errorText}`);
     }
 
