@@ -113,7 +113,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-border p-4 text-center">
-        <p className="text-sm text-muted-foreground">© 2025 NEO-KEYS</p>
+        <p className="text-sm text-muted-foreground">© 2025 ELITEVAULT</p>
       </div>
     </footer>
   );
