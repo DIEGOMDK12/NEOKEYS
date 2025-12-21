@@ -104,7 +104,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         
         <Button
           size="sm"
-          className="w-full bg-white text-black font-bold mt-2 hover:bg-white/90"
+          className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold mt-2 hover:bg-gray-300 dark:hover:bg-gray-600"
           onClick={(e) => {
             e.stopPropagation();
             onAddToCart(product);

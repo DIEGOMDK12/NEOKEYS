@@ -245,7 +245,7 @@ export default function ProductDetail({
               Essa chave funcionara no Brasil
             </p>
             <div className="space-y-3">
-              <Button className="w-full bg-white text-black font-bold hover:bg-white/90" onClick={onAddToCart} data-testid="button-detail-add-cart">
+              <Button className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold hover:bg-gray-300 dark:hover:bg-gray-600" onClick={onAddToCart} data-testid="button-detail-add-cart">
                 🛒 Adicionar
               </Button>
               <Button variant="outline" className="w-full font-bold" onClick={onBuyNow} data-testid="button-buy-now">

@@ -186,7 +186,7 @@ export default function CartDrawer({
                   Editar
                 </Button>
                 <Button 
-                  className="flex-1 bg-white text-black font-bold hover:bg-white/90" 
+                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold hover:bg-gray-300 dark:hover:bg-gray-600" 
                   onClick={onCheckout} 
                   data-testid="button-checkout"
                 >

@@ -23,7 +23,7 @@ export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFi
             variant={selectedFilter === option.value ? "default" : "outline"}
             className={`h-10 px-5 font-semibold text-sm rounded-full whitespace-nowrap transition-all ${
               selectedFilter === option.value 
-                ? "bg-white text-black shadow-lg shadow-white/30" 
+                ? "bg-gray-200 dark:bg-gray-700 text-black dark:text-white shadow-lg shadow-gray-300/30 dark:shadow-gray-700/30" 
                 : "border-white/50 text-white hover:bg-white/10"
             }`}
             onClick={() => onFilterSelect(option.value)}

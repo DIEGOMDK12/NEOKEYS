@@ -96,7 +96,7 @@ export default function Header({
           <Button
             type="submit"
             size="icon"
-            className="rounded-l-none bg-white text-black px-4"
+            className="rounded-l-none bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4"
             data-testid="button-search"
           >
             <Search className="h-5 w-5" />
