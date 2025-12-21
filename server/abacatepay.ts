@@ -6,7 +6,7 @@ interface PixCustomer {
   name: string;
   cellphone: string;
   email: string;
-  taxId: string;
+  taxId?: string;
 }
 
 interface CreatePixQrCodeRequest {
@@ -47,8 +47,13 @@ interface CheckPixStatusResponse {
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
     const apiKey = process.env.ABACATEPAY_API_KEY;
     
+    console.log("📡 AbacatePay - Verificando API Key...");
+    console.log("API Key exists:", !!apiKey);
+    console.log("API Key length:", apiKey?.length || 0);
+    console.log("API Key start:", apiKey?.substring(0, 10) + "...");
+    
     if (!apiKey) {
-      console.error("ABACATEPAY_API_KEY is not configured!");
+      console.error("❌ ABACATEPAY_API_KEY not configured!");
       throw new Error("ABACATEPAY_API_KEY not configured");
     }
 
@@ -63,15 +68,15 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       webhookId: ABACATEPAY_WEBHOOK_ID,
       customer: request.customer || {
         name: "Cliente EliteVault",
-        cellphone: "00000000000",
-        email: "contato@elitevault.fun",
-        taxId: "00000000000"
+        cellphone: "11999999999",
+        email: "contato@elitevault.fun"
       }
     };
 
-    console.log("AbacatePay Request Payload (Sanitized):", JSON.stringify({ ...payload, customer: "HIDDEN" }, null, 2));
+    console.log("📦 Payload AbacatePay:", JSON.stringify({ ...payload, customer: "HIDDEN" }, null, 2));
 
   try {
+    console.log(`🚀 Enviando requisição para: ${ABACATEPAY_API_URL}/pixQrCode/create`);
     const response = await fetch(`${ABACATEPAY_API_URL}/pixQrCode/create`, {
       method: "POST",
       headers: {
@@ -81,17 +86,20 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       body: JSON.stringify(payload),
     });
 
+    console.log("📥 Resposta recebida com status:", response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AbacatePay API Error Status:", response.status);
-      console.error("AbacatePay API Error Body:", errorText);
+      console.error("❌ AbacatePay API Error Status:", response.status);
+      console.error("❌ AbacatePay API Error Body:", errorText);
       throw new Error(`AbacatePay API error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
+    console.log("✅ Resposta QR Code PIX obtida com sucesso!");
     return result;
   } catch (error) {
-    console.error("Error calling AbacatePay API:", error);
+    console.error("❌ Erro ao chamar AbacatePay API:", error);
     throw error;
   }
 }
