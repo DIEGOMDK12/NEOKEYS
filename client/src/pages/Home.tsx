@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import { queryClient, getQueryFn } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
+import promoBannerImg from "@assets/elitevault-promo.png";
 
 interface CustomerUser {
   id: string;
@@ -264,6 +265,15 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
               }
               toast({ title: "Comprar", description: "Adicionando ao carrinho..." });
             }}
+          />
+        </div>
+
+        <div className="p-4">
+          <img 
+            src={promoBannerImg} 
+            alt="ELITEVAULT - Chaves de Jogos Premium" 
+            className="w-full rounded-lg shadow-lg"
+            data-testid="promo-banner-image"
           />
         </div>
 
