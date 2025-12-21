@@ -87,11 +87,12 @@ export default function PixCheckout({
         const data = await response.json();
 
         if (data.error) {
-          if (data.error.includes("login") || data.error.includes("Sessao")) {
+          const errorMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+          if (errorMsg.includes("login") || errorMsg.includes("Sessao")) {
             onLoginRequired();
             return;
           }
-          toast({ title: "Erro", description: data.error, variant: "destructive" });
+          toast({ title: "Erro", description: errorMsg, variant: "destructive" });
           setIsLoading(false);
           return;
         }
