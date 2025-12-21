@@ -43,19 +43,31 @@ interface CheckPixStatusResponse {
 }
 
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
-  const apiKey = process.env.ABACATEPAY_API_KEY;
-  const webhookUrl = process.env.WEBHOOK_URL || "https://elitevault.fun/webhook";
-  
-  if (!apiKey) {
-    console.error("ABACATEPAY_API_KEY is not configured!");
-    throw new Error("ABACATEPAY_API_KEY not configured");
-  }
+    const apiKey = process.env.ABACATEPAY_API_KEY;
+    const webhookUrl = process.env.WEBHOOK_URL || "https://elitevault.fun/api/webhooks/abacatepay";
+    
+    if (!apiKey) {
+      console.error("ABACATEPAY_API_KEY is not configured!");
+      throw new Error("ABACATEPAY_API_KEY not configured");
+    }
 
-  const payload = {
-    ...request,
-    returnUrl: request.returnUrl || webhookUrl,
-    completionUrl: request.completionUrl || webhookUrl,
-  };
+    const payload = {
+      amount: request.amount,
+      expiresIn: request.expiresIn || 3600,
+      description: request.description,
+      metadata: request.metadata,
+      methods: ["PIX"],
+      returnUrl: request.returnUrl || "https://elitevault.fun/orders",
+      completionUrl: request.completionUrl || "https://elitevault.fun/orders",
+      customer: request.customer || {
+        name: "Cliente EliteVault",
+        cellphone: "00000000000",
+        email: "contato@elitevault.fun",
+        taxId: "00000000000"
+      }
+    };
+
+    console.log("AbacatePay Request Payload (Sanitized):", JSON.stringify({ ...payload, customer: "HIDDEN" }, null, 2));
 
   try {
     const response = await fetch(`${ABACATEPAY_API_URL}/pixQrCode/create`, {
