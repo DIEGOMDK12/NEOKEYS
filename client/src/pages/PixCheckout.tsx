@@ -322,7 +322,7 @@ export default function PixCheckout({
           <CardContent className="space-y-4">
             {/* QR Code */}
             <div className="flex justify-center">
-              <div className="bg-white p-4 rounded-lg">
+              <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
                 <img
                   src={pixData.qrCodeBase64}
                   alt="QR Code PIX"
