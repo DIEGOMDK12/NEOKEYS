@@ -453,8 +453,8 @@ export async function registerRoutes(
           email: session.user.email || "contato@elitevault.fun",
           taxId: (session.user as any).taxId || "00000000000",
         },
-        returnUrl: `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
-        completionUrl: `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
+        returnUrl: `https://${req.get("host")}/orders`,
+        completionUrl: `https://${req.get("host")}/orders`,
       });
       
       console.log("📱 PIX Response:", pixResponse);
@@ -547,8 +547,8 @@ export async function registerRoutes(
           email: session.user.email || "contato@elitevault.fun",
           taxId: (session.user as any).taxId || "00000000000",
         },
-        returnUrl: `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
-        completionUrl: `https://${process.env.REPLIT_DEV_DOMAIN}/orders`,
+        returnUrl: `https://${req.get("host")}/orders`,
+        completionUrl: `https://${req.get("host")}/orders`,
       });
       
       if (pixResponse.error) {
