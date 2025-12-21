@@ -63,13 +63,13 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       description: request.description,
       metadata: request.metadata,
       methods: ["PIX"],
-      returnUrl: request.returnUrl || `https://${process.env.REPLIT_DEV_DOMAIN || process.env.REPL_ID + ".id.repl.co"}/orders`,
-      completionUrl: request.completionUrl || `https://${process.env.REPLIT_DEV_DOMAIN || process.env.REPL_ID + ".id.repl.co"}/orders`,
+      returnUrl: request.returnUrl,
+      completionUrl: request.completionUrl,
       customer: {
         name: request.customer?.name || "Cliente EliteVault",
         cellphone: request.customer?.cellphone || "11999999999",
         email: request.customer?.email || "contato@elitevault.fun",
-        taxId: (request.customer?.taxId && request.customer.taxId.length >= 11) ? request.customer.taxId : "00000000000"
+        taxId: (request.customer?.taxId && request.customer.taxId.length >= 11) ? request.customer.taxId.replace(/\D/g, '') : "00000000000"
       }
     };
 

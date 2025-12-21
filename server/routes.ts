@@ -438,6 +438,10 @@ export async function registerRoutes(
         status: "awaiting_payment",
       });
       
+      const protocol = req.headers["x-forwarded-proto"] || "http";
+      const host = req.get("host");
+      const baseUrl = `${protocol}://${host}`;
+
       console.log("🔐 Creating PIX QR Code with amount:", amountInCents);
       const pixResponse = await createPixQrCode({
         amount: amountInCents,
@@ -453,8 +457,8 @@ export async function registerRoutes(
           email: session.user.email || "contato@elitevault.fun",
           taxId: (session.user as any).taxId || "00000000000",
         },
-        returnUrl: `https://${req.get("host")}/orders`,
-        completionUrl: `https://${req.get("host")}/orders`,
+        returnUrl: `${baseUrl}/orders`,
+        completionUrl: `${baseUrl}/orders`,
       });
       
       console.log("📱 PIX Response:", pixResponse);
@@ -534,6 +538,10 @@ export async function registerRoutes(
         status: "awaiting_payment",
       });
       
+      const protocol = req.headers["x-forwarded-proto"] || "http";
+      const host = req.get("host");
+      const baseUrl = `${protocol}://${host}`;
+
       const pixResponse = await createPixQrCode({
         amount: amountInCents,
         expiresIn: 3600,
@@ -547,8 +555,8 @@ export async function registerRoutes(
           email: session.user.email || "contato@elitevault.fun",
           taxId: (session.user as any).taxId || "00000000000",
         },
-        returnUrl: `https://${req.get("host")}/orders`,
-        completionUrl: `https://${req.get("host")}/orders`,
+        returnUrl: `${baseUrl}/orders`,
+        completionUrl: `${baseUrl}/orders`,
       });
       
       if (pixResponse.error) {
