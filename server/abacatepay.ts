@@ -60,6 +60,7 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       methods: ["PIX"],
       returnUrl: request.returnUrl || "https://elitevault.fun/orders",
       completionUrl: request.completionUrl || "https://elitevault.fun/orders",
+      webhookId: ABACATEPAY_WEBHOOK_ID,
       customer: request.customer || {
         name: "Cliente EliteVault",
         cellphone: "00000000000",
