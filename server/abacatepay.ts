@@ -65,11 +65,11 @@ export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<
       methods: ["PIX"],
       returnUrl: request.returnUrl || "https://elitevault.fun/orders",
       completionUrl: request.completionUrl || "https://elitevault.fun/orders",
-      webhookId: ABACATEPAY_WEBHOOK_ID,
-      customer: request.customer || {
-        name: "Cliente EliteVault",
-        cellphone: "11999999999",
-        email: "contato@elitevault.fun"
+      customer: {
+        name: request.customer?.name || "Cliente EliteVault",
+        cellphone: request.customer?.cellphone || "11999999999",
+        email: request.customer?.email || "contato@elitevault.fun",
+        taxId: request.customer?.taxId || "00000000000"
       }
     };
 

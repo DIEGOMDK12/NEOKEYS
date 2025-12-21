@@ -448,10 +448,10 @@ export async function registerRoutes(
           itemCount: items.length.toString(),
         },
         customer: {
-          name: `${session.user.firstName}`,
-          cellphone: (session.user as any).whatsapp || "11999999999",
-          email: (session.user as any).email || "contato@elitevault.fun",
-          taxId: (session.user as any).taxId || "",
+          name: session.user.firstName || "Cliente",
+          cellphone: session.user.whatsapp || "11999999999",
+          email: session.user.email || "contato@elitevault.fun",
+          taxId: (session.user as any).taxId || "00000000000",
         },
       });
       
@@ -540,10 +540,10 @@ export async function registerRoutes(
           orderId: order.id.toString(),
         },
         customer: {
-          name: `${session.user.firstName}`,
-          cellphone: (session.user as any).whatsapp || "11999999999",
-          email: (session.user as any).email || "contato@elitevault.fun",
-          taxId: (session.user as any).taxId || "",
+          name: session.user.firstName || "Cliente",
+          cellphone: session.user.whatsapp || "11999999999",
+          email: session.user.email || "contato@elitevault.fun",
+          taxId: (session.user as any).taxId || "00000000000",
         },
         returnUrl: `https://elitevault.fun/orders`,
         completionUrl: `https://elitevault.fun/orders`,
