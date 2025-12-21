@@ -1,6 +1,6 @@
 const ABACATEPAY_API_URL = "https://api.abacatepay.com/v1";
-const ABACATEPAY_WEBHOOK_ID = "webh_prod_Qr2yP6eRNfsrDZNfqZ5ELtka";
-const ABACATEPAY_WEBHOOK_URL = "https://elitevault.fun/webhook";
+const ABACATEPAY_WEBHOOK_ID = process.env.ABACATEPAY_WEBHOOK_KEY || "webh_prod_Qr2yP6eRNfsrDZNfqZ5ELtka";
+const ABACATEPAY_WEBHOOK_URL = process.env.WEBHOOK_URL || "https://elitevault.fun/webhook";
 
 interface PixCustomer {
   name: string;

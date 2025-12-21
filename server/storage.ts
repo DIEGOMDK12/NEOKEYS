@@ -379,12 +379,14 @@ export class DatabaseStorage implements IStorage {
 
   async seedAdminUser(): Promise<User> {
     const existingAdmin = await db.select().from(users).where(eq(users.isAdmin, true));
+    const adminEmail = "diego.ndk999@gmail.com";
+    const hashedPassword = await bcrypt.hash("506731", 10);
+
     if (existingAdmin.length > 0) {
       const admin = existingAdmin[0];
-      const hashedPassword = await bcrypt.hash("506731", 10);
       const [updatedAdmin] = await db.update(users)
         .set({
-          email: "diego.marinho.foda@gmail.com",
+          email: adminEmail,
           password: hashedPassword,
           firstName: "Diego",
           lastName: "Marinho",
@@ -394,13 +396,13 @@ export class DatabaseStorage implements IStorage {
       return updatedAdmin;
     }
 
-    const hashedPassword = await bcrypt.hash("506731", 10);
     const [admin] = await db.insert(users).values({
-      email: "diego.marinho.foda@gmail.com",
+      email: adminEmail,
       password: hashedPassword,
       firstName: "Diego",
       lastName: "Marinho",
       isAdmin: true,
+      taxId: "00000000000",
     }).returning();
     return admin;
   }
