@@ -44,7 +44,7 @@ interface CheckPixStatusResponse {
 
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
     const apiKey = process.env.ABACATEPAY_API_KEY;
-    const webhookUrl = process.env.WEBHOOK_URL || "https://elitevault.fun/api/webhooks/abacatepay";
+    const webhookUrl = "https://elitevault.fun/webhook";
     
     if (!apiKey) {
       console.error("ABACATEPAY_API_KEY is not configured!");
