@@ -1,4 +1,6 @@
 const ABACATEPAY_API_URL = "https://api.abacatepay.com/v1";
+const ABACATEPAY_WEBHOOK_ID = "webh_prod_Qr2yP6eRNfsrDZNfqZ5ELtka";
+const ABACATEPAY_WEBHOOK_URL = "https://elitevault.fun/webhook";
 
 interface PixCustomer {
   name: string;
@@ -44,7 +46,6 @@ interface CheckPixStatusResponse {
 
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
     const apiKey = process.env.ABACATEPAY_API_KEY;
-    const webhookUrl = "https://elitevault.fun/webhook";
     
     if (!apiKey) {
       console.error("ABACATEPAY_API_KEY is not configured!");
