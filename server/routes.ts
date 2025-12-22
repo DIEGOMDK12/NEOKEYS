@@ -29,6 +29,7 @@ const checkoutCartSchema = z.object({
 
 const customerRegisterSchema = z.object({
   firstName: z.string().min(1, "Nome e obrigatorio"),
+  lastName: z.string().min(1, "Sobrenome e obrigatorio"),
   email: z.string().email("Email invalido"),
   whatsapp: z.string().min(10, "WhatsApp invalido"),
   taxId: z.string().min(11, "CPF/CNPJ invalido"),
@@ -188,7 +189,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Dados invalidos", details: parsed.error.errors });
       }
       
-      const { firstName, email, whatsapp, taxId, password } = parsed.data;
+      const { firstName, lastName, email, whatsapp, taxId, password } = parsed.data;
       
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -199,7 +200,7 @@ export async function registerRoutes(
         email,
         password,
         firstName,
-        lastName: "",
+        lastName,
         whatsapp,
         taxId,
         isAdmin: false,
