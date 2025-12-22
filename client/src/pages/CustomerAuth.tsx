@@ -23,7 +23,6 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
     lastName: "",
     email: "",
     whatsapp: "",
-    taxId: "",
     password: "",
   });
 
@@ -162,20 +161,6 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
                         onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                         required={!isLogin}
                         data-testid="input-whatsapp"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="taxId">CPF/CNPJ</Label>
-                    <div className="relative">
-                      <Input
-                        id="taxId"
-                        placeholder="Apenas números (11 ou 14 dígitos)"
-                        className="pl-10"
-                        value={formData.taxId}
-                        onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                        required={!isLogin}
-                        data-testid="input-taxid"
                       />
                     </div>
                   </div>

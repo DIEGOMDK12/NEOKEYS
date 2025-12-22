@@ -32,7 +32,6 @@ const customerRegisterSchema = z.object({
   lastName: z.string().min(1, "Sobrenome e obrigatorio"),
   email: z.string().email("Email invalido"),
   whatsapp: z.string().min(10, "WhatsApp invalido"),
-  taxId: z.string().min(11, "CPF/CNPJ invalido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
@@ -189,7 +188,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Dados invalidos", details: parsed.error.errors });
       }
       
-      const { firstName, lastName, email, whatsapp, taxId, password } = parsed.data;
+      const { firstName, lastName, email, whatsapp, password } = parsed.data;
       
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -202,7 +201,7 @@ export async function registerRoutes(
         firstName,
         lastName,
         whatsapp,
-        taxId,
+        taxId: "00000000000",
         isAdmin: false,
       });
       
