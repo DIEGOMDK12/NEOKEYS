@@ -20,8 +20,10 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
   
   const [formData, setFormData] = useState({
     firstName: "",
+    lastName: "",
     email: "",
     whatsapp: "",
+    taxId: "",
     password: "",
   });
 
@@ -95,21 +97,38 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Nome</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="firstName"
-                      placeholder="Seu nome"
-                      className="pl-10"
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      required={!isLogin}
-                      data-testid="input-name"
-                    />
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Nome</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="firstName"
+                        placeholder="Seu nome"
+                        className="pl-10"
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                        required={!isLogin}
+                        data-testid="input-firstname"
+                      />
+                    </div>
                   </div>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Sobrenome</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="lastName"
+                        placeholder="Seu sobrenome"
+                        className="pl-10"
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                        required={!isLogin}
+                        data-testid="input-lastname"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">
@@ -130,21 +149,37 @@ export default function CustomerAuth({ mode, onBack, onSuccess }: CustomerAuthPr
               </div>
 
               {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="whatsapp">WhatsApp</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="whatsapp"
-                      placeholder="(11) 99999-9999"
-                      className="pl-10"
-                      value={formData.whatsapp}
-                      onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                      required={!isLogin}
-                      data-testid="input-whatsapp"
-                    />
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp">WhatsApp</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="whatsapp"
+                        placeholder="(11) 99999-9999"
+                        className="pl-10"
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                        required={!isLogin}
+                        data-testid="input-whatsapp"
+                      />
+                    </div>
                   </div>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="taxId">CPF/CNPJ</Label>
+                    <div className="relative">
+                      <Input
+                        id="taxId"
+                        placeholder="Apenas números (11 ou 14 dígitos)"
+                        className="pl-10"
+                        value={formData.taxId}
+                        onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+                        required={!isLogin}
+                        data-testid="input-taxid"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">
