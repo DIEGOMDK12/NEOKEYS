@@ -34,6 +34,7 @@ function transformProduct(p: any): Product {
     galleryImages: p.galleryImages,
     systemRequirements: p.systemRequirements,
     description: p.description,
+    availableStock: p.availableStock,
   };
 }
 

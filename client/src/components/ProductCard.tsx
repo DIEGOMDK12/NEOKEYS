@@ -17,6 +17,7 @@ export interface Product {
   galleryImages?: string[];
   systemRequirements?: string;
   description?: string;
+  availableStock?: number;
 }
 
 interface ProductCardProps {

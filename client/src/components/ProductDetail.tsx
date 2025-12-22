@@ -239,6 +239,20 @@ export default function ProductDetail({
           </span>
         </div>
 
+        <div className="flex gap-2 mb-4">
+          {(product as any).availableStock !== undefined && (
+            (product as any).availableStock > 0 ? (
+              <Badge className="bg-green-600 hover:bg-green-700 text-white gap-1" data-testid={`stock-badge-${product.id}`}>
+                Em estoque: {(product as any).availableStock}
+              </Badge>
+            ) : (
+              <Badge className="bg-red-600 hover:bg-red-700 text-white gap-1" data-testid={`stock-badge-${product.id}`}>
+                Sem estoque
+              </Badge>
+            )
+          )}
+        </div>
+
         <Card className="mb-4">
           <CardContent className="p-4">
             <p className="text-white font-medium mb-4">
