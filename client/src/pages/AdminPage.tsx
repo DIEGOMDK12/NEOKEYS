@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import {
   Sidebar,
   SidebarContent,
@@ -99,7 +99,7 @@ const defaultSettings = {
   accentColor: "#fbbf24",
 };
 
-type AdminSection = "dashboard" | "products" | "keys" | "orders" | "banner" | "colors";
+type AdminSection = "dashboard" | "products" | "keys" | "orders" | "customers" | "banner" | "colors";
 
 function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) => void }) {
   const { toast } = useToast();
@@ -195,6 +195,7 @@ function AdminSidebar({
     { id: "products" as AdminSection, title: "Produtos", icon: Package },
     { id: "keys" as AdminSection, title: "Chaves", icon: Key },
     { id: "orders" as AdminSection, title: "Pedidos", icon: ShoppingBag },
+    { id: "customers" as AdminSection, title: "Clientes", icon: Users },
     { id: "banner" as AdminSection, title: "Banner", icon: Image },
     { id: "colors" as AdminSection, title: "Cores", icon: Palette },
   ];
@@ -1390,6 +1391,105 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
   );
 }
 
+interface Customer {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  whatsapp?: string;
+}
+
+function CustomersSection() {
+  const { toast } = useToast();
+  const { data: customers = [], isLoading } = useQuery<Customer[]>({
+    queryKey: ["/api/admin/customers"],
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: (customerId: string) => 
+      apiRequest("DELETE", `/api/admin/customers/${customerId}`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/customers"] });
+      toast({ title: "Sucesso", description: "Cliente deletado com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao deletar cliente", variant: "destructive" });
+    },
+  });
+
+  const handleDeleteCustomer = (customerId: string) => {
+    if (confirm("Tem certeza que deseja deletar este cliente?")) {
+      deleteCustomerMutation.mutate(customerId);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Clientes</h2>
+        <p className="text-muted-foreground">Total de clientes: <span className="font-semibold text-foreground">{customers.length}</span></p>
+      </div>
+
+      {isLoading ? (
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-muted-foreground">Carregando clientes...</p>
+          </CardContent>
+        </Card>
+      ) : customers.length === 0 ? (
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-muted-foreground">Nenhum cliente cadastrado</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b border-border bg-muted/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left font-medium">Nome</th>
+                    <th className="px-6 py-3 text-left font-medium">Email</th>
+                    <th className="px-6 py-3 text-left font-medium">WhatsApp</th>
+                    <th className="px-6 py-3 text-right font-medium">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.map((customer) => (
+                    <tr key={customer.id} className="border-b border-border hover:bg-muted/50">
+                      <td className="px-6 py-3" data-testid={`text-customer-name-${customer.id}`}>
+                        {customer.firstName} {customer.lastName}
+                      </td>
+                      <td className="px-6 py-3" data-testid={`text-customer-email-${customer.id}`}>
+                        {customer.email}
+                      </td>
+                      <td className="px-6 py-3" data-testid={`text-customer-whatsapp-${customer.id}`}>
+                        {customer.whatsapp || "-"}
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteCustomer(customer.id)}
+                          disabled={deleteCustomerMutation.isPending}
+                          data-testid={`button-delete-customer-${customer.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 function ColorsSection({ settings, setSettings }: { settings: typeof defaultSettings; setSettings: (s: typeof defaultSettings) => void }) {
   const { toast } = useToast();
 
@@ -1596,6 +1696,9 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
             )}
             {currentSection === "orders" && (
               <OrdersSection orders={orders} />
+            )}
+            {currentSection === "customers" && (
+              <CustomersSection />
             )}
             {currentSection === "banner" && (
               <BannerSection settings={settings} setSettings={setSettings} products={products} />

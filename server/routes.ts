@@ -828,6 +828,47 @@ export async function registerRoutes(
     }
   });
 
+  // Admin Customers API
+  app.get("/api/admin/customers", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      const customers = await storage.getAllCustomers();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ error: "Falha ao buscar clientes" });
+    }
+  });
+
+  app.delete("/api/admin/customers/:id", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Nao autenticado" });
+      }
+      
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) {
+        return res.status(401).json({ error: "Sessao invalida" });
+      }
+      
+      await storage.deleteCustomer(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ error: "Falha ao deletar cliente" });
+    }
+  });
+
   // Admin Orders API - returns only paid and delivered orders
   app.get("/api/admin/orders", async (req: Request, res: Response) => {
     try {

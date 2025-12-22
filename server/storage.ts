@@ -14,6 +14,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   validatePassword(email: string, password: string): Promise<User | null>;
+  getAllCustomers(): Promise<User[]>;
+  deleteCustomer(id: string): Promise<void>;
 
   // Products
   getAllProducts(): Promise<Product[]>;
@@ -92,6 +94,17 @@ export class DatabaseStorage implements IStorage {
     if (!user) return null;
     const isValid = await bcrypt.compare(password, user.password);
     return isValid ? user : null;
+  }
+
+  async getAllCustomers(): Promise<User[]> {
+    return db.select().from(users).where(eq(users.isAdmin, false));
+  }
+
+  async deleteCustomer(id: string): Promise<void> {
+    await db.delete(customerSessions).where(eq(customerSessions.userId, id));
+    await db.delete(orders).where(eq(orders.userId, id));
+    await db.delete(cartItems).where(eq(cartItems.sessionId, id));
+    await db.delete(users).where(eq(users.id, id));
   }
 
   // Products
