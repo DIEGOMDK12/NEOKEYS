@@ -44,6 +44,7 @@ interface Product {
   galleryImages?: string[];
   videoUrl?: string;
   systemRequirements?: string;
+  availableStock?: number;
 }
 
 interface AdminUser {
@@ -759,6 +760,17 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                 <span className="font-bold text-white">R$ {product.price}</span>
                 {parseFloat(product.originalPrice) > parseFloat(product.price) && (
                   <span className="text-sm text-muted-foreground line-through">R$ {product.originalPrice}</span>
+                )}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                {(product.availableStock ?? 0) > 0 ? (
+                  <span className="text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full" data-testid={`stock-${product.id}`}>
+                    Em estoque: {product.availableStock}
+                  </span>
+                ) : (
+                  <span className="text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full" data-testid={`stock-${product.id}`}>
+                    Sem estoque
+                  </span>
                 )}
               </div>
               <div className="flex gap-2 mt-4">

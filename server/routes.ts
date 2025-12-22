@@ -61,7 +61,15 @@ export async function registerRoutes(
         products = await storage.getAllProducts();
       }
       
-      res.json(products);
+      // Add available stock for each product
+      const productsWithStock = await Promise.all(
+        products.map(async (product) => {
+          const availableKeys = await storage.getAvailableKeyCount(product.id);
+          return { ...product, availableStock: availableKeys };
+        })
+      );
+      
+      res.json(productsWithStock);
     } catch (error) {
       console.error("Error fetching products:", error);
       res.status(500).json({ error: "Failed to fetch products" });
