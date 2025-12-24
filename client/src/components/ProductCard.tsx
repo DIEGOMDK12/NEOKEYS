@@ -40,11 +40,11 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
 
   return (
     <div
-      className="cursor-pointer group"
+      className="cursor-pointer group fade-in"
       onClick={() => onProductClick(product)}
       data-testid={`card-product-${product.id}`}
     >
-      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-card mb-1 sm:mb-2 shadow hover-elevate transition-shadow duration-300">
+      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-card mb-1 sm:mb-2 shadow hover-elevate transition-all duration-300 transform hover:scale-105">
         <img
           src={product.imageUrl}
           alt={product.name}
@@ -105,7 +105,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         
         <Button
           size="sm"
-          className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold mt-1 sm:mt-2 h-6 sm:h-7 text-xs hover:bg-gray-300 dark:hover:bg-gray-600 pulse-button border-4 border-green-500"
+          className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold mt-1 sm:mt-2 h-6 sm:h-7 text-xs hover:bg-gray-300 dark:hover:bg-gray-600 pulse-button border-4 border-green-500 glow-border"
           onClick={(e) => {
             e.stopPropagation();
             onAddToCart(product);

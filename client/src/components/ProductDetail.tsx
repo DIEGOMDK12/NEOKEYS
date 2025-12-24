@@ -111,10 +111,10 @@ export default function ProductDetail({
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-24 fade-in">
       <div>
         {videoEmbedUrl && (
-          <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
+          <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer scale-in" onClick={() => setShowVideoPlayer(true)}>
             <img
               src={product.imageUrl}
               alt={product.name}
@@ -259,10 +259,10 @@ export default function ProductDetail({
               Essa chave funcionara no Brasil
             </p>
             <div className="space-y-3">
-              <Button className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold hover:bg-gray-300 dark:hover:bg-gray-600 pulse-button border-4 border-green-500" onClick={onAddToCart} data-testid="button-detail-add-cart">
+              <Button className="w-full bg-gray-200 dark:bg-gray-700 text-black dark:text-white font-bold hover:bg-gray-300 dark:hover:bg-gray-600 pulse-button border-4 border-green-500 glow-border" onClick={onAddToCart} data-testid="button-detail-add-cart">
                 🛒 Adicionar
               </Button>
-              <Button variant="outline" className="w-full font-bold pulse-button border-4 border-green-500" onClick={onBuyNow} data-testid="button-buy-now">
+              <Button variant="outline" className="w-full font-bold pulse-button border-4 border-green-500 glow-border" onClick={onBuyNow} data-testid="button-buy-now">
                 💳 Comprar (PIX)
               </Button>
             </div>
