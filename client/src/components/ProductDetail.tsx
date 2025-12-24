@@ -69,15 +69,20 @@ export default function ProductDetail({
   const editingRequirements = Array.isArray(requirements) ? requirements : [];
   const editingDescription = description || "";
   
-  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
+  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages.slice(0, 2) : [];
   const videoEmbedUrl = product.videoUrl ? convertVideoUrl(product.videoUrl) : "";
+  const hasVideo = !!videoEmbedUrl;
+  
+  const galleryWithVideo = hasVideo 
+    ? [{type: 'video' as const, url: videoEmbedUrl}, ...galleryImages.map(url => ({type: 'image' as const, url}))]
+    : galleryImages.map(url => ({type: 'image' as const, url}));
 
   const handlePreviousImage = () => {
-    setCurrentGalleryIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+    setCurrentGalleryIndex((prev) => (prev === 0 ? galleryWithVideo.length - 1 : prev - 1));
   };
 
   const handleNextImage = () => {
-    setCurrentGalleryIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+    setCurrentGalleryIndex((prev) => (prev === galleryWithVideo.length - 1 ? 0 : prev + 1));
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -156,7 +161,7 @@ export default function ProductDetail({
             </div>
           )}
           
-          {galleryImages.length > 0 && (
+          {galleryWithVideo.length > 0 && (
             <div>
               <div 
                 ref={galleryRef}
@@ -164,12 +169,27 @@ export default function ProductDetail({
                 onTouchEnd={handleTouchEnd}
                 className="relative aspect-square bg-card rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none"
               >
-                <img
-                  src={galleryImages[currentGalleryIndex]}
-                  alt={`Gallery ${currentGalleryIndex + 1}`}
-                  className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
-                />
-                {galleryImages.length > 1 && (
+                {galleryWithVideo[currentGalleryIndex].type === 'video' ? (
+                  <div className="w-full h-full bg-black flex items-center justify-center group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
+                    <img
+                      src={product.imageUrl}
+                      alt="Video thumbnail"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                      <div className="bg-red-600 rounded-full p-4">
+                        <Play className="h-8 w-8 text-white fill-white" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={galleryWithVideo[currentGalleryIndex].url}
+                    alt={`Gallery ${currentGalleryIndex + 1}`}
+                    className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
+                  />
+                )}
+                {galleryWithVideo.length > 1 && (
                   <>
                     <button
                       onClick={handlePreviousImage}
@@ -188,20 +208,29 @@ export default function ProductDetail({
                   </>
                 )}
               </div>
-              {galleryImages.length > 1 && (
+              {galleryWithVideo.length > 1 && (
                 <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto mt-3 pb-2">
-                  {galleryImages.map((img, idx) => (
+                  {galleryWithVideo.map((item, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentGalleryIndex(idx)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 ${
+                      className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 relative ${
                         idx === currentGalleryIndex 
                           ? "ring-3 ring-primary shadow-lg" 
                           : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 opacity-75 hover:opacity-100"
                       }`}
                       data-testid={`button-gallery-thumbnail-${idx}`}
                     >
-                      <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                      {item.type === 'video' ? (
+                        <>
+                          <img src={product.imageUrl} alt={`Video thumb`} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <Play className="h-4 w-4 text-white fill-white" />
+                          </div>
+                        </>
+                      ) : (
+                        <img src={item.url} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                      )}
                     </button>
                   ))}
                 </div>
