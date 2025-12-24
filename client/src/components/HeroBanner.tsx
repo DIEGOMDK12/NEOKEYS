@@ -20,7 +20,7 @@ export default function HeroBanner({
       <img
         src={imageUrl}
         alt={title}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
       <div className="absolute inset-0 flex flex-col justify-center p-3 md:p-4">
