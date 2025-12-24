@@ -15,14 +15,14 @@ const priceOptions = [
 
 export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFiltersProps) {
   return (
-    <div className="px-4 py-1.5">
-      <div className="flex gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide">
+    <div className="px-2 sm:px-4 py-1 sm:py-1.5">
+      <div className="flex gap-1 sm:gap-1.5 overflow-x-auto pb-1 sm:pb-1.5 scrollbar-hide">
         {priceOptions.map((option) => (
           <Button
             key={option.value}
             size="sm"
             variant={selectedFilter === option.value ? "default" : "outline"}
-            className={`h-7 px-3 font-semibold text-xs rounded-full whitespace-nowrap transition-all ${
+            className={`h-6 sm:h-7 px-2 sm:px-3 font-semibold text-[10px] sm:text-xs rounded-full whitespace-nowrap transition-all ${
               selectedFilter === option.value 
                 ? "bg-gray-200 dark:bg-gray-700 text-black dark:text-white" 
                 : "border-white/50 text-white hover:bg-white/10"
