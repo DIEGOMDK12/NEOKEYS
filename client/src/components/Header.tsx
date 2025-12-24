@@ -34,47 +34,48 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
-      <div className="flex items-center justify-between gap-4 px-4 py-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-3 px-4 py-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <Button
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
             data-testid="button-menu"
+            className="h-8 w-8"
           >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </Button>
           <button
             onClick={onLogoClick}
             className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
             data-testid="button-logo"
           >
-            <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
+            <span className="text-xs font-bold text-foreground">ELITEVAULT</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={onUserClick}
             data-testid="button-user"
-            className={isLoggedIn ? "text-white" : ""}
+            className={`h-8 w-8 ${isLoggedIn ? "text-white" : ""}`}
           >
-            {isLoggedIn ? <UserCheck className="h-5 w-5" /> : <User className="h-5 w-5" />}
+            {isLoggedIn ? <UserCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={onCartClick}
-            className="relative"
+            className="relative h-8 w-8"
             data-testid="button-cart"
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-4 w-4" />
             {cartCount > 0 && (
               <Badge
                 variant="default"
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
               >
                 {cartCount}
               </Badge>
@@ -83,23 +84,23 @@ export default function Header({
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="px-4 pb-3">
-        <div className="relative flex">
+      <form onSubmit={handleSearch} className="px-4 pb-2">
+        <div className="relative flex gap-1">
           <Input
             type="search"
             placeholder="Pesquisar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-12 bg-card/50 border-border rounded-r-none flex-1"
+            className="pr-10 bg-card/50 border-border rounded-r-none flex-1 h-8 text-xs"
             data-testid="input-search"
           />
           <Button
             type="submit"
             size="icon"
-            className="rounded-l-none bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4"
+            className="rounded-l-none bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-3 h-8 w-8"
             data-testid="button-search"
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4" />
           </Button>
         </div>
       </form>
