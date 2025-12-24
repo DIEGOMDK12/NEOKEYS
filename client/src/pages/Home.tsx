@@ -248,7 +248,7 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
       />
 
       <main className="pb-16">
-        <div className="p-2">
+        <div className="p-2 flex justify-center">
           <HeroBanner
             title={settings.heroTitle || "RIMS RACING ULTIMATE EDITION"}
             subtitle={settings.heroSubtitle || "DISPONIVEL AGORA!"}
