@@ -69,7 +69,7 @@ export default function ProductDetail({
   const editingRequirements = Array.isArray(requirements) ? requirements : [];
   const editingDescription = description || "";
   
-  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages.slice(0, 2) : [];
+  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages.slice(0, 1) : [];
   const videoEmbedUrl = product.videoUrl ? convertVideoUrl(product.videoUrl) : "";
   const hasVideo = !!videoEmbedUrl;
   
