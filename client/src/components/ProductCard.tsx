@@ -44,7 +44,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
       onClick={() => onProductClick(product)}
       data-testid={`card-product-${product.id}`}
     >
-      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-card mb-1 sm:mb-2 shadow hover-elevate transition-all duration-300 transform hover:scale-105">
+      <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-card mb-1 sm:mb-2 shadow hover-elevate transition-all duration-300 transform hover:scale-105 pulsing-border">
         <img
           src={product.imageUrl}
           alt={product.name}

@@ -212,6 +212,17 @@
   }
 }
 
+@keyframes pulsingBorder {
+  0%, 100% {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+  }
+  50% {
+    border-color: rgba(34, 197, 94, 1);
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.9), 0 0 40px rgba(34, 197, 94, 0.6);
+  }
+}
+
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);
@@ -243,6 +254,11 @@
 
 .bounce-animation {
   animation: bounce 2s ease-in-out infinite;
+}
+
+.pulsing-border {
+  border: 2px solid rgba(34, 197, 94, 0.6);
+  animation: pulsingBorder 2.5s ease-in-out infinite;
 }
 
 @layer utilities {
