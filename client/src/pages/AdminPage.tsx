@@ -585,7 +585,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Regiao</Label>
+                  <Label>Região</Label>
                   <Select
                     value={newProduct.region}
                     onValueChange={(value) => setNewProduct({ ...newProduct, region: value })}
@@ -595,10 +595,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Global">Global</SelectItem>
-                      <SelectItem value="Brasil">Brasil</SelectItem>
                       <SelectItem value="LATAM">LATAM</SelectItem>
-                      <SelectItem value="NA">NA</SelectItem>
-                      <SelectItem value="EU">EU</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -820,6 +817,44 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                           {editingProduct.imageUrl && (
                             <img src={editingProduct.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md mt-2" />
                           )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Plataforma</Label>
+                            <Select
+                              value={editingProduct.platform}
+                              onValueChange={(value) => setEditingProduct({ ...editingProduct, platform: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Steam">Steam</SelectItem>
+                                <SelectItem value="Epic">Epic Games</SelectItem>
+                                <SelectItem value="Origin">Origin</SelectItem>
+                                <SelectItem value="Uplay">Uplay</SelectItem>
+                                <SelectItem value="GOG">GOG</SelectItem>
+                                <SelectItem value="EA">EA</SelectItem>
+                                <SelectItem value="Xbox">Xbox</SelectItem>
+                                <SelectItem value="PlayStation">PlayStation</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Região</Label>
+                            <Select
+                              value={editingProduct.region}
+                              onValueChange={(value) => setEditingProduct({ ...editingProduct, region: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Global">Global</SelectItem>
+                                <SelectItem value="LATAM">LATAM</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
