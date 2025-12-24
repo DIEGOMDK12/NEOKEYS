@@ -122,7 +122,7 @@ export default function ProductDetail({
                 ref={galleryRef}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
-                className="relative aspect-square bg-card rounded-lg overflow-hidden cursor-grab active:cursor-grabbing select-none"
+                className="relative aspect-square bg-card rounded-sm overflow-hidden cursor-grab active:cursor-grabbing select-none"
               >
                 {galleryWithVideo[currentGalleryIndex].type === 'video' ? (
                   <div className="w-full h-full bg-black flex items-center justify-center group cursor-pointer" onClick={() => setShowVideoPlayer(true)}>
@@ -190,10 +190,10 @@ export default function ProductDetail({
                     <button
                       key={idx}
                       onClick={() => setCurrentGalleryIndex(idx)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden transition-all duration-300 relative ${
+                      className={`flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden transition-all duration-300 relative ${
                         idx === currentGalleryIndex 
-                          ? "ring-3 ring-primary shadow-lg" 
-                          : "ring-2 ring-muted-foreground/30 hover:ring-primary/60 opacity-75 hover:opacity-100"
+                          ? "ring-1 ring-primary" 
+                          : "ring-1 ring-muted-foreground/20 hover:ring-primary/40 opacity-75 hover:opacity-100"
                       }`}
                       data-testid={`button-gallery-thumbnail-${idx}`}
                     >
