@@ -116,51 +116,6 @@ export default function ProductDetail({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4 lg:px-6">
         {/* Left column - Images */}
         <div>
-          {videoEmbedUrl && (
-            <div className="relative aspect-square bg-black rounded-lg overflow-hidden mb-4 group cursor-pointer scale-in" onClick={() => setShowVideoPlayer(true)}>
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <div className="bg-red-600 rounded-full p-4">
-                  <Play className="h-8 w-8 text-white fill-white" />
-                </div>
-              </div>
-              {showVideoPlayer && (
-                <div className="absolute inset-0 z-50">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowVideoPlayer(false);
-                    }}
-                    className="absolute top-4 right-4 z-50 bg-black/50 rounded-full p-2 hover:bg-black/70"
-                    data-testid="button-close-video"
-                  >
-                    ✕
-                  </button>
-                  <iframe
-                    src={videoEmbedUrl}
-                    className="w-full h-full"
-                    allowFullScreen
-                    allow="autoplay"
-                    data-testid="video-player"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-          {!videoEmbedUrl && (
-            <div className="aspect-square bg-card rounded-lg overflow-hidden mb-4">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-          
           {galleryWithVideo.length > 0 && (
             <div>
               <div 
@@ -188,6 +143,27 @@ export default function ProductDetail({
                     alt={`Gallery ${currentGalleryIndex + 1}`}
                     className="w-full h-full object-cover transition-opacity duration-300 pointer-events-none"
                   />
+                )}
+                {showVideoPlayer && (
+                  <div className="absolute inset-0 z-50">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowVideoPlayer(false);
+                      }}
+                      className="absolute top-4 right-4 z-50 bg-black/50 rounded-full p-2 hover:bg-black/70"
+                      data-testid="button-close-video"
+                    >
+                      ✕
+                    </button>
+                    <iframe
+                      src={videoEmbedUrl}
+                      className="w-full h-full"
+                      allowFullScreen
+                      allow="autoplay"
+                      data-testid="video-player"
+                    />
+                  </div>
                 )}
                 {galleryWithVideo.length > 1 && (
                   <>
