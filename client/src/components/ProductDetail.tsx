@@ -59,6 +59,7 @@ export default function ProductDetail({
   onBuyNow,
 }: ProductDetailProps) {
   const [showFullRequirements, setShowFullRequirements] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
@@ -278,10 +279,30 @@ export default function ProductDetail({
 
           <div className="mb-6">
             <div className="mb-3">
-              <h2 className="text-xl font-bold">Descricao</h2>
+              <h2 className="text-xl font-bold">Descrição</h2>
             </div>
             
-            <p className="text-muted-foreground whitespace-pre-line">{editingDescription}</p>
+            <p className="text-muted-foreground whitespace-pre-line line-clamp-3" style={showFullDescription ? { overflow: 'visible', display: 'block' } : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+              {editingDescription}
+            </p>
+            {editingDescription.split('\n').length > 3 && (
+              <Button
+                variant="ghost"
+                className="text-white p-0 h-auto mt-2"
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                data-testid="button-toggle-description"
+              >
+                {showFullDescription ? (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-1" /> Ver menos
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-1" /> Ver mais
+                  </>
+                )}
+              </Button>
+            )}
           </div>
 
           <Separator className="my-6" />
