@@ -574,11 +574,12 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Steam">Steam</SelectItem>
-                      <SelectItem value="Epic">Epic Games</SelectItem>
-                      <SelectItem value="Origin">Origin</SelectItem>
-                      <SelectItem value="Uplay">Uplay</SelectItem>
-                      <SelectItem value="GOG">GOG</SelectItem>
                       <SelectItem value="EA">EA</SelectItem>
+                      <SelectItem value="Epic">Epic Games</SelectItem>
+                      <SelectItem value="GOG">GOG</SelectItem>
+                      <SelectItem value="Windows">Windows</SelectItem>
+                      <SelectItem value="Rockstar">Rockstar</SelectItem>
+                      <SelectItem value="Ubi Connect">Ubi Connect</SelectItem>
                       <SelectItem value="Xbox">Xbox</SelectItem>
                       <SelectItem value="PlayStation">PlayStation</SelectItem>
                     </SelectContent>

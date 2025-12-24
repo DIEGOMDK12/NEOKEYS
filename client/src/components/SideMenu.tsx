@@ -62,15 +62,6 @@ export default function SideMenu({ isOpen, onClose, onCategorySelect }: SideMenu
                 <span className="font-medium">{platform.name}</span>
               </button>
             ))}
-
-            <button
-              onClick={() => onCategorySelect("CATEGORIAS")}
-              className="flex items-center justify-between w-full py-3 text-left text-foreground hover-elevate active-elevate-2 rounded-md px-2"
-              data-testid="menu-categorias"
-            >
-              <span className="font-medium">CATEGORIAS</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </button>
           </nav>
         </ScrollArea>
 
