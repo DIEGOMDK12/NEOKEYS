@@ -42,7 +42,7 @@ export default function Header({
           className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
           data-testid="button-logo"
         >
-          <span className="text-sm font-bold text-primary">ELITEVAULT</span>
+          <span className="text-sm font-bold text-foreground">ELITEVAULT</span>
         </button>
 
         <div className="hidden sm:flex items-center gap-3 flex-1 px-4 overflow-x-auto scrollbar-hide">
