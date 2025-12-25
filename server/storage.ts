@@ -66,6 +66,10 @@ export interface IStorage {
   createCustomerSession(userId: string): Promise<CustomerSession>;
   getCustomerSession(sessionId: string): Promise<(CustomerSession & { user: User }) | null>;
   deleteCustomerSession(sessionId: string): Promise<void>;
+
+  // Backup
+  exportData(): Promise<any>;
+  importData(data: any): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -448,6 +452,57 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCustomerSession(sessionId: string): Promise<void> {
     await db.delete(customerSessions).where(eq(customerSessions.id, sessionId));
+  }
+
+  // Backup
+  async exportData(): Promise<any> {
+    const allProducts = await db.select().from(products);
+    const allKeys = await db.select().from(productKeys);
+    const allSettings = await db.select().from(siteSettings);
+    
+    return {
+      products: allProducts,
+      productKeys: allKeys,
+      siteSettings: allSettings,
+      exportedAt: new Date().toISOString()
+    };
+  }
+
+  async importData(data: any): Promise<void> {
+    const { products: importedProducts, productKeys: importedKeys, siteSettings: importedSettings } = data;
+
+    if (importedProducts?.length) {
+      for (const p of importedProducts) {
+        const [existing] = await db.select().from(products).where(eq(products.id, p.id));
+        if (existing) {
+          await db.update(products).set(p).where(eq(products.id, p.id));
+        } else {
+          await db.insert(products).values(p);
+        }
+      }
+    }
+
+    if (importedKeys?.length) {
+      for (const k of importedKeys) {
+        const [existing] = await db.select().from(productKeys).where(eq(productKeys.id, k.id));
+        if (existing) {
+          await db.update(productKeys).set(k).where(eq(productKeys.id, k.id));
+        } else {
+          await db.insert(productKeys).values(k);
+        }
+      }
+    }
+
+    if (importedSettings?.length) {
+      for (const s of importedSettings) {
+        const [existing] = await db.select().from(siteSettings).where(eq(siteSettings.key, s.key));
+        if (existing) {
+          await db.update(siteSettings).set(s).where(eq(siteSettings.key, s.key));
+        } else {
+          await db.insert(siteSettings).values(s);
+        }
+      }
+    }
   }
 }
 

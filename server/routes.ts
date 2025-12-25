@@ -76,6 +76,37 @@ export async function registerRoutes(
     }
   });
 
+  // Backup API
+  app.get("/api/admin/backup/export", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autorizado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessão inválida" });
+
+      const data = await storage.exportData();
+      res.json(data);
+    } catch (error) {
+      console.error("Export error:", error);
+      res.status(500).json({ error: "Erro ao exportar backup" });
+    }
+  });
+
+  app.post("/api/admin/backup/import", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autorizado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessão inválida" });
+
+      await storage.importData(req.body);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Import error:", error);
+      res.status(500).json({ error: "Erro ao importar backup" });
+    }
+  });
+
   app.get("/api/products/:id", async (req: Request, res: Response) => {
     try {
       const product = await storage.getProductById(req.params.id);

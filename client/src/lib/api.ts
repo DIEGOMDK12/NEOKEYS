@@ -218,4 +218,15 @@ export const api = {
       method: "POST",
     });
   },
+
+  exportBackup: async () => {
+    return fetchWithSession("/api/admin/backup/export");
+  },
+
+  importBackup: async (data: any) => {
+    return fetchWithSession("/api/admin/backup/import", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };

@@ -102,7 +102,7 @@ const defaultSettings = {
   accentColor: "#fbbf24",
 };
 
-type AdminSection = "dashboard" | "products" | "keys" | "orders" | "customers" | "banner" | "colors";
+type AdminSection = "dashboard" | "products" | "keys" | "orders" | "customers" | "banner" | "colors" | "backup";
 
 function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) => void }) {
   const { toast } = useToast();
@@ -201,6 +201,7 @@ function AdminSidebar({
     { id: "customers" as AdminSection, title: "Clientes", icon: Users },
     { id: "banner" as AdminSection, title: "Banner", icon: Image },
     { id: "colors" as AdminSection, title: "Cores", icon: Palette },
+    { id: "backup" as AdminSection, title: "Backup", icon: Save },
   ];
 
   return (
@@ -1802,6 +1803,9 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
             )}
             {currentSection === "colors" && (
               <ColorsSection settings={settings} setSettings={setSettings} />
+            )}
+            {currentSection === "backup" && (
+              <BackupSection />
             )}
           </main>
         </div>
