@@ -8,12 +8,18 @@ const root = createRoot(document.getElementById("root")!);
 root.render(<App />);
 
 // Remove loading screen when app mounts
-setTimeout(() => {
+const hideLoading = () => {
   const loadingScreen = document.getElementById("loading-screen");
   if (loadingScreen) {
     loadingScreen.classList.add("hidden");
     setTimeout(() => {
       loadingScreen.remove();
-    }, 500);
+    }, 300);
   }
-}, 100);
+};
+
+if (document.readyState === "complete") {
+  hideLoading();
+} else {
+  window.addEventListener("load", hideLoading);
+}
