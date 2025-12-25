@@ -742,20 +742,19 @@ export async function registerRoutes(
   app.post("/api/admin/login", async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email e senha sao obrigatorios" });
-      }
-      
+      console.log(`[Admin Login Attempt] Email: ${email}`);
       const user = await storage.validatePassword(email, password);
+      
       if (!user) {
+        console.log(`[Admin Login Failed] Invalid credentials for: ${email}`);
         return res.status(401).json({ error: "E-mail ou senha incorretos" });
       }
-      
+
       if (!user.isAdmin) {
+        console.log(`[Admin Login Failed] User is not admin: ${email}`);
         return res.status(403).json({ error: "Acesso restrito a administradores" });
       }
-      
+
       const session = await storage.createAdminSession(user.id);
       
       res.cookie("admin_session", session.id, {
@@ -765,6 +764,7 @@ export async function registerRoutes(
         maxAge: 24 * 60 * 60 * 1000,
       });
       
+      console.log(`[Admin Login Success] User: ${user.email}, Session: ${session.id}`);
       res.json({ 
         id: user.id, 
         email: user.email, 
@@ -773,7 +773,7 @@ export async function registerRoutes(
         isAdmin: user.isAdmin 
       });
     } catch (error) {
-      console.error("Error admin login:", error);
+      console.error("[Admin Login Error]", error);
       res.status(500).json({ error: "Falha ao fazer login" });
     }
   });
