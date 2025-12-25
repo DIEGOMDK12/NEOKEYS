@@ -91,6 +91,8 @@ const defaultSettings = {
   heroPrice: "R$ 46,92",
   heroImageUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&h=600&fit=crop",
   heroProductId: "",
+  heroPlatform: "STEAM",
+  heroRegion: "Global",
   siteName: "EliteVault",
   contactPhone: "000-000-0000",
   contactEmail: "info@elitevault.com",
@@ -1399,6 +1401,45 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
                       {p.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Plataforma</Label>
+              <Select
+                value={settings.heroPlatform}
+                onValueChange={(value) => setSettings({ ...settings, heroPlatform: value })}
+              >
+                <SelectTrigger data-testid="select-hero-platform">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="STEAM">STEAM</SelectItem>
+                  <SelectItem value="EA">EA</SelectItem>
+                  <SelectItem value="EPIC GAMES">EPIC GAMES</SelectItem>
+                  <SelectItem value="GOG">GOG</SelectItem>
+                  <SelectItem value="WINDOWS">WINDOWS</SelectItem>
+                  <SelectItem value="ROCKSTAR">ROCKSTAR</SelectItem>
+                  <SelectItem value="UBI CONNECT">UBI CONNECT</SelectItem>
+                  <SelectItem value="XBOX">XBOX</SelectItem>
+                  <SelectItem value="PLAYSTATION">PLAYSTATION</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Região</Label>
+              <Select
+                value={settings.heroRegion}
+                onValueChange={(value) => setSettings({ ...settings, heroRegion: value })}
+              >
+                <SelectTrigger data-testid="select-hero-region">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Global">Global</SelectItem>
+                  <SelectItem value="LATAM">LATAM</SelectItem>
                 </SelectContent>
               </Select>
             </div>
