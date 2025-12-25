@@ -78,10 +78,49 @@ export const api = {
   },
 
   login: async (email: string, password: string) => {
-    return fetchWithSession("/api/auth/login", {
+    return fetchWithSession("/api/customer/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
+  },
+
+  me: async () => {
+    return fetchWithSession("/api/customer/me");
+  },
+
+  logout: async () => {
+    return fetchWithSession("/api/customer/logout", {
+      method: "POST",
+    });
+  },
+
+  getOrders: async () => {
+    return fetchWithSession("/api/customer/orders");
+  },
+
+  createOrder: async (data: { productId: string; quantity: number }) => {
+    return fetchWithSession("/api/customer/orders", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  checkoutPix: async (data: { productId: string; quantity: number }) => {
+    return fetchWithSession("/api/customer/checkout/pix", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  checkoutCart: async (items: { productId: string; quantity: number }[]) => {
+    return fetchWithSession("/api/customer/checkout/cart", {
+      method: "POST",
+      body: JSON.stringify({ items }),
+    });
+  },
+
+  getPixStatus: async (orderId: string) => {
+    return fetchWithSession(`/api/customer/orders/${orderId}/pix-status`);
   },
 
   // Seed

@@ -47,6 +47,7 @@ export default function CustomerDashboard({ onBack, onLoginRequired }: CustomerD
 
   const { data: user, isLoading: userLoading, error: userError } = useQuery<CustomerUser>({
     queryKey: ["/api/customer/me"],
+    retry: false,
   });
 
   const { data: orders = [], isLoading: ordersLoading } = useQuery<Order[]>({
