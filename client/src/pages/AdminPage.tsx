@@ -97,9 +97,9 @@ const defaultSettings = {
   contactPhone: "000-000-0000",
   contactEmail: "info@elitevault.com",
   footerText: "2024 EliteVault. Todos os direitos reservados.",
-  backgroundColor: "#1f1a3d",
-  primaryColor: "#8b5cf6",
-  accentColor: "#fbbf24",
+  backgroundColor: "#000000",
+  primaryColor: "#FF006E",
+  accentColor: "#00FFFF",
 };
 
 type AdminSection = "dashboard" | "products" | "keys" | "orders" | "customers" | "banner" | "colors" | "backup";
@@ -136,13 +136,13 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
           <div className="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4">
             <Lock className="h-8 w-8 text-white" />
           </div>
-        <CardTitle className="text-2xl">Painel Administrativo</CardTitle>
-        <CardDescription>Entre com suas credenciais de administrador</CardDescription>
+        <CardTitle className="text-2xl" style={{ color: "#FF006E" }}>Painel Administrativo</CardTitle>
+        <CardDescription style={{ color: "#FF006E" }}>Entre com suas credenciais de administrador</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="admin-email">E-mail</Label>
+            <Label htmlFor="admin-email" style={{ color: "#FF006E" }}>E-mail</Label>
             <Input
               id="admin-email"
               type="email"
@@ -154,7 +154,7 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="admin-password">Senha</Label>
+            <Label htmlFor="admin-password" style={{ color: "#FF006E" }}>Senha</Label>
             <Input
               id="admin-password"
               type="password"
@@ -765,8 +765,8 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
               </div>
               <div className="mt-3 flex items-center gap-2">
                 {(product.availableStock ?? 0) > 0 ? (
-                  <span className="text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full" data-testid={`stock-${product.id}`}>
-                    Em estoque: {product.availableStock}
+                  <span className="text-xs font-medium bg-cyan-950 text-cyan-300 px-2 py-1 rounded-full" style={{ borderColor: "#00FFB8", border: "1px solid" }} data-testid={`stock-${product.id}`}>
+                    ✓ Em estoque: {product.availableStock}
                   </span>
                 ) : (
                   <span className="text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded-full" data-testid={`stock-${product.id}`}>
@@ -1214,7 +1214,7 @@ function KeysSection({ products }: { products: Product[] }) {
                             onClick={() => copyToClipboard(key.keyValue, key.id)}
                           >
                             {copiedKey === key.id ? (
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4" style={{ color: "#00FFB8" }} />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
@@ -1306,10 +1306,10 @@ function OrdersSection({ orders }: { orders: Order[] }) {
                         <p className="font-bold">R$ {order.totalPrice}</p>
                         <span className={`inline-block px-2 py-1 text-xs rounded-full ${
                           order.status === "delivered" 
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" 
+                            ? "bg-cyan-950 text-cyan-300" 
                             : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                        }`}>
-                          {order.status === "delivered" ? "Entregue" : "Pendente"}
+                        }`} style={order.status === "delivered" ? { borderColor: "#00FFB8", border: "1px solid" } : undefined}>
+                          {order.status === "delivered" ? "✓ Entregue" : "⏳ Pendente"}
                         </span>
                       </div>
                     </div>
@@ -1324,7 +1324,7 @@ function OrdersSection({ orders }: { orders: Order[] }) {
                             onClick={() => copyToClipboard(order.deliveredKey!, order.id)}
                           >
                             {copiedKey === order.id ? (
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4" style={{ color: "#00FFB8" }} />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
