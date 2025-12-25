@@ -1409,7 +1409,7 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
             <div className="space-y-2">
               <Label>Plataforma</Label>
               <Select
-                value={settings.heroPlatform}
+                value={settings.heroPlatform || defaultSettings.heroPlatform}
                 onValueChange={(value) => setSettings({ ...settings, heroPlatform: value })}
               >
                 <SelectTrigger data-testid="select-hero-platform">
@@ -1431,7 +1431,7 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
             <div className="space-y-2">
               <Label>Região</Label>
               <Select
-                value={settings.heroRegion}
+                value={settings.heroRegion || defaultSettings.heroRegion}
                 onValueChange={(value) => setSettings({ ...settings, heroRegion: value })}
               >
                 <SelectTrigger data-testid="select-hero-region">
