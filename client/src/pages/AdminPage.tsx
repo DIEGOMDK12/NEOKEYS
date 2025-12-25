@@ -1409,11 +1409,11 @@ function BannerSection({ settings, setSettings, products }: { settings: typeof d
             <div className="space-y-2">
               <Label>Plataforma</Label>
               <Select
-                value={settings.heroPlatform || defaultSettings.heroPlatform}
+                value={settings.heroPlatform && settings.heroPlatform.trim() ? settings.heroPlatform : "STEAM"}
                 onValueChange={(value) => setSettings({ ...settings, heroPlatform: value })}
               >
                 <SelectTrigger data-testid="select-hero-platform">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione uma plataforma" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="STEAM">STEAM</SelectItem>
@@ -1680,7 +1680,11 @@ function ColorsSection({ settings, setSettings }: { settings: typeof defaultSett
 function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogout: () => void; onBack: () => void }) {
   const { toast } = useToast();
   const [currentSection, setCurrentSection] = useState<AdminSection>("dashboard");
-  const [settings, setSettings] = useState(defaultSettings);
+  const [settings, setSettings] = useState<typeof defaultSettings>({
+    ...defaultSettings,
+    heroPlatform: "STEAM",
+    heroRegion: "Global",
+  });
 
   const { data: savedSettings = {} } = useQuery({
     queryKey: ["/api/settings"],
