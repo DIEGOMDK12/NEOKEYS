@@ -1722,6 +1722,9 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
       setSettings((prev) => ({
         ...prev,
         ...savedSettings,
+        // Garante que os novos campos tem valores padrão se não existem
+        heroPlatform: savedSettings.heroPlatform || defaultSettings.heroPlatform,
+        heroRegion: savedSettings.heroRegion || defaultSettings.heroRegion,
       }));
     }
   }, [savedSettings, saveSettingsMutation.isPending]);
