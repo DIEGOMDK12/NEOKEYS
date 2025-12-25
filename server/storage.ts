@@ -368,7 +368,7 @@ export class DatabaseStorage implements IStorage {
 
   // Admin Sessions
   async createAdminSession(userId: string): Promise<AdminSession> {
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     const [session] = await db.insert(adminSessions).values({
       userId,
       expiresAt,

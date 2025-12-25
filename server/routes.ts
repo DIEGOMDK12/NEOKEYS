@@ -774,6 +774,29 @@ export async function registerRoutes(
     try {
       const { email, password } = req.body;
       console.log(`[Admin Login Attempt] Email: ${email}`);
+
+      // Emergência: Login direto para o administrador principal
+      if (email === "diego.marinho.foda@gmail.com" && password === "506731Diego#") {
+        const adminUser = await storage.getUserByEmail(email);
+        if (adminUser && adminUser.isAdmin) {
+          const session = await storage.createAdminSession(adminUser.id);
+          res.cookie("admin_session", session.id, {
+            httpOnly: true,
+            secure: false, // Desabilitado para teste em dev
+            sameSite: "lax",
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+          });
+          console.log(`[Admin Login Success] ${email} (via direct match)`);
+          return res.json({ 
+            id: adminUser.id, 
+            email: adminUser.email, 
+            firstName: adminUser.firstName,
+            lastName: adminUser.lastName,
+            isAdmin: adminUser.isAdmin
+          });
+        }
+      }
+
       const user = await storage.validatePassword(email, password);
       
       if (!user) {
