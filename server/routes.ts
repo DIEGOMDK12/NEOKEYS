@@ -28,10 +28,10 @@ const checkoutCartSchema = z.object({
 });
 
 const customerRegisterSchema = z.object({
-  firstName: z.string().min(1, "Nome e obrigatorio"),
-  lastName: z.string().min(1, "Sobrenome e obrigatorio"),
-  email: z.string().email("Email invalido"),
-  whatsapp: z.string().min(10, "WhatsApp invalido"),
+  firstName: z.string().min(1, "Nome é obrigatório"),
+  lastName: z.string().min(1, "Sobrenome é obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  whatsapp: z.string().min(10, "WhatsApp inválido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 });
 
@@ -95,7 +95,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       const items = await storage.getCartItems(sessionId);
       res.json(items);
@@ -109,7 +109,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const parsed = addToCartSchema.safeParse(req.body);
@@ -146,7 +146,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const parsed = updateCartSchema.safeParse(req.body);
@@ -178,7 +178,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       await storage.removeFromCart(sessionId, req.params.productId);
       res.json({ success: true });
@@ -244,7 +244,7 @@ export async function registerRoutes(
       
       const user = await storage.validatePassword(email, password);
       if (!user) {
-        return res.status(401).json({ error: "Email ou senha incorretos" });
+        return res.status(401).json({ error: "E-mail ou senha incorretos" });
       }
       
       if (user.isAdmin) {
@@ -276,7 +276,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getCustomerSession(sessionId);
@@ -316,7 +316,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getCustomerSession(sessionId);
@@ -616,7 +616,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.customer_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getCustomerSession(sessionId);
@@ -749,7 +749,7 @@ export async function registerRoutes(
       
       const user = await storage.validatePassword(email, password);
       if (!user) {
-        return res.status(401).json({ error: "Email ou senha incorretos" });
+        return res.status(401).json({ error: "E-mail ou senha incorretos" });
       }
       
       if (!user.isAdmin) {
@@ -782,7 +782,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -841,7 +841,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -861,7 +861,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -882,7 +882,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -904,7 +904,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -925,7 +925,7 @@ export async function registerRoutes(
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
         console.warn("⚠️ No admin session when adding key");
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -960,7 +960,7 @@ export async function registerRoutes(
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
         console.warn("⚠️ No admin session when adding bulk keys");
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);
@@ -1001,7 +1001,7 @@ export async function registerRoutes(
     try {
       const sessionId = req.cookies?.admin_session;
       if (!sessionId) {
-        return res.status(401).json({ error: "Nao autenticado" });
+        return res.status(401).json({ error: "Não autenticado" });
       }
       
       const session = await storage.getAdminSession(sessionId);

@@ -112,13 +112,13 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
   const loginMutation = useMutation({
     mutationFn: () => api.adminLogin(email, password),
     onSuccess: (data) => {
-      toast({ title: "Bem-vindo!", description: `Ola, ${data.firstName}!` });
+      toast({ title: "Bem-vindo!", description: `Olá, ${data.firstName}!` });
       onLoginSuccess(data);
     },
     onError: (error: Error) => {
       toast({ 
         title: "Erro", 
-        description: error.message || "Email ou senha incorretos",
+        description: error.message || "E-mail ou senha incorretos",
         variant: "destructive" 
       });
     },
@@ -136,45 +136,45 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
           <div className="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4">
             <Lock className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl">Painel Administrativo</CardTitle>
-          <CardDescription>Entre com suas credenciais de administrador</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="admin-email">Email</Label>
-              <Input
-                id="admin-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@exemplo.com"
-                required
-                data-testid="input-admin-email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-password">Senha</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha"
-                required
-                data-testid="input-admin-password"
-              />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loginMutation.isPending}
-              data-testid="button-admin-login"
-            >
-              {loginMutation.isPending ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </CardContent>
+        <CardTitle className="text-2xl">Painel Administrativo</CardTitle>
+        <CardDescription>Entre com suas credenciais de administrador</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="admin-email">E-mail</Label>
+            <Input
+              id="admin-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@exemplo.com"
+              required
+              data-testid="input-admin-email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="admin-password">Senha</Label>
+            <Input
+              id="admin-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Sua senha"
+              required
+              data-testid="input-admin-password"
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={loginMutation.isPending}
+            data-testid="button-admin-login"
+          >
+            {loginMutation.isPending ? "Entrando..." : "Entrar"}
+          </Button>
+        </form>
+      </CardContent>
       </Card>
     </div>
   );
@@ -1836,7 +1836,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
   if (isCheckingAuth || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">Verificando autenticacao...</div>
+        <div className="text-muted-foreground">Verificando autenticação...</div>
       </div>
     );
   }
