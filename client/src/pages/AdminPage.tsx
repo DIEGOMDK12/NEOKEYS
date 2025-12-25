@@ -1719,13 +1719,14 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
 
   useEffect(() => {
     if (Object.keys(savedSettings).length > 0 && !saveSettingsMutation.isPending) {
-      setSettings((prev) => ({
-        ...prev,
+      // Garante que SEMPRE temos valores válidos, mesmo para configurações antigas
+      const processedSettings = {
+        ...defaultSettings,
         ...savedSettings,
-        // Garante que os novos campos tem valores padrão se não existem
-        heroPlatform: savedSettings.heroPlatform || defaultSettings.heroPlatform,
-        heroRegion: savedSettings.heroRegion || defaultSettings.heroRegion,
-      }));
+        heroPlatform: (savedSettings.heroPlatform || '').trim() || defaultSettings.heroPlatform,
+        heroRegion: (savedSettings.heroRegion || '').trim() || defaultSettings.heroRegion,
+      };
+      setSettings(processedSettings);
     }
   }, [savedSettings, saveSettingsMutation.isPending]);
 
