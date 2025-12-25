@@ -15,6 +15,8 @@ interface HeaderProps {
   isLoggedIn?: boolean;
 }
 
+const platforms = ["STEAM", "EA", "EPIC GAMES", "GOG", "WINDOWS", "ROCKSTAR", "UBI CONNECT", "XBOX", "CATEGORIAS"];
+
 export default function Header({
   cartCount,
   onMenuClick,
@@ -33,25 +35,25 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border">
+    <header className="sticky top-0 z-50 bg-background border-b border-primary/30">
       <div className="flex items-center justify-between gap-3 px-4 py-2">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMenuClick}
-            data-testid="button-menu"
-            className="h-8 w-8"
-          >
-            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </Button>
-          <button
-            onClick={onLogoClick}
-            className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
-            data-testid="button-logo"
-          >
-            <span className="text-xs font-bold text-foreground">ELITEVAULT</span>
-          </button>
+        <button
+          onClick={onLogoClick}
+          className="flex items-center gap-1 hover:opacity-80 transition-opacity cursor-pointer"
+          data-testid="button-logo"
+        >
+          <span className="text-sm font-bold text-primary">ELITEVAULT</span>
+        </button>
+
+        <div className="hidden sm:flex items-center gap-3 flex-1 px-4 overflow-x-auto scrollbar-hide">
+          {platforms.map((platform) => (
+            <button
+              key={platform}
+              className="text-xs font-semibold text-foreground/80 hover:text-primary transition-colors whitespace-nowrap"
+            >
+              {platform}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-center gap-1">
@@ -60,7 +62,7 @@ export default function Header({
             size="icon"
             onClick={onUserClick}
             data-testid="button-user"
-            className={`h-8 w-8 ${isLoggedIn ? "text-white" : ""}`}
+            className="h-8 w-8"
           >
             {isLoggedIn ? <UserCheck className="h-4 w-4" /> : <User className="h-4 w-4" />}
           </Button>
@@ -81,23 +83,32 @@ export default function Header({
               </Badge>
             )}
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            data-testid="button-menu"
+            className="sm:hidden h-8 w-8"
+          >
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="px-4 pb-2">
+      <form onSubmit={handleSearch} className="px-4 pb-2 border-t border-primary/20">
         <div className="relative flex gap-1">
           <Input
             type="search"
             placeholder="Pesquisar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10 bg-card/50 border-border rounded-r-none flex-1 h-8 text-xs"
+            className="pr-10 bg-secondary border-primary/40 rounded-r-none flex-1 h-8 text-xs text-foreground"
             data-testid="input-search"
           />
           <Button
             type="submit"
             size="icon"
-            className="rounded-l-none bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-3 h-8 w-8"
+            className="rounded-l-none bg-primary text-primary-foreground px-3 h-8 w-8 hover:bg-primary/90"
             data-testid="button-search"
           >
             <Search className="h-4 w-4" />
