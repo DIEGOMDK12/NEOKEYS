@@ -188,7 +188,7 @@ export default function Home({ onNavigateToProduct, onNavigateToLogin, onNavigat
 
   // Transform products
   const products = (selectedPriceFilter || searchQuery ? filteredProducts : allProducts) || [];
-  const transformedProducts: Product[] = products.map(transformProduct);
+  const transformedProducts: Product[] = Array.isArray(products) ? products.map(transformProduct) : [];
 
   // Split into cheap and expensive for display
   const cheapProducts = transformedProducts.filter((p) => p.price <= 10);

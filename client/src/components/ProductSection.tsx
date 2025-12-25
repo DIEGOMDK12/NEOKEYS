@@ -12,12 +12,13 @@ interface ProductSectionProps {
 
 export default function ProductSection({
   title,
-  products,
+  products = [],
   onAddToCart,
   onProductClick,
   onViewMore,
   highlighted = false,
 }: ProductSectionProps) {
+  if (!Array.isArray(products) || products.length === 0) return null;
   return (
     <section className={`py-4 sm:py-5 md:py-6 ${highlighted ? 'bg-white/10' : ''}`}>
       <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4 px-3 sm:px-4">
