@@ -1018,6 +1018,65 @@ export async function registerRoutes(
   });
 
   // Site Settings API
+  app.get("/api/settings/export", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autenticado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessao invalida" });
+
+      const settings = await storage.getAllSettings();
+      const products = await storage.getAllProducts();
+      
+      const exportData = {
+        settings: settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {}),
+        products: products,
+        exportedAt: new Date().toISOString(),
+        version: "1.0"
+      };
+
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", "attachment; filename=site-config.json");
+      res.json(exportData);
+    } catch (error) {
+      console.error("Export error:", error);
+      res.status(500).json({ error: "Falha ao exportar configurações" });
+    }
+  });
+
+  app.post("/api/settings/import", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autenticado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessao invalida" });
+
+      const { settings, products } = req.body;
+
+      if (settings) {
+        for (const [key, value] of Object.entries(settings)) {
+          await storage.setSetting(key, value as string);
+        }
+      }
+
+      if (products && Array.isArray(products)) {
+        for (const product of products) {
+          // Check if product exists by name or ID to avoid duplicates
+          const existing = await storage.getAllProducts();
+          const alreadyExists = existing.find(p => p.name === product.name);
+          if (!alreadyExists) {
+            await storage.createProduct(product);
+          }
+        }
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Import error:", error);
+      res.status(500).json({ error: "Falha ao importar configurações" });
+    }
+  });
+
   app.get("/api/settings", async (req: Request, res: Response) => {
     try {
       const settings = await storage.getAllSettings();
