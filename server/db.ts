@@ -10,9 +10,11 @@ if (!databaseUrl) {
   );
 }
 
-const client = new pg.Client({ connectionString: databaseUrl });
-client.connect().catch(err => {
-  console.error("Failed to connect to database:", err);
+const client = new pg.Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 1,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 export const db = drizzle(client, { schema });
