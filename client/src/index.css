@@ -4,11 +4,11 @@
 
 /* CYBERPUNK DARK THEME - BLACK BG + NEON GREEN + CYAN ACCENTS */
 :root {
-  --button-outline: rgba(0, 255, 136, 0.4);
-  --badge-outline: rgba(0, 255, 200, 0.2);
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
   --opaque-button-border-intensity: 8;
-  --elevate-1: rgba(0, 255, 136, 0.08);
-  --elevate-2: rgba(0, 255, 136, 0.15);
+  --elevate-1: rgba(255, 255, 255, 0.08);
+  --elevate-2: rgba(255, 255, 255, 0.15);
   --background: 0 0% 0%;
   --foreground: 240 5% 90%;
   --border: 240 5% 26%;
@@ -205,30 +205,30 @@
 
 @keyframes glowBorder {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.6), inset 0 0 5px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 5px rgba(255, 255, 255, 0.05);
   }
   50% {
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.9), 0 0 50px rgba(0, 255, 200, 0.5), inset 0 0 10px rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.1);
   }
 }
 
 @keyframes neonPulse {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.7), 0 0 20px rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
   }
   50% {
-    box-shadow: 0 0 20px rgba(0, 255, 136, 1), 0 0 40px rgba(0, 255, 200, 0.7);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
   }
 }
 
 @keyframes pulsingBorder {
   0%, 100% {
-    border-color: rgba(34, 197, 94, 0.6);
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
   }
   50% {
-    border-color: rgba(34, 197, 94, 1);
-    box-shadow: 0 0 25px rgba(34, 197, 94, 0.9), 0 0 40px rgba(34, 197, 94, 0.6);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
 }
 

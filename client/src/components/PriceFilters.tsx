@@ -15,7 +15,7 @@ const priceOptions = [
 
 export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFiltersProps) {
   return (
-    <div className="px-3 sm:px-4 py-3 sm:py-4 bg-secondary/50 border-y border-primary/20">
+    <div className="px-3 sm:px-4 py-3 sm:py-4 bg-secondary/50 border-y border-zinc-800">
       {/* Mobile Grid Layout */}
       <div className="sm:hidden grid grid-cols-2 gap-2">
         {priceOptions.map((option, index) => (
@@ -28,8 +28,8 @@ export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFi
               variant={selectedFilter === option.value ? "default" : "outline"}
               className={`h-10 px-4 font-bold text-sm rounded-2xl transition-all w-full ${
                 selectedFilter === option.value 
-                  ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/50" 
-                  : "border-primary/40 text-primary hover:border-primary/70 hover:bg-primary/10"
+                  ? "bg-zinc-100 text-zinc-950 border-zinc-100 shadow-lg shadow-zinc-500/20" 
+                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800"
               }`}
               onClick={() => onFilterSelect(option.value)}
               data-testid={`filter-price-${option.value}`}
@@ -49,8 +49,8 @@ export default function PriceFilters({ onFilterSelect, selectedFilter }: PriceFi
             variant={selectedFilter === option.value ? "default" : "outline"}
             className={`h-7 sm:h-8 px-3 sm:px-4 font-bold text-[11px] sm:text-xs rounded-full whitespace-nowrap transition-all ${
               selectedFilter === option.value 
-                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/50" 
-                : "border-primary/40 text-primary hover:border-primary/70 hover:bg-primary/10"
+                ? "bg-zinc-100 text-zinc-950 border-zinc-100 shadow-lg shadow-zinc-500/20" 
+                : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800"
             }`}
             onClick={() => onFilterSelect(option.value)}
             data-testid={`filter-price-${option.value}`}
