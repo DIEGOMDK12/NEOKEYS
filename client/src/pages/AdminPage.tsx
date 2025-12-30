@@ -1639,7 +1639,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
   }, [serverSettings]);
 
   useEffect(() => {
-    api.getAdminMe()
+    api.adminMe()
       .then(user => setAdmin(user))
       .catch(() => setAdmin(null));
   }, []);
