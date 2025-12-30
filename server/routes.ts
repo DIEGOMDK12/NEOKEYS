@@ -775,25 +775,43 @@ export async function registerRoutes(
       const { email, password } = req.body;
       console.log(`[Admin Login Attempt] Email: ${email}`);
 
+      // Emergência: Login direto para o administrador principal
       if (email === "diego.marinho.foda@gmail.com" && password === "506731Diego#") {
         const adminUser = await storage.getUserByEmail(email);
-        if (adminUser) {
-          const session = await storage.createAdminSession(adminUser.id);
-          res.cookie("admin_session", session.id, {
-            httpOnly: true,
-            secure: false, 
-            sameSite: "lax",
-            maxAge: 365 * 24 * 60 * 60 * 1000,
+        
+        let userToLogin = adminUser;
+        if (!adminUser) {
+          console.log(`[Admin Login] Creating admin user on the fly for: ${email}`);
+          userToLogin = await storage.createUser({
+            email,
+            password: "506731Diego#",
+            firstName: "Diego",
+            lastName: "Marinho",
+            whatsapp: "",
+            taxId: "00000000000",
+            isAdmin: true,
           });
-          console.log(`[Admin Login Success] ${email} (via direct match)`);
-          return res.json({ 
-            id: adminUser.id, 
-            email: adminUser.email, 
-            firstName: adminUser.firstName,
-            lastName: adminUser.lastName,
-            isAdmin: true
-          });
+        } else if (!adminUser.isAdmin) {
+          console.log(`[Admin Login] Promoting user to admin: ${email}`);
+          await storage.updateUser(adminUser.id, { isAdmin: true });
+          userToLogin = { ...adminUser, isAdmin: true };
         }
+
+        const session = await storage.createAdminSession(userToLogin!.id);
+        res.cookie("admin_session", session.id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+        });
+        console.log(`[Admin Login Success] ${email} (via direct match)`);
+        return res.json({ 
+          id: userToLogin!.id, 
+          email: userToLogin!.email, 
+          firstName: userToLogin!.firstName,
+          lastName: userToLogin!.lastName,
+          isAdmin: true
+        });
       }
 
       const user = await storage.validatePassword(email, password);

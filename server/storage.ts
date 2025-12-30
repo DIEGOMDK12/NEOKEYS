@@ -16,6 +16,7 @@ export interface IStorage {
   validatePassword(email: string, password: string): Promise<User | null>;
   getAllCustomers(): Promise<User[]>;
   deleteCustomer(id: string): Promise<void>;
+  updateUser(id: string, user: Partial<InsertUser>): Promise<User>;
 
   // Products
   getAllProducts(): Promise<Product[]>;
@@ -109,6 +110,14 @@ export class DatabaseStorage implements IStorage {
     await db.delete(orders).where(eq(orders.userId, id));
     await db.delete(cartItems).where(eq(cartItems.sessionId, id));
     await db.delete(users).where(eq(users.id, id));
+  }
+
+  async updateUser(id: string, user: Partial<InsertUser>): Promise<User> {
+    const [updated] = await db.update(users)
+      .set(user)
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
   }
 
   // Products
