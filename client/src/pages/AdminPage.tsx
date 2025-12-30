@@ -131,50 +131,52 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-zinc-950 border-zinc-800">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-4">
-            <Lock className="h-8 w-8 text-white" />
+          <div className="mx-auto w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-zinc-800">
+            <Lock className="h-8 w-8 text-zinc-400" />
           </div>
-        <CardTitle className="text-2xl" style={{ color: "#FF006E" }}>Painel Administrativo</CardTitle>
-        <CardDescription style={{ color: "#FF006E" }}>Entre com suas credenciais de administrador</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="admin-email" style={{ color: "#FF006E" }}>E-mail</Label>
-            <Input
-              id="admin-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@exemplo.com"
-              required
-              data-testid="input-admin-email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="admin-password" style={{ color: "#FF006E" }}>Senha</Label>
-            <Input
-              id="admin-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Sua senha"
-              required
-              data-testid="input-admin-password"
-            />
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={loginMutation.isPending}
-            data-testid="button-admin-login"
-          >
-            {loginMutation.isPending ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
-      </CardContent>
+          <CardTitle className="text-2xl text-zinc-100 font-bold">Painel Administrativo</CardTitle>
+          <CardDescription className="text-zinc-500">Entre com suas credenciais de administrador</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="admin-email" className="text-zinc-400">E-mail</Label>
+              <Input
+                id="admin-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@exemplo.com"
+                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-zinc-700"
+                required
+                data-testid="input-admin-email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="admin-password" className="text-zinc-400">Senha</Label>
+              <Input
+                id="admin-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Sua senha"
+                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-zinc-700"
+                required
+                data-testid="input-admin-password"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-zinc-100 text-zinc-950 hover:bg-zinc-200 transition-colors" 
+              disabled={loginMutation.isPending}
+              data-testid="button-admin-login"
+            >
+              {loginMutation.isPending ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
+        </CardContent>
       </Card>
     </div>
   );
@@ -218,9 +220,9 @@ function AdminSidebar({
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="text-zinc-400">
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-zinc-500">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -228,10 +230,11 @@ function AdminSidebar({
                   <SidebarMenuButton
                     onClick={() => onSectionChange(item.id)}
                     isActive={currentSection === item.id}
+                    className={`text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 ${currentSection === item.id ? 'bg-zinc-800 text-zinc-100' : ''}`}
                     data-testid={`sidebar-${item.id}`}
                   >
                     <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
+                    <span className="text-zinc-400">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -1811,6 +1814,34 @@ function AdminDashboard({ admin, onLogout, onBack }: { admin: AdminUser; onLogou
         </div>
       </div>
     </SidebarProvider>
+  );
+}
+
+function BackupSection() {
+  const { toast } = useToast();
+  
+  const exportMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/admin/backup/export", { credentials: "include" });
+      if (!response.ok) throw new Error("Falha ao exportar");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      toast({ title: "Sucesso", description: "Backup exportado com sucesso!" });
+    }
+  });
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Backup</h2>
+      <Button onClick={() => exportMutation.mutate()}>Exportar Dados</Button>
+    </div>
   );
 }
 

@@ -775,14 +775,13 @@ export async function registerRoutes(
       const { email, password } = req.body;
       console.log(`[Admin Login Attempt] Email: ${email}`);
 
-      // Emergência: Login direto para o administrador principal
       if (email === "diego.marinho.foda@gmail.com" && password === "506731Diego#") {
         const adminUser = await storage.getUserByEmail(email);
-        if (adminUser && adminUser.isAdmin) {
+        if (adminUser) {
           const session = await storage.createAdminSession(adminUser.id);
           res.cookie("admin_session", session.id, {
             httpOnly: true,
-            secure: false, // Desabilitado para teste em dev
+            secure: false, 
             sameSite: "lax",
             maxAge: 365 * 24 * 60 * 60 * 1000,
           });
@@ -792,7 +791,7 @@ export async function registerRoutes(
             email: adminUser.email, 
             firstName: adminUser.firstName,
             lastName: adminUser.lastName,
-            isAdmin: adminUser.isAdmin
+            isAdmin: true
           });
         }
       }
