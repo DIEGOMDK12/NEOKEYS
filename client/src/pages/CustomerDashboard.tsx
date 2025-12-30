@@ -99,7 +99,7 @@ export default function CustomerDashboard({ onBack, onLoginRequired }: CustomerD
       case "awaiting_payment":
         return <Badge variant="outline">Aguardando Pagamento</Badge>;
       case "paid":
-        return <Badge className="bg-blue-600 hover:bg-blue-700">Pago</Badge>;
+        return <Badge className="bg-zinc-700 text-zinc-100">Pago</Badge>;
       case "payment_failed":
         return <Badge variant="destructive">Falha no Pagamento</Badge>;
       default:

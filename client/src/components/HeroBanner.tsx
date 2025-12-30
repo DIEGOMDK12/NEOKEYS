@@ -34,7 +34,7 @@ export default function HeroBanner({
           <p className="text-[11px] sm:text-xs md:text-sm text-white/85 mb-2 sm:mb-3 font-medium">
             POR APENAS <span className="text-white font-bold text-xs sm:text-sm md:text-base">{price}</span>
           </p>
-          <Button onClick={onBuyClick} data-testid="button-hero-buy" className="bg-gradient-to-r from-green-400 to-cyan-400 text-black font-bold hover:from-green-300 hover:to-cyan-300 text-xs sm:text-sm h-8 sm:h-8 px-4 sm:px-5 rounded-md transition-all shadow-lg shadow-green-500/50">
+          <Button onClick={onBuyClick} data-testid="button-hero-buy" className="bg-zinc-100 text-zinc-950 font-bold hover:bg-zinc-200 text-xs sm:text-sm h-8 sm:h-8 px-4 sm:px-5 rounded-md transition-all shadow-lg shadow-zinc-500/20">
             COMPRE AGORA
           </Button>
         </div>
