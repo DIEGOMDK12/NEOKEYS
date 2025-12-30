@@ -134,7 +134,7 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
       <Card className="w-full max-w-md bg-zinc-950 border-zinc-800">
         <CardHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-zinc-800">
-            <Lock className="h-8 w-8 text-cyan-400" />
+            <Lock className="h-8 w-8 text-zinc-100" />
           </div>
           <CardTitle className="text-2xl text-zinc-100 font-bold">Painel Administrativo</CardTitle>
           <CardDescription className="text-zinc-500">Entre com suas credenciais de administrador</CardDescription>
