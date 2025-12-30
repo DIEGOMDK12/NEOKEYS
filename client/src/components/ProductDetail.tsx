@@ -265,11 +265,11 @@ export default function ProductDetail({
                 Essa chave funcionara no Brasil
               </p>
               <div className="space-y-3">
-                <Button className="w-full bg-zinc-800 text-zinc-100 font-bold hover:bg-zinc-700 pulse-button border border-zinc-700" onClick={onAddToCart} data-testid="button-detail-add-cart">
-                  🛒 Adicionar
+                <Button className="w-full bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all" onClick={onAddToCart} data-testid="button-detail-add-cart">
+                  🛒 Adicionar ao carrinho
                 </Button>
-                <Button variant="outline" className="w-full font-bold pulse-button border border-zinc-700" onClick={onBuyNow} data-testid="button-buy-now">
-                  💳 Comprar (PIX)
+                <Button variant="outline" className="w-full font-bold border border-zinc-700 hover:bg-zinc-800 transition-all" onClick={onBuyNow} data-testid="button-buy-now">
+                  💳 Comprar Agora (PIX)
                 </Button>
               </div>
             </CardContent>
