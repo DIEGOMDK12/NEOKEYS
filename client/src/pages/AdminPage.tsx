@@ -135,54 +135,69 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
     <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
       <MatrixBackground />
       
-      <Card className="w-full max-w-md bg-zinc-950/80 border-primary/30 backdrop-blur-md relative z-10 shadow-[0_0_20px_rgba(255,0,110,0.1)]">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 border border-primary/20 shadow-[0_0_15px_rgba(255,0,110,0.2)]">
-            <Lock className="h-10 w-10 text-primary" />
+      {/* Dynamic glow effect in background */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0 animate-pulse" />
+      
+      <Card className="w-full max-w-md bg-zinc-950/40 border-primary/20 backdrop-blur-xl relative z-10 shadow-[0_0_40px_rgba(0,0,0,0.5)] border-t-primary/30">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-20 h-20 bg-black/60 rounded-full flex items-center justify-center mb-6 border border-primary/30 shadow-[0_0_20px_rgba(255,0,110,0.15)] relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-50" />
+            <Lock className="h-10 w-10 text-primary relative z-10 animate-pulse" />
           </div>
-          <CardTitle className="text-3xl text-white font-black tracking-tighter uppercase italic">
-            Painel <span className="text-primary">Admin</span>
+          <CardTitle className="text-4xl text-white font-black tracking-tighter uppercase italic drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            PAINEL <span className="text-primary">ADMIN</span>
           </CardTitle>
-          <CardDescription className="text-zinc-500 font-medium">
+          <CardDescription className="text-zinc-400 font-bold text-[10px] tracking-[0.2em] uppercase mt-2">
             Sistema de Gerenciamento EliteVault
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="admin-email" className="text-zinc-400 text-xs uppercase tracking-widest font-bold">E-mail</Label>
-              <Input
-                id="admin-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@elitevault.com"
-                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-primary focus:border-primary h-11"
-                required
-                data-testid="input-admin-email"
-              />
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-1.5">
+              <Label htmlFor="admin-email" className="text-zinc-500 text-[9px] uppercase tracking-[0.3em] font-black pl-1">E-mail de Acesso</Label>
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-primary/20 rounded-md blur opacity-0 group-focus-within:opacity-100 transition duration-500" />
+                <Input
+                  id="admin-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@elitevault.com"
+                  className="bg-black/40 border-zinc-800/50 text-white placeholder:text-zinc-600 focus:ring-0 focus:border-primary/50 h-12 relative z-10 transition-all rounded-md"
+                  required
+                  data-testid="input-admin-email"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-password" className="text-zinc-400 text-xs uppercase tracking-widest font-bold">Senha</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-500 focus:ring-primary focus:border-primary h-11"
-                required
-                data-testid="input-admin-password"
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="admin-password" className="text-zinc-500 text-[9px] uppercase tracking-[0.3em] font-black pl-1">Senha Administrativa</Label>
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-primary/20 rounded-md blur opacity-0 group-focus-within:opacity-100 transition duration-500" />
+                <Input
+                  id="admin-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="bg-black/40 border-zinc-800/50 text-white placeholder:text-zinc-600 focus:ring-0 focus:border-primary/50 h-12 relative z-10 transition-all rounded-md"
+                  required
+                  data-testid="input-admin-password"
+                />
+              </div>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full max-w-[120px] mx-auto bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-tighter h-8 rounded-md hover-elevate active-elevate-2 transition-all shadow-[0_4px_15px_rgba(255,0,110,0.3)] block text-[10px]" 
-              disabled={loginMutation.isPending}
-              data-testid="button-admin-login"
-            >
-              {loginMutation.isPending ? "..." : "Acessar"}
-            </Button>
+            <div className="pt-2 flex justify-center">
+              <Button 
+                type="submit" 
+                className="w-full max-w-[140px] bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-10 rounded-md hover-elevate active-elevate-2 transition-all shadow-[0_0_20px_rgba(255,0,110,0.4)] relative overflow-hidden group border border-white/10" 
+                disabled={loginMutation.isPending}
+                data-testid="button-admin-login"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <span className="relative z-10 text-[11px]">
+                  {loginMutation.isPending ? "..." : "ACESSAR"}
+                </span>
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

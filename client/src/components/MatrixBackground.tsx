@@ -19,16 +19,35 @@ export function MatrixBackground() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
 
     function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.15)"; // Slightly darker trail for better visibility
+      // Slightly more transparent background for smoother trail
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; 
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = "#0F0"; // Green color
-      ctx.shadowBlur = 10; // Add glow
-      ctx.shadowColor = "#0F0";
-      ctx.font = "bold 15px monospace";
+      // Create a gradient for the green text
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, "#0F0");
+      gradient.addColorStop(1, "#050");
+
+      ctx.fillStyle = gradient;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "rgba(0, 255, 0, 0.5)";
+      ctx.font = "bold 16px monospace";
 
       for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
+        // Occasionally use special characters
+        const text = Math.random() > 0.9 ? "EliteVault"[Math.floor(Math.random() * 10)] : chars[Math.floor(Math.random() * chars.length)];
+        
+        // Randomize brightness for some characters
+        if (Math.random() > 0.9) {
+          ctx.fillStyle = "#FFF";
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = "#FFF";
+        } else {
+          ctx.fillStyle = gradient;
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = "rgba(0, 255, 0, 0.5)";
+        }
+
         ctx.fillText(text, i * 20, drops[i] * 20);
 
         if (drops[i] * 20 > height && Math.random() > 0.975) {
