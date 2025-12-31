@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import { randomUUID } from "crypto";
 import { storage } from "./storage";
 import { insertUserSchema, insertProductKeySchema } from "@shared/schema";
 import { z } from "zod";
@@ -197,7 +198,7 @@ export async function registerRoutes(
     try {
       let sessionId = getSessionId(req);
       if (!sessionId) {
-        sessionId = crypto.randomUUID();
+        sessionId = randomUUID();
       }
       
       const parsed = addToCartSchema.safeParse(req.body);
