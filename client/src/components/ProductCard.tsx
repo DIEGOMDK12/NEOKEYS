@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
+import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames } from "react-icons/si";
 import { Gamepad2 } from "lucide-react";
 
 export interface Product {
@@ -32,7 +32,10 @@ const platformIcons: Record<string, any> = {
   GOG: SiGogdotcom,
   Xbox: Gamepad2,
   PlayStation: SiPlaystation,
+  Rockstar: SiRockstargames,
+  "Ubi Connect": SiSteam,
   EA: Gamepad2,
+  Windows: Gamepad2,
 };
 
 export default function ProductCard({ product, onAddToCart, onProductClick }: ProductCardProps) {
@@ -91,7 +94,7 @@ export default function ProductCard({ product, onAddToCart, onProductClick }: Pr
         </div>
         
         <div className="flex items-baseline gap-1.5 pt-1">
-          <span className="text-primary font-bold text-sm" data-testid={`text-price-${product.id}`}>
+          <span className="text-green-500 font-bold text-sm" data-testid={`text-price-${product.id}`}>
             R$ {product.price.toFixed(2).replace(".", ",")}
           </span>
           {product.originalPrice > product.price && (

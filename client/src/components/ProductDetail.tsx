@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation } from "react-icons/si";
+import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames } from "react-icons/si";
 import { Gamepad2, Play } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
@@ -24,6 +24,10 @@ const platformIcons: Record<string, any> = {
   GOG: SiGogdotcom,
   Xbox: Gamepad2,
   PlayStation: SiPlaystation,
+  Rockstar: SiRockstargames,
+  "Ubi Connect": SiSteam,
+  EA: Gamepad2,
+  Windows: Gamepad2,
 };
 
 function convertVideoUrl(url: string): string {
@@ -237,7 +241,7 @@ export default function ProductDetail({
 
           <div className="flex items-center gap-3 mb-4">
             <span className="text-muted-foreground">Preco:</span>
-            <span className="text-2xl font-bold text-success">
+            <span className="text-2xl font-bold text-green-500">
               R$ {product.price.toFixed(2).replace(".", ",")}
             </span>
             <span className="text-muted-foreground line-through">
