@@ -538,6 +538,67 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
+                <Label>Galeria de Imagens</Label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {(isAddingProduct ? newProduct.galleryImages : editingProduct?.galleryImages)?.map((img, idx) => (
+                    <div key={idx} className="relative w-20 h-20 group">
+                      <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover rounded-md" />
+                      <button
+                        onClick={() => {
+                          if (isAddingProduct) {
+                            setNewProduct({
+                              ...newProduct,
+                              galleryImages: newProduct.galleryImages.filter((_, i) => i !== idx)
+                            });
+                          } else if (editingProduct) {
+                            setEditingProduct({
+                              ...editingProduct,
+                              galleryImages: (editingProduct.galleryImages || []).filter((_, i) => i !== idx)
+                            });
+                          }
+                        }}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <Label 
+                    htmlFor="gallery-upload" 
+                    className="w-20 h-20 border-2 border-dashed border-zinc-800 rounded-md flex items-center justify-center cursor-pointer hover:border-zinc-700 transition-colors"
+                  >
+                    <Plus className="h-6 w-6 text-zinc-600" />
+                    <input
+                      id="gallery-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        files.forEach(file => {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            if (isAddingProduct) {
+                              setNewProduct(prev => ({
+                                ...prev,
+                                galleryImages: [...prev.galleryImages, reader.result as string]
+                              }));
+                            } else if (editingProduct) {
+                              setEditingProduct(prev => prev ? ({
+                                ...prev,
+                                galleryImages: [...(prev.galleryImages || []), reader.result as string]
+                              }) : null);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        });
+                      }}
+                    />
+                  </Label>
+                </div>
+              </div>
+              <div className="space-y-2">
                 <Label>Nome do Produto *</Label>
                 <Input
                   value={newProduct.name}
@@ -677,16 +738,6 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   data-testid="input-product-system-requirements"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>URLs de Imagens da Galeria</Label>
-                <Textarea
-                  value={newProduct.galleryImages.join('\n')}
-                  onChange={(e) => setNewProduct({ ...newProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
-                  placeholder="Digite uma URL por linha"
-                  rows={3}
-                  data-testid="input-product-gallery-images"
-                />
-              </div>
               <Button
                 onClick={handleCreateProduct}
                 disabled={createProductMutation.isPending}
@@ -746,6 +797,54 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                     </DialogHeader>
                     {editingProduct && (
                       <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                          <Label>Galeria de Imagens</Label>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {editingProduct?.galleryImages?.map((img: string, idx: number) => (
+                              <div key={idx} className="relative w-20 h-20 group">
+                                <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover rounded-md" />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      galleryImages: (editingProduct.galleryImages || []).filter((_, i) => i !== idx)
+                                    });
+                                  }}
+                                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                            <Label 
+                              htmlFor="edit-gallery-upload" 
+                              className="w-20 h-20 border-2 border-dashed border-zinc-800 rounded-md flex items-center justify-center cursor-pointer hover:border-zinc-700 transition-colors"
+                            >
+                              <Plus className="h-6 w-6 text-zinc-600" />
+                              <input
+                                id="edit-gallery-upload"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                onChange={(e) => {
+                                  const files = Array.from(e.target.files || []);
+                                  files.forEach(file => {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      setEditingProduct(prev => prev ? ({
+                                        ...prev,
+                                        galleryImages: [...(prev.galleryImages || []), reader.result as string]
+                                      }) : null);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  });
+                                }}
+                              />
+                            </Label>
+                          </div>
+                        </div>
                         <div className="space-y-2">
                           <Label>Nome do Produto</Label>
                           <Input
@@ -874,16 +973,6 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                             placeholder="Digite os requisitos (cada linha é um requisito)"
                             rows={3}
                             data-testid="input-product-system-requirements-edit"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>URLs de Imagens da Galeria</Label>
-                          <Textarea
-                            value={(editingProduct.galleryImages || []).join('\n')}
-                            onChange={(e) => setEditingProduct({ ...editingProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
-                            placeholder="Digite uma URL por linha"
-                            rows={3}
-                            data-testid="input-product-gallery-images-edit"
                           />
                         </div>
                         <Button

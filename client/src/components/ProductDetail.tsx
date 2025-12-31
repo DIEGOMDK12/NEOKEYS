@@ -74,7 +74,7 @@ export default function ProductDetail({
   const editingRequirements = Array.isArray(requirements) ? requirements : [];
   const editingDescription = description || "";
   
-  const galleryImages = product.galleryImages && product.galleryImages.length > 0 ? product.galleryImages : [];
+  const galleryImages = Array.from(new Set([product.imageUrl, ...(product.galleryImages || [])])).filter(Boolean);
   const videoEmbedUrl = product.videoUrl ? convertVideoUrl(product.videoUrl) : "";
   const hasVideo = !!videoEmbedUrl;
   
@@ -286,27 +286,9 @@ export default function ProductDetail({
               <h2 className="text-xl font-bold">Descrição</h2>
             </div>
             
-            <p className="text-muted-foreground whitespace-pre-line line-clamp-3" style={showFullDescription ? { overflow: 'visible', display: 'block' } : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+            <p className="text-muted-foreground whitespace-pre-line">
               {editingDescription}
             </p>
-            {editingDescription.split('\n').length > 3 && (
-              <Button
-                variant="ghost"
-                className="text-white p-0 h-auto mt-2"
-                onClick={() => setShowFullDescription(!showFullDescription)}
-                data-testid="button-toggle-description"
-              >
-                {showFullDescription ? (
-                  <>
-                    <ChevronUp className="h-4 w-4 mr-1" /> Ver menos
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-4 w-4 mr-1" /> Ver mais
-                  </>
-                )}
-              </Button>
-            )}
           </div>
 
           <Separator className="my-6" />
