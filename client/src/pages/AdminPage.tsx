@@ -104,6 +104,8 @@ const defaultSettings = {
 
 type AdminSection = "dashboard" | "products" | "keys" | "orders" | "customers" | "banner" | "colors" | "backup";
 
+import { MatrixBackground } from "@/components/MatrixBackground";
+
 function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) => void }) {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -130,50 +132,56 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-zinc-950 border-zinc-800">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      <MatrixBackground />
+      
+      <Card className="w-full max-w-md bg-zinc-950/80 border-primary/30 backdrop-blur-md relative z-10 shadow-[0_0_20px_rgba(255,0,110,0.1)]">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-zinc-800">
-            <Lock className="h-8 w-8 text-zinc-100" />
+          <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 border border-primary/20 shadow-[0_0_15px_rgba(255,0,110,0.2)]">
+            <Lock className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-zinc-100 font-bold">Painel Administrativo</CardTitle>
-          <CardDescription className="text-zinc-500">Entre com suas credenciais de administrador</CardDescription>
+          <CardTitle className="text-3xl text-white font-black tracking-tighter uppercase italic">
+            Painel <span className="text-primary">Admin</span>
+          </CardTitle>
+          <CardDescription className="text-zinc-500 font-medium">
+            Sistema de Gerenciamento EliteVault
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="admin-email" className="text-zinc-400">E-mail</Label>
+              <Label htmlFor="admin-email" className="text-zinc-400 text-xs uppercase tracking-widest font-bold">E-mail</Label>
               <Input
                 id="admin-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@exemplo.com"
-                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-zinc-700"
+                placeholder="admin@elitevault.com"
+                className="bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
                 required
                 data-testid="input-admin-email"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="admin-password" className="text-zinc-400">Senha</Label>
+              <Label htmlFor="admin-password" className="text-zinc-400 text-xs uppercase tracking-widest font-bold">Senha</Label>
               <Input
                 id="admin-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha"
-                className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:ring-zinc-700"
+                placeholder="••••••••"
+                className="bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
                 required
                 data-testid="input-admin-password"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-zinc-100 text-zinc-950 hover:bg-zinc-200 transition-colors" 
+              className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-tighter py-6 rounded-md hover-elevate active-elevate-2 transition-all shadow-[0_4px_15px_rgba(255,0,110,0.3)]" 
               disabled={loginMutation.isPending}
               data-testid="button-admin-login"
             >
-              {loginMutation.isPending ? "Entrando..." : "Entrar"}
+              {loginMutation.isPending ? "Autenticando..." : "Acessar Painel"}
             </Button>
           </form>
         </CardContent>
