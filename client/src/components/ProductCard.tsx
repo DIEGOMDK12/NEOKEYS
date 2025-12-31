@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames } from "react-icons/si";
-import { Gamepad2 } from "lucide-react";
+import { Gamepad2, Monitor } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -35,7 +35,7 @@ const platformIcons: Record<string, any> = {
   Rockstar: SiRockstargames,
   "Ubi Connect": SiSteam,
   EA: Gamepad2,
-  Windows: Gamepad2,
+  Windows: Monitor,
 };
 
 export default function ProductCard({ product, onAddToCart, onProductClick }: ProductCardProps) {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames } from "react-icons/si";
-import { Gamepad2, Play } from "lucide-react";
+import { Gamepad2, Play, Monitor } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { Product } from "./ProductCard";
@@ -27,7 +27,7 @@ const platformIcons: Record<string, any> = {
   Rockstar: SiRockstargames,
   "Ubi Connect": SiSteam,
   EA: Gamepad2,
-  Windows: Gamepad2,
+  Windows: Monitor,
 };
 
 function convertVideoUrl(url: string): string {
