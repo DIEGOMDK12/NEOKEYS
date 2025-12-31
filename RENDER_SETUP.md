@@ -54,8 +54,13 @@ git push -u origin main
 
 | Chave | Valor |
 |-------|-------|
-| `DATABASE_URL` | Cole a URL interna do banco que copiou no Passo 2 |
+| `DATABASE_URL` | **Cole a URL de conexão do Neon** (exemplo: `postgresql://user:pass@host/neondb?sslmode=require&channel_binding=require`) |
 | `NODE_ENV` | `production` |
+
+**⚠️ IMPORTANTE**: A DATABASE_URL é gerenciada pelo Replit em desenvolvimento. Para usar uma conexão Neon customizada em desenvolvimento local, crie um arquivo `.env.local` na raiz do projeto com:
+```
+DATABASE_URL=sua_string_neon_aqui
+```
 
 7. Clique **"Create Web Service"**
 8. Render vai compilar e fazer deploy automaticamente
