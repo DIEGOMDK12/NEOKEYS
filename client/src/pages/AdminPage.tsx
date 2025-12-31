@@ -177,11 +177,11 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-tighter py-6 rounded-md hover-elevate active-elevate-2 transition-all shadow-[0_4px_15px_rgba(255,0,110,0.3)]" 
+              className="w-full max-w-[200px] mx-auto bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-tighter py-5 rounded-md hover-elevate active-elevate-2 transition-all shadow-[0_4px_15px_rgba(255,0,110,0.3)] block" 
               disabled={loginMutation.isPending}
               data-testid="button-admin-login"
             >
-              {loginMutation.isPending ? "Autenticando..." : "Acessar Painel"}
+              {loginMutation.isPending ? "..." : "Acessar"}
             </Button>
           </form>
         </CardContent>

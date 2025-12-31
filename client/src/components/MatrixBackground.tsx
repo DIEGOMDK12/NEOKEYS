@@ -19,11 +19,13 @@ export function MatrixBackground() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
 
     function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.15)"; // Slightly darker trail for better visibility
       ctx.fillRect(0, 0, width, height);
 
       ctx.fillStyle = "#0F0"; // Green color
-      ctx.font = "15px monospace";
+      ctx.shadowBlur = 10; // Add glow
+      ctx.shadowColor = "#0F0";
+      ctx.font = "bold 15px monospace";
 
       for (let i = 0; i < drops.length; i++) {
         const text = chars[Math.floor(Math.random() * chars.length)];
@@ -54,7 +56,7 @@ export function MatrixBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none opacity-20 z-0"
+      className="fixed inset-0 pointer-events-none opacity-40 z-0"
     />
   );
 }
