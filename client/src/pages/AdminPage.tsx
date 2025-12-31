@@ -202,7 +202,6 @@ function AdminSidebar({
     { id: "orders" as AdminSection, title: "Pedidos", icon: ShoppingBag },
     { id: "customers" as AdminSection, title: "Clientes", icon: Users },
     { id: "banner" as AdminSection, title: "Banner", icon: Image },
-    { id: "colors" as AdminSection, title: "Cores", icon: Palette },
     { id: "backup" as AdminSection, title: "Backup", icon: Save },
   ];
 
