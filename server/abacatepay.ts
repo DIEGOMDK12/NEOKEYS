@@ -84,11 +84,6 @@ interface CheckPixStatusResponse {
 export async function createPixQrCode(request: CreatePixQrCodeRequest): Promise<PixQrCodeResponse> {
     const apiKey = process.env.ABACATEPAY_API_KEY;
     
-    console.log("📡 AbacatePay - Verificando API Key...");
-    console.log("API Key exists:", !!apiKey);
-    console.log("API Key length:", apiKey?.length || 0);
-    console.log("API Key start:", apiKey?.substring(0, 10) + "...");
-    
     if (!apiKey) {
       console.error("❌ ABACATEPAY_API_KEY not configured!");
       throw new Error("ABACATEPAY_API_KEY not configured");
