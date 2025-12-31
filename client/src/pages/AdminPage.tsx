@@ -549,6 +549,23 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     }
   };
 
+  const deleteAllProductsMutation = useMutation({
+    mutationFn: () => apiRequest("DELETE", "/api/admin/products/all"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      toast({ title: "Sucesso", description: "Todos os produtos foram removidos." });
+    },
+    onError: () => {
+      toast({ title: "Erro", description: "Falha ao remover produtos.", variant: "destructive" });
+    },
+  });
+
+  const handleDeleteAll = () => {
+    if (confirm("ATENÇÃO: Isso removerá TODOS os produtos do catálogo. Continuar?")) {
+      deleteAllProductsMutation.mutate();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -557,6 +574,15 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
           <p className="text-muted-foreground">Gerencie seu catalogo de produtos</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="destructive"
+            onClick={handleDeleteAll}
+            disabled={deleteAllProductsMutation.isPending}
+            className="gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
+            Apagar Tudo
+          </Button>
           <Button
             variant="outline"
             onClick={() => {
