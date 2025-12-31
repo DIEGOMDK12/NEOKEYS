@@ -494,7 +494,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: (id: string) => api.deleteProduct(id),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Sucesso", description: "Produto excluido com sucesso!" });
