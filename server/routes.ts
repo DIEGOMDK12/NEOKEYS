@@ -84,16 +84,21 @@ export async function registerRoutes(
       if (!session) return res.status(401).json({ error: "Sessão inválida" });
 
       if (req.params.id === "all") {
+        console.log("[Product Delete] Deleting all products...");
         const products = await storage.getAllProducts();
+        console.log(`[Product Delete] Found ${products.length} products to delete`);
         for (const product of products) {
           await storage.deleteProduct(product.id);
+          console.log(`[Product Delete] Deleted product: ${product.id}`);
         }
       } else {
+        console.log(`[Product Delete] Deleting product: ${req.params.id}`);
         await storage.deleteProduct(req.params.id);
+        console.log(`[Product Delete] Successfully deleted product: ${req.params.id}`);
       }
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting product(s):", error);
+      console.error("[Product Delete Error]", error);
       res.status(500).json({ error: "Failed to delete product(s)" });
     }
   });

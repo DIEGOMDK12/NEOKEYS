@@ -497,9 +497,11 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     mutationFn: (id: string) => api.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      queryClient.refetchQueries({ queryKey: ["/api/products"] });
       toast({ title: "Sucesso", description: "Produto excluido com sucesso!" });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete error:", error);
       toast({ title: "Erro", description: "Falha ao excluir produto", variant: "destructive" });
     },
   });
@@ -553,9 +555,11 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
     mutationFn: () => api.deleteProduct("all"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      queryClient.refetchQueries({ queryKey: ["/api/products"] });
       toast({ title: "Sucesso", description: "Todos os produtos foram removidos." });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete all error:", error);
       toast({ title: "Erro", description: "Falha ao remover produtos.", variant: "destructive" });
     },
   });
