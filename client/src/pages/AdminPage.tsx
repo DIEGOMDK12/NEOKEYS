@@ -494,7 +494,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/products/${id}`),
+    mutationFn: (id: string) => api.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Sucesso", description: "Produto excluido com sucesso!" });
@@ -550,7 +550,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
   };
 
   const deleteAllProductsMutation = useMutation({
-    mutationFn: () => apiRequest("DELETE", "/api/admin/products/all"),
+    mutationFn: () => api.deleteProduct("all"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Sucesso", description: "Todos os produtos foram removidos." });

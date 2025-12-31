@@ -83,29 +83,18 @@ export async function registerRoutes(
       const session = await storage.getAdminSession(sessionId);
       if (!session) return res.status(401).json({ error: "Sessão inválida" });
 
-      await storage.deleteProduct(req.params.id);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      res.status(500).json({ error: "Failed to delete product" });
-    }
-  });
-
-  app.delete("/api/admin/products/all", async (req: Request, res: Response) => {
-    try {
-      const sessionId = req.cookies?.admin_session;
-      if (!sessionId) return res.status(401).json({ error: "Não autorizado" });
-      const session = await storage.getAdminSession(sessionId);
-      if (!session) return res.status(401).json({ error: "Sessão inválida" });
-
-      const products = await storage.getAllProducts();
-      for (const product of products) {
-        await storage.deleteProduct(product.id);
+      if (req.params.id === "all") {
+        const products = await storage.getAllProducts();
+        for (const product of products) {
+          await storage.deleteProduct(product.id);
+        }
+      } else {
+        await storage.deleteProduct(req.params.id);
       }
       res.json({ success: true });
     } catch (error) {
-      console.error("Error deleting all products:", error);
-      res.status(500).json({ error: "Failed to delete all products" });
+      console.error("Error deleting product(s):", error);
+      res.status(500).json({ error: "Failed to delete product(s)" });
     }
   });
 
@@ -137,6 +126,36 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Import error:", error);
       res.status(500).json({ error: "Erro ao importar backup" });
+    }
+  });
+
+  app.post("/api/products", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autorizado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessão inválida" });
+
+      const product = await storage.createProduct(req.body);
+      res.json(product);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ error: "Failed to create product" });
+    }
+  });
+
+  app.put("/api/products/:id", async (req: Request, res: Response) => {
+    try {
+      const sessionId = req.cookies?.admin_session;
+      if (!sessionId) return res.status(401).json({ error: "Não autorizado" });
+      const session = await storage.getAdminSession(sessionId);
+      if (!session) return res.status(401).json({ error: "Sessão inválida" });
+
+      const product = await storage.updateProduct(req.params.id, req.body);
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Failed to update product" });
     }
   });
 
