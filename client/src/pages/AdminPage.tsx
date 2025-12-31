@@ -157,7 +157,7 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@elitevault.com"
-                className="bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
                 required
                 data-testid="input-admin-email"
               />
@@ -170,7 +170,7 @@ function AdminLoginForm({ onLoginSuccess }: { onLoginSuccess: (user: AdminUser) 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-zinc-900/50 border-zinc-800 text-zinc-100 placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-700 focus:ring-primary focus:border-primary h-11"
                 required
                 data-testid="input-admin-password"
               />
