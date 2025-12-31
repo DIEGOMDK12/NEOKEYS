@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames } from "react-icons/si";
+import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiRockstargames, SiUbisoft } from "react-icons/si";
 import { Gamepad2, Play, Monitor } from "lucide-react";
 import { Globe, Languages, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
@@ -25,7 +25,7 @@ const platformIcons: Record<string, any> = {
   Xbox: Gamepad2,
   PlayStation: SiPlaystation,
   Rockstar: SiRockstargames,
-  "Ubi Connect": SiSteam,
+  "Ubi Connect": SiUbisoft,
   EA: Gamepad2,
   Windows: Monitor,
 };
