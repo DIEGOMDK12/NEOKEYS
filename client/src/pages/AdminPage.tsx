@@ -648,6 +648,16 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   onChange={(e) => setNewProduct({ ...newProduct, discount: parseInt(e.target.value) || 0 })}
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <Textarea
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  placeholder="Digite a descrição do produto..."
+                  rows={4}
+                  data-testid="input-product-description"
+                />
+              </div>
               <Button
                 onClick={handleCreateProduct}
                 disabled={createProductMutation.isPending}
@@ -806,6 +816,16 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                             type="number"
                             value={editingProduct.discount}
                             onChange={(e) => setEditingProduct({ ...editingProduct, discount: parseInt(e.target.value) || 0 })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Descrição</Label>
+                          <Textarea
+                            value={editingProduct.description || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                            placeholder="Digite a descrição do produto..."
+                            rows={4}
+                            data-testid="input-product-description-edit"
                           />
                         </div>
                         <Button
