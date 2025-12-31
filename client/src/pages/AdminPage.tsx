@@ -483,15 +483,41 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
   });
 
   const handleCreateProduct = () => {
+    // Basic validation
     if (!newProduct.name || !newProduct.price || !newProduct.originalPrice) {
-      toast({ title: "Erro", description: "Preencha todos os campos obrigatorios", variant: "destructive" });
+      toast({ 
+        title: "Campos obrigatórios", 
+        description: "Por favor, preencha o nome e os preços do produto.", 
+        variant: "destructive" 
+      });
       return;
     }
+
+    // Ensure we have at least a main image
+    if (!newProduct.imageUrl) {
+      toast({ 
+        title: "Imagem obrigatória", 
+        description: "Por favor, adicione uma imagem principal para o produto.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     createProductMutation.mutate(newProduct);
   };
 
   const handleUpdateProduct = () => {
     if (!editingProduct) return;
+    
+    if (!editingProduct.name || !editingProduct.price || !editingProduct.originalPrice) {
+      toast({ 
+        title: "Campos obrigatórios", 
+        description: "Por favor, preencha o nome e os preços do produto.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     updateProductMutation.mutate({ id: editingProduct.id, data: editingProduct });
   };
 
@@ -608,7 +634,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                 />
               </div>
               <div className="space-y-2">
-                <Label>Imagem do Produto</Label>
+                <Label>Imagem Principal (Capa) *</Label>
                 <input
                   type="file"
                   accept="image/*"
@@ -626,7 +652,10 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   data-testid="input-product-image-file"
                 />
                 {newProduct.imageUrl && (
-                  <img src={newProduct.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md mt-2" />
+                  <div className="relative mt-2">
+                    <img src={newProduct.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-md" />
+                    <p className="text-[10px] text-muted-foreground mt-1">Esta será a imagem principal do produto.</p>
+                  </div>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -853,7 +882,7 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>Imagem do Produto</Label>
+                          <Label>Imagem Principal (Capa)</Label>
                           <input
                             type="file"
                             accept="image/*"
