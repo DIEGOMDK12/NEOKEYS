@@ -658,6 +658,35 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                   data-testid="input-product-description"
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Link do Vídeo (YouTube)</Label>
+                <Input
+                  value={newProduct.videoUrl}
+                  onChange={(e) => setNewProduct({ ...newProduct, videoUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  data-testid="input-product-video-url"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Requisitos do Sistema</Label>
+                <Textarea
+                  value={newProduct.systemRequirements}
+                  onChange={(e) => setNewProduct({ ...newProduct, systemRequirements: e.target.value })}
+                  placeholder="Digite os requisitos (cada linha é um requisito)"
+                  rows={3}
+                  data-testid="input-product-system-requirements"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>URLs de Imagens da Galeria</Label>
+                <Textarea
+                  value={newProduct.galleryImages.join('\n')}
+                  onChange={(e) => setNewProduct({ ...newProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
+                  placeholder="Digite uma URL por linha"
+                  rows={3}
+                  data-testid="input-product-gallery-images"
+                />
+              </div>
               <Button
                 onClick={handleCreateProduct}
                 disabled={createProductMutation.isPending}
@@ -826,6 +855,35 @@ function ProductsSection({ products, onSave }: { products: Product[]; onSave: ()
                             placeholder="Digite a descrição do produto..."
                             rows={4}
                             data-testid="input-product-description-edit"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Link do Vídeo (YouTube)</Label>
+                          <Input
+                            value={editingProduct.videoUrl || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, videoUrl: e.target.value })}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            data-testid="input-product-video-url-edit"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Requisitos do Sistema</Label>
+                          <Textarea
+                            value={editingProduct.systemRequirements || ""}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, systemRequirements: e.target.value })}
+                            placeholder="Digite os requisitos (cada linha é um requisito)"
+                            rows={3}
+                            data-testid="input-product-system-requirements-edit"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>URLs de Imagens da Galeria</Label>
+                          <Textarea
+                            value={(editingProduct.galleryImages || []).join('\n')}
+                            onChange={(e) => setEditingProduct({ ...editingProduct, galleryImages: e.target.value.split('\n').filter(url => url.trim()) })}
+                            placeholder="Digite uma URL por linha"
+                            rows={3}
+                            data-testid="input-product-gallery-images-edit"
                           />
                         </div>
                         <Button
