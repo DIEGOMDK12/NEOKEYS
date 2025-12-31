@@ -183,7 +183,7 @@ export async function registerRoutes(
     try {
       const sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Não autenticado" });
+        return res.json([]);
       }
       const items = await storage.getCartItems(sessionId);
       res.json(items);
@@ -195,9 +195,9 @@ export async function registerRoutes(
 
   app.post("/api/cart", async (req: Request, res: Response) => {
     try {
-      const sessionId = getSessionId(req);
+      let sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Não autenticado" });
+        sessionId = crypto.randomUUID();
       }
       
       const parsed = addToCartSchema.safeParse(req.body);
@@ -232,9 +232,9 @@ export async function registerRoutes(
 
   app.patch("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = getSessionId(req);
+      let sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Não autenticado" });
+        return res.status(400).json({ error: "Session required for cart operations" });
       }
       
       const parsed = updateCartSchema.safeParse(req.body);
@@ -264,9 +264,9 @@ export async function registerRoutes(
 
   app.delete("/api/cart/:productId", async (req: Request, res: Response) => {
     try {
-      const sessionId = getSessionId(req);
+      let sessionId = getSessionId(req);
       if (!sessionId) {
-        return res.status(401).json({ error: "Não autenticado" });
+        return res.status(400).json({ error: "Session required for cart operations" });
       }
       await storage.removeFromCart(sessionId, req.params.productId);
       res.json({ success: true });
