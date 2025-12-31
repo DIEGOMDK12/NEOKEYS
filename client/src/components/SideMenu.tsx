@@ -2,8 +2,8 @@ import { X, Phone, Mail, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiUbisoft, SiWindows, SiRockstargames } from "react-icons/si";
-import { Gamepad2 } from "lucide-react";
+import { SiSteam, SiEpicgames, SiGogdotcom, SiPlaystation, SiUbisoft, SiRockstargames } from "react-icons/si";
+import { Gamepad2, Monitor } from "lucide-react";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ const platforms = [
   { name: "EA", icon: Gamepad2 },
   { name: "EPIC GAMES", icon: SiEpicgames },
   { name: "GOG", icon: SiGogdotcom },
-  { name: "WINDOWS", icon: SiWindows },
+  { name: "WINDOWS", icon: Monitor },
   { name: "ROCKSTAR", icon: SiRockstargames },
   { name: "UBI CONNECT", icon: SiUbisoft },
   { name: "XBOX", icon: Gamepad2 },
